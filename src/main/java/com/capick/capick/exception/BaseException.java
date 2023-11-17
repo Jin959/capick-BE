@@ -1,7 +1,9 @@
 package com.capick.capick.exception;
 
 import com.capick.capick.dto.ApiResponseStatus;
+import lombok.Getter;
 
+@Getter
 public class BaseException extends RuntimeException {
 
     private ApiResponseStatus status;
