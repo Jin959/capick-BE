@@ -55,6 +55,10 @@ spring:
       hibernate:
         format_sql: true
         highlight_sql: true
+
+web:
+  cors:
+    allowed-origin: ${LOCAL_FE_SERVER}
 ---
 spring:
   config:
@@ -92,3 +96,7 @@ spring:
       ddl-auto: none
       jdbc:
         time-zone: Asia/Seoul
+
+web:
+  cors:
+    allowed-origin: ${PROD_FE_SERVER}
