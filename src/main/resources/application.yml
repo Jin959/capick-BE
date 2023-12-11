@@ -12,9 +12,6 @@ spring:
       on-profile: common
 
   jpa:
-    hibernate:
-      naming:
-        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
     open-in-view: false # OSIV
 
 springdoc:
@@ -39,7 +36,7 @@ spring:
 
   datasource:
     driver-class-name: org.h2.Driver
-    url: jdbc:h2:mem:${H2_HOST}
+    url: jdbc:h2:${LOCAL_H2_PATH};AUTO_SERVER=TRUE
     username: ${H2_USERNAME}
     password: ${H2_PASSWORD}
 
@@ -49,7 +46,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: create-drop
     show-sql: true
     properties:
       hibernate:
@@ -73,7 +70,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: create-drop
     show-sql: true
     properties:
       hibernate:
