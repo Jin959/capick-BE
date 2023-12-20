@@ -3,6 +3,7 @@ package com.capick.capick.domain.member;
 import com.capick.capick.domain.common.BaseEntity;
 import com.capick.capick.domain.common.Location;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -39,5 +40,12 @@ public class Member extends BaseEntity {
             @AttributeOverride(name = "number", column = @Column(name = "prefer_town_number"))
     })
     private Location preferTown;
+
+    @Builder
+    private Member(String email, String password, String nickname) {
+        this.email = email;
+        this.password = password;
+        this.nickname = nickname;
+    }
 
 }
