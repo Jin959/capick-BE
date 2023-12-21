@@ -8,7 +8,7 @@ public class BaseException extends RuntimeException {
 
     private ApiResponseStatus status;
 
-    public BaseException(ApiResponseStatus status) {
+    private BaseException(ApiResponseStatus status) {
         super(status.getMessage());
         this.status = status;
     }
