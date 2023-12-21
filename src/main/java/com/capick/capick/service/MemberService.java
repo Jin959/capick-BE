@@ -21,16 +21,23 @@ public class MemberService {
 
     @Transactional
     public MemberCreateResponse createMember(MemberCreateRequest request) {
-        if (memberRepository.existsByEmailAndStatus(request.getEmail(), ACTIVE)) {
-            throw BaseException.of(DUPLICATE_EMAIL);
-        }
-
-        if (memberRepository.existsByNicknameAndStatus(request.getNickname(), ACTIVE)) {
-            throw BaseException.of(DUPLICATE_NICKNAME);
-        }
+        ifExistsByEmailThrow(request.getEmail());
+        ifExistsByNickNameThrow(request.getNickname());
 
         Member member = memberRepository.save(request.toEntity());
         return MemberCreateResponse.of(member);
+    }
+
+    private void ifExistsByEmailThrow(String email) {
+        if (memberRepository.existsByEmailAndStatus(email, ACTIVE)) {
+            throw BaseException.of(DUPLICATE_EMAIL);
+        }
+    }
+
+    private void ifExistsByNickNameThrow(String nickname) {
+        if (memberRepository.existsByNicknameAndStatus(nickname, ACTIVE)) {
+            throw BaseException.of(DUPLICATE_NICKNAME);
+        }
     }
 
 }
