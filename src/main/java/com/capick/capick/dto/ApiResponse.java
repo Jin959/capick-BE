@@ -3,6 +3,7 @@ package com.capick.capick.dto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.Getter;
+import org.springframework.http.HttpStatus;
 
 @Getter
 @Builder
@@ -27,6 +28,13 @@ public class ApiResponse<T> {
         return ApiResponse.<T>builder()
                 .code(status.getStatus().value())
                 .message(status.getMessage())
+                .build();
+    }
+
+    public static <T> ApiResponse<T> of(HttpStatus status, String message) {
+        return ApiResponse.<T>builder()
+                .code(status.value())
+                .message(message)
                 .build();
     }
 
