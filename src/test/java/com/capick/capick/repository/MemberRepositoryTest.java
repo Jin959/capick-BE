@@ -18,7 +18,7 @@ class MemberRepositoryTest {
     private MemberRepository memberRepository;
 
     @Test
-    @DisplayName("이미 사용 중인 이메일인지 조회한다.")
+    @DisplayName("성공: 이미 사용 중인 이메일인지 조회한다.")
     void existsByEmailAndStatus() {
         // given
         Member member = createMember("email01@naver.com", "password01", "member1");
@@ -34,7 +34,7 @@ class MemberRepositoryTest {
     }
 
     @Test
-    @DisplayName("이미 사용 중인 닉네임인지 조회한다.")
+    @DisplayName("성공: 이미 사용 중인 닉네임인지 조회한다.")
     void existsByNicknameAndStatus() {
         // given
         Member member = createMember("email01@naver.com", "password01", "member1");

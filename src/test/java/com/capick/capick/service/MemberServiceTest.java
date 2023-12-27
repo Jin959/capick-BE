@@ -25,7 +25,7 @@ class MemberServiceTest {
     private MemberRepository memberRepository;
 
     @Test
-    @DisplayName("방문자는 이메일, 비밀번호, 닉네임을 입력하고 가입할 수 있다.")
+    @DisplayName("성공: 방문자는 이메일, 비밀번호, 닉네임을 입력하고 가입할 수 있다.")
     void createMember() {
         // given
         MemberCreateRequest request = createMemberRequest("email@naver.com", "password", "some_nickname");
@@ -39,7 +39,7 @@ class MemberServiceTest {
     }
 
     @Test
-    @DisplayName("동일한 이메일, 닉네임이 이미 서비스에 존재하면 안된다. 중복된 이메일 또는 닉네임으로 가입하는 경우 예외가 발생한다.")
+    @DisplayName("예외: 동일한 이메일, 닉네임이 이미 서비스에 존재하면 안된다. 중복된 이메일 또는 닉네임으로 가입하는 경우 예외가 발생한다.")
     void createMemberWithDuplicateEmail() {
         // given
         Member member = Member.builder()
