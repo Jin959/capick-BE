@@ -125,7 +125,7 @@ class MemberControllerTest {
     }
 
     @Test
-    @DisplayName("예외: 회원가입 시 비밀번호 형식은 띄어쓰기 없는 영문/숫자/특수문자(!@#$^*+=-)를 조합하여 8자~20자이다. 그렇지 않으면 상태코드 400을 반환한다.")
+    @DisplayName("예외: 회원가입 시 비밀번호 형식은 띄어쓰기 없는 영문/숫자/특수문자(!@#$%^&*()?)를 조합하여 8자~20자이다. 그렇지 않으면 상태코드 400을 반환한다.")
     void createMemberWithInvalidPassword() throws Exception {
         // given
         MemberCreateRequest request = MemberCreateRequest.builder()
@@ -142,7 +142,7 @@ class MemberControllerTest {
                 )
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value("400"))
-                .andExpect(jsonPath("$.message").value("회원가입을 위해 비밀번호는 띄어쓰기 없는 영문/숫자/특수문자(!@#$^*+=-)를 조합하여 8자~20자리로 작성해주세요."))
+                .andExpect(jsonPath("$.message").value("회원가입을 위해 비밀번호는 띄어쓰기 없는 영문/숫자/특수문자(!@#$%^&*()?)를 조합하여 8자~20자리로 작성해주세요."))
                 .andExpect(jsonPath("$.data").doesNotExist())
                 .andDo(print());
     }
