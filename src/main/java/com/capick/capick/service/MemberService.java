@@ -3,7 +3,7 @@ package com.capick.capick.service;
 import com.capick.capick.domain.member.Member;
 import com.capick.capick.dto.request.MemberCreateRequest;
 import com.capick.capick.dto.response.MemberCreateResponse;
-import com.capick.capick.dto.response.MemberReadResponse;
+import com.capick.capick.dto.response.MemberResponse;
 import com.capick.capick.exception.DuplicateResourceException;
 import com.capick.capick.exception.NotFoundResourceException;
 import com.capick.capick.repository.MemberRepository;
@@ -30,7 +30,7 @@ public class MemberService {
         return MemberCreateResponse.of(member);
     }
 
-    public MemberReadResponse readMember(Long memberId) {
+    public MemberResponse getMember(Long memberId) {
         Member member = FindMemberOrElseThrow(memberId);
         return null;
     }

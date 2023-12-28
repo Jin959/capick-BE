@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-public class MemberReadResponse {
+public class MemberResponse {
 
     private Long id;
 
@@ -18,7 +18,7 @@ public class MemberReadResponse {
     private LocationResponse preferTown;
 
     @Builder
-    private MemberReadResponse(Long id, String email, String nickname, MemberProfileResponse profile, LocationResponse location) {
+    private MemberResponse(Long id, String email, String nickname, MemberProfileResponse profile, LocationResponse location) {
         this.id = id;
         this.email = email;
         this.nickname = nickname;
@@ -26,8 +26,8 @@ public class MemberReadResponse {
         this.preferTown = location;
     }
 
-    public static MemberReadResponse of(Member member) {
-        return MemberReadResponse.builder()
+    public static MemberResponse of(Member member) {
+        return MemberResponse.builder()
                 .id(member.getId())
                 .email(member.getEmail())
                 .nickname(member.getNickname())

@@ -3,7 +3,7 @@ package com.capick.capick.controller;
 import com.capick.capick.dto.ApiResponse;
 import com.capick.capick.dto.request.MemberCreateRequest;
 import com.capick.capick.dto.response.MemberCreateResponse;
-import com.capick.capick.dto.response.MemberReadResponse;
+import com.capick.capick.dto.response.MemberResponse;
 import com.capick.capick.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -23,8 +23,8 @@ public class MemberController {
     }
 
     @GetMapping("/{memberId}")
-    public ApiResponse<MemberReadResponse> readMember(@PathVariable("memberId") Long memberId) {
-        return ApiResponse.ok(memberService.readMember(memberId));
+    public ApiResponse<MemberResponse> getMember(@PathVariable("memberId") Long memberId) {
+        return ApiResponse.ok(memberService.getMember(memberId));
     }
 
 }
