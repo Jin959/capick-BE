@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.util.Optional;
+
 import static com.capick.capick.domain.common.BaseStatus.ACTIVE;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -47,6 +49,21 @@ class MemberRepositoryTest {
         // then
         assertThat(exists).isTrue();
         assertThat(notExists).isFalse();
+    }
+
+    @Test
+    @DisplayName("성공: 탈퇴하지 않았거나 가입한 회원을 조회할 수 있다.")
+    void findByIdAndStatus() {
+        // given
+        Member member = createMember("email01@naver.com", "password01", "member1");
+        memberRepository.save(member);
+
+        // when
+        Optional<Member> optionalMember = memberRepository.findByIdAndStatus(member.getId(), ACTIVE);
+
+        // then
+        assertThat(optionalMember.isPresent()).isTrue();
+        assertThat(optionalMember.get()).usingRecursiveComparison().isEqualTo(member);
     }
 
     private Member createMember(String email, String password, String memeber) {
