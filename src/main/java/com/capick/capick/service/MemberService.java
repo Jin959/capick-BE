@@ -3,7 +3,9 @@ package com.capick.capick.service;
 import com.capick.capick.domain.member.Member;
 import com.capick.capick.dto.request.MemberCreateRequest;
 import com.capick.capick.dto.response.MemberCreateResponse;
+import com.capick.capick.dto.response.MemberReadResponse;
 import com.capick.capick.exception.DuplicateResourceException;
+import com.capick.capick.exception.NotFoundResourceException;
 import com.capick.capick.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -28,6 +30,11 @@ public class MemberService {
         return MemberCreateResponse.of(member);
     }
 
+    public MemberReadResponse readMember(Long memberId) {
+        Member member = FindMemberOrElseThrow(memberId);
+        return null;
+    }
+
     private void ifExistsByEmailThrow(String email) {
         if (memberRepository.existsByEmailAndStatus(email, ACTIVE)) {
             throw DuplicateResourceException.of(DUPLICATE_EMAIL);
@@ -38,6 +45,11 @@ public class MemberService {
         if (memberRepository.existsByNicknameAndStatus(nickname, ACTIVE)) {
             throw DuplicateResourceException.of(DUPLICATE_NICKNAME);
         }
+    }
+
+    private Member FindMemberOrElseThrow(Long id) {
+        return memberRepository.findByIdAndStatus(id, ACTIVE)
+                .orElseThrow(() -> NotFoundResourceException.of(NOT_FOUND_MEMBER));
     }
 
 }
