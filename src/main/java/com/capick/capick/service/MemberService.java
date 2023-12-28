@@ -3,7 +3,7 @@ package com.capick.capick.service;
 import com.capick.capick.domain.member.Member;
 import com.capick.capick.dto.request.MemberCreateRequest;
 import com.capick.capick.dto.response.MemberCreateResponse;
-import com.capick.capick.exception.BaseException;
+import com.capick.capick.exception.DuplicateResourceException;
 import com.capick.capick.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -30,13 +30,13 @@ public class MemberService {
 
     private void ifExistsByEmailThrow(String email) {
         if (memberRepository.existsByEmailAndStatus(email, ACTIVE)) {
-            throw BaseException.of(DUPLICATE_EMAIL);
+            throw DuplicateResourceException.of(DUPLICATE_EMAIL);
         }
     }
 
     private void ifExistsByNickNameThrow(String nickname) {
         if (memberRepository.existsByNicknameAndStatus(nickname, ACTIVE)) {
-            throw BaseException.of(DUPLICATE_NICKNAME);
+            throw DuplicateResourceException.of(DUPLICATE_NICKNAME);
         }
     }
 

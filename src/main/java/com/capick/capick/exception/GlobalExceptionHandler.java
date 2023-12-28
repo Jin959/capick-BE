@@ -13,6 +13,18 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(BindException.class)
+    public ApiResponse<ApiResponseStatus> BindExceptionHandler(BindException exception) {
+        log.warn("Exception Message : {}", exception.getBindingResult().getAllErrors().get(0).getDefaultMessage());
+        log.warn("BindException : ", exception);
+        return ApiResponse.of(
+                HttpStatus.BAD_REQUEST,
+                exception.getBindingResult().getAllErrors().get(0).getDefaultMessage()
+        );
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(BaseException.class)
     public ApiResponse<ApiResponseStatus> BaseExceptionHandler(BaseException exception) {
         log.warn("Exception Message : {}", exception.getMessage());
@@ -21,14 +33,11 @@ public class GlobalExceptionHandler {
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(BindException.class)
-    public ApiResponse<ApiResponseStatus> BindExceptionHandler(BindException exception) {
+    @ExceptionHandler(DuplicateResourceException.class)
+    public ApiResponse<ApiResponseStatus> DuplicateResourceExceptionHandler(DuplicateResourceException exception) {
         log.warn("Exception Message : {}", exception.getMessage());
-        log.warn("BindException : ", exception);
-        return ApiResponse.of(
-                HttpStatus.BAD_REQUEST,
-                exception.getBindingResult().getAllErrors().get(0).getDefaultMessage()
-        );
+        log.warn("BaseException : ", exception);
+        return ApiResponse.of(exception.getStatus());
     }
 
 }
