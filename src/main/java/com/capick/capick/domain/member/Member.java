@@ -1,6 +1,7 @@
 package com.capick.capick.domain.member;
 
 import com.capick.capick.domain.common.BaseEntity;
+import com.capick.capick.domain.common.BaseStatus;
 import com.capick.capick.domain.common.Location;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -48,4 +49,7 @@ public class Member extends BaseEntity {
         this.nickname = nickname;
     }
 
+    public void delete() {
+        this.status = BaseStatus.INACTIVE;
+    }
 }
