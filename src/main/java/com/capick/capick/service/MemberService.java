@@ -32,7 +32,7 @@ public class MemberService {
 
     public MemberResponse getMember(Long memberId) {
         Member member = FindMemberOrElseThrow(memberId);
-        return null;
+        return MemberResponse.of(member);
     }
 
     private void ifExistsByEmailThrow(String email) {

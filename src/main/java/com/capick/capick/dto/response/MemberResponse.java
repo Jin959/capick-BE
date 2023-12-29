@@ -1,8 +1,12 @@
 package com.capick.capick.dto.response;
 
+import com.capick.capick.domain.common.Location;
 import com.capick.capick.domain.member.Member;
+import com.capick.capick.domain.member.Profile;
 import lombok.Builder;
 import lombok.Getter;
+
+import java.util.Optional;
 
 @Getter
 public class MemberResponse {
@@ -18,12 +22,14 @@ public class MemberResponse {
     private LocationResponse preferTown;
 
     @Builder
-    private MemberResponse(Long id, String email, String nickname, MemberProfileResponse profile, LocationResponse location) {
+    private MemberResponse(Long id, String email, String nickname, Profile profile, Location location) {
         this.id = id;
         this.email = email;
         this.nickname = nickname;
-        this.profile = profile;
-        this.preferTown = location;
+        Optional.ofNullable(profile)
+                .ifPresent(embeddedProfile -> this.profile = MemberProfileResponse.of(embeddedProfile));
+        Optional.ofNullable(location)
+                .ifPresent(embeddedLocation -> this.preferTown = LocationResponse.of(embeddedLocation));
     }
 
     public static MemberResponse of(Member member) {
@@ -31,8 +37,8 @@ public class MemberResponse {
                 .id(member.getId())
                 .email(member.getEmail())
                 .nickname(member.getNickname())
-                .profile(MemberProfileResponse.of(member.getProfile()))
-                .location(LocationResponse.of(member.getPreferTown()))
+                .profile(member.getProfile())
+                .location(member.getPreferTown())
                 .build();
     }
 
