@@ -2,6 +2,7 @@ package com.capick.capick.controller;
 
 import com.capick.capick.dto.request.MemberCreateRequest;
 import com.capick.capick.dto.response.MemberCreateResponse;
+import com.capick.capick.dto.response.MemberResponse;
 import com.capick.capick.service.MemberService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
@@ -13,8 +14,10 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -192,4 +195,23 @@ class MemberControllerTest {
                 .andDo(print());
     }
 
+    @Test
+    @DisplayName("성공: 회원 정보를 조회한다. 상태코드 200 을 반환한다.")
+    void getMember() throws Exception {
+        // given
+        MemberResponse response = MemberResponse.builder().build();
+        when(memberService.getMember(anyLong())).thenReturn(response);
+        int requestMemberId = 1234;
+
+        // when // then
+        mockMvc.perform(
+                        get("/api/members/{memberId}", requestMemberId)
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value("200"))
+                .andExpect(jsonPath("$.message").value("요청에 성공했습니다."))
+                .andExpect(jsonPath("$.data").exists())
+                .andDo(print());
+    }
+    
 }
