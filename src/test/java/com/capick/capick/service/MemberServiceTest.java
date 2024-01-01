@@ -1,6 +1,8 @@
 package com.capick.capick.service;
 
+import com.capick.capick.domain.common.Location;
 import com.capick.capick.domain.member.Member;
+import com.capick.capick.domain.member.Profile;
 import com.capick.capick.dto.request.MemberCreateRequest;
 import com.capick.capick.dto.response.MemberCreateResponse;
 import com.capick.capick.dto.response.MemberResponse;
@@ -70,16 +72,49 @@ class MemberServiceTest {
     @DisplayName("성공: 회원은 자신의 회원 정보를 조회 할 수 있다.")
     void getMember() {
         // given
-        Member member = createMember("email@naver.com", "password12^&*", "닉네임");
-        memberRepository.save(member);
+        Profile profile = Profile.builder()
+                .imageUrl("image URL")
+                .introduction("자기소개 글")
+                .build();
+        Location preferTown = Location.builder()
+                .latitude(48.8)
+                .longitude(11.34)
+                .city("뮌헨")
+                .street("Marienplatz")
+                .number("80331")
+                .build();
+        Profile profileOnlyIntro = Profile.builder()
+                .introduction("자기소개 글")
+                .build();
+
+        Member memberRequiredOnly = createMember("email@naver.com", "password12^&*", "닉네임");
+        Member memberWithProfile = createMember("email@naver.com", "password12^&*", "닉네임", profile);
+        Member memberWithProfileAndPreferTown = createMember("email@naver.com", "password12^&*", "닉네임", profile, preferTown);
+        Member memberWithIntro = createMember("email@naver.com", "password12^&*", "닉네임", profileOnlyIntro);
+        memberRepository.saveAll(List.of(memberRequiredOnly, memberWithProfile, memberWithProfileAndPreferTown, memberWithIntro));
 
         // when
-        MemberResponse response = memberService.getMember(member.getId());
+        MemberResponse response1 = memberService.getMember(memberRequiredOnly.getId());
+        MemberResponse response2 = memberService.getMember(memberWithProfile.getId());
+        MemberResponse response3 = memberService.getMember(memberWithProfileAndPreferTown.getId());
+        MemberResponse response4 = memberService.getMember(memberWithIntro.getId());
 
         // then
-        assertThat(response)
+        assertThat(response1)
                 .extracting("id", "email", "nickname")
-                .contains(member.getId(), "email@naver.com", "닉네임");
+                .contains(memberRequiredOnly.getId(), "email@naver.com", "닉네임");
+        assertThat(response2)
+                .extracting("id", "email", "nickname",
+                        "profile.imageUrl", "profile.introduction")
+                .contains(memberWithProfile.getId(), "email@naver.com", "닉네임", "image URL", "자기소개 글");
+        assertThat(response3)
+                .extracting("id", "email", "nickname",
+                        "profile.imageUrl", "profile.introduction",
+                        "preferTown.latitude", "preferTown.longitude", "preferTown.city", "preferTown.street", "preferTown.number")
+                .contains(memberWithProfileAndPreferTown.getId(), "email@naver.com", "닉네임", "image URL", "자기소개 글", 48.8, 11.34, "뮌헨", "Marienplatz", "80331");
+        assertThat(response4)
+                .extracting("id", "email", "nickname", "profile.introduction")
+                .contains(memberWithIntro.getId(), "email@naver.com", "닉네임", "자기소개 글");
     }
 
     @Test
@@ -107,6 +142,25 @@ class MemberServiceTest {
                 .email(email)
                 .password(password)
                 .nickname(nickname)
+                .build();
+    }
+
+    private Member createMember(String email, String password, String nickname, Profile profile) {
+        return Member.builder()
+                .email(email)
+                .password(password)
+                .nickname(nickname)
+                .profile(profile)
+                .build();
+    }
+
+    private Member createMember(String email, String password, String nickname, Profile profile, Location location) {
+        return Member.builder()
+                .email(email)
+                .password(password)
+                .nickname(nickname)
+                .profile(profile)
+                .location(location)
                 .build();
     }
 

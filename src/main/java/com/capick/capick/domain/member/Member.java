@@ -43,10 +43,12 @@ public class Member extends BaseEntity {
     private Location preferTown;
 
     @Builder
-    private Member(String email, String password, String nickname) {
+    private Member(String email, String password, String nickname, Profile profile, Location location) {
         this.email = email;
         this.password = password;
         this.nickname = nickname;
+        this.profile = profile;
+        this.preferTown = location;
     }
 
     public void delete() {
