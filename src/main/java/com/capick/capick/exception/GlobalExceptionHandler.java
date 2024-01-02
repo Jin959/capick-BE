@@ -36,7 +36,15 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(DuplicateResourceException.class)
     public ApiResponse<ApiResponseStatus> DuplicateResourceExceptionHandler(DuplicateResourceException exception) {
         log.warn("Exception Message : {}", exception.getMessage());
-        log.warn("BaseException : ", exception);
+        log.warn("DuplicateResourceException : ", exception);
+        return ApiResponse.of(exception.getStatus());
+    }
+
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(NotFoundResourceException.class)
+    public ApiResponse<ApiResponseStatus> NotFoundResourceExceptionHandler(NotFoundResourceException exception) {
+        log.warn("Exception Message : {}", exception.getMessage());
+        log.warn("NotFoundResourceException : ", exception);
         return ApiResponse.of(exception.getStatus());
     }
 
