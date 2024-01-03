@@ -2,6 +2,7 @@ package com.capick.capick.service;
 
 import com.capick.capick.domain.member.Member;
 import com.capick.capick.dto.request.MemberCreateRequest;
+import com.capick.capick.dto.request.MemberUpdateRequest;
 import com.capick.capick.dto.response.MemberCreateResponse;
 import com.capick.capick.dto.response.MemberResponse;
 import com.capick.capick.exception.DuplicateResourceException;
@@ -35,6 +36,11 @@ public class MemberService {
         return MemberResponse.of(member);
     }
 
+    public MemberResponse updateMemberInfo(MemberUpdateRequest memberUpdateRequest) {
+        Member member = FindMemberOrElseThrow(memberUpdateRequest.getId());
+        return MemberResponse.of(member);
+    }
+
     private void ifExistsByEmailThrow(String email) {
         if (memberRepository.existsByEmailAndStatus(email, ACTIVE)) {
             throw DuplicateResourceException.of(DUPLICATE_EMAIL);
@@ -51,5 +57,4 @@ public class MemberService {
         return memberRepository.findByIdAndStatus(id, ACTIVE)
                 .orElseThrow(() -> NotFoundResourceException.of(NOT_FOUND_MEMBER));
     }
-
 }

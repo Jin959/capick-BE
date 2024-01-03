@@ -2,6 +2,7 @@ package com.capick.capick.controller;
 
 import com.capick.capick.dto.ApiResponse;
 import com.capick.capick.dto.request.MemberCreateRequest;
+import com.capick.capick.dto.request.MemberUpdateRequest;
 import com.capick.capick.dto.response.MemberCreateResponse;
 import com.capick.capick.dto.response.MemberResponse;
 import com.capick.capick.service.MemberService;
@@ -25,6 +26,11 @@ public class MemberController {
     @GetMapping("/{memberId}")
     public ApiResponse<MemberResponse> getMember(@PathVariable("memberId") Long memberId) {
         return ApiResponse.ok(memberService.getMember(memberId));
+    }
+
+    @PatchMapping("/me")
+    public ApiResponse<MemberResponse> updateMemberInfo(@Valid @RequestBody MemberUpdateRequest memberUpdateRequest) {
+        return ApiResponse.ok(memberService.updateMemberInfo(memberUpdateRequest));
     }
 
 }
