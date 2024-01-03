@@ -213,7 +213,7 @@ class MemberControllerTest {
                 )
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value("400"))
-                .andExpect(jsonPath("$.message").value("회원가입을 위해 닉네임은 특수문자는 마침표(.), 밑줄(_) 만 사용하여 20자리 이하로 작성해주세요."))
+                .andExpect(jsonPath("$.message").value("회원가입을 위해 닉네임의 특수문자는 마침표(.), 밑줄(_) 만 사용하여 20자리 이하로 작성해주세요."))
                 .andExpect(jsonPath("$.data").doesNotExist())
                 .andDo(print());
     }
