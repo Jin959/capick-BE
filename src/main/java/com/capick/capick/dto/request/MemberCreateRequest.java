@@ -16,6 +16,7 @@ public class MemberCreateRequest {
             regexp = "^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*.[a-zA-Z]{2,3}$",
             message = "회원가입을 위해 형식에 맞는 이메일을 입력해주세요."
     )
+    @Size(max = 320, message = "이메일은 320자를 넘을 수 없습니다.")
     private String email;
 
     @NotBlank(message = "회원가입을 위해 비밀번호를 입력해주세요.")
