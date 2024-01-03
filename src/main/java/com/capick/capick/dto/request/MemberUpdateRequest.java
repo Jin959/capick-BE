@@ -1,5 +1,6 @@
 package com.capick.capick.dto.request;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -22,5 +23,12 @@ public class MemberUpdateRequest {
             message = "회원가입을 위해 닉네임의 특수문자는 마침표(.), 밑줄(_) 만 사용하여 20자리 이하로 작성해주세요."
     )
     private String nickname;
+
+    @Builder
+    public MemberUpdateRequest(Long id, String password, String nickname) {
+        this.id = id;
+        this.password = password;
+        this.nickname = nickname;
+    }
 
 }

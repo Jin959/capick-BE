@@ -4,6 +4,7 @@ import com.capick.capick.domain.common.Location;
 import com.capick.capick.domain.member.Member;
 import com.capick.capick.domain.member.Profile;
 import com.capick.capick.dto.request.MemberCreateRequest;
+import com.capick.capick.dto.request.MemberUpdateRequest;
 import com.capick.capick.dto.response.MemberCreateResponse;
 import com.capick.capick.dto.response.MemberResponse;
 import com.capick.capick.exception.DuplicateResourceException;
@@ -137,6 +138,51 @@ class MemberServiceTest {
                 .hasMessage("존재하지 않는 회원입니다.");
     }
 
+    @Test
+    @DisplayName("성공: 회원은 자신의 비밀번호와 닉네임을 수정 할 수 있다.")
+    void updateMemberInfo() {
+        // given
+        Member member1 = createMember("email01@naver.com", "password01%^&", "nickname01");
+        Member member2 = createMember("email02@naver.com", "password02%^&", "nickname02");
+        Long memberId1 = memberRepository.save(member1).getId();
+        Long memberId2 = memberRepository.save(member2).getId();
+
+        String newPassword = "new^&*password123";
+        String newNickname = "new_nickname";
+
+        MemberUpdateRequest request = updateMemberRequest(memberId1, newPassword, newNickname);
+        MemberUpdateRequest requestOnlyNickname = MemberUpdateRequest.builder()
+                .id(memberId2)
+                .nickname(newNickname)
+                .build();
+
+        // when
+        MemberResponse response = memberService.updateMemberInfo(request);
+        MemberResponse responseOnlyNickname = memberService.updateMemberInfo(requestOnlyNickname);
+
+        // then
+        assertThat(response)
+                .extracting("id", "email", "nickname")
+                .contains(memberId1, "email01@naver.com", newNickname);
+        assertThat(responseOnlyNickname)
+                .extracting("id", "email", "nickname")
+                .contains(memberId2, "email02@naver.com", newNickname);
+    }
+
+    @Test
+    @DisplayName("예외: 존재하지 않는 회원이 회원 정보 수정을 시도할 경우 예외가 발생한다.")
+    void updateNotExistMemberInfo() {
+        // given
+        Member member = createMember("email01@naver.com", "password01%^&", "nickname01");
+        Long notExistId = memberRepository.save(member).getId() + 1;
+        MemberUpdateRequest request = updateMemberRequest(notExistId, "new^&*password123", "new_nickname");
+
+        // when // then
+        assertThatThrownBy(() -> memberService.updateMemberInfo(request))
+                .isInstanceOf(NotFoundResourceException.class)
+                .hasMessage("존재하지 않는 회원입니다.");
+    }
+
     private Member createMember(String email, String password, String nickname) {
         return Member.builder()
                 .email(email)
@@ -167,6 +213,14 @@ class MemberServiceTest {
     private MemberCreateRequest createMemberRequest(String email, String password, String nickname) {
         return MemberCreateRequest.builder()
                 .email(email)
+                .password(password)
+                .nickname(nickname)
+                .build();
+    }
+
+    private MemberUpdateRequest updateMemberRequest(Long id, String password, String nickname) {
+        return MemberUpdateRequest.builder()
+                .id(id)
                 .password(password)
                 .nickname(nickname)
                 .build();
