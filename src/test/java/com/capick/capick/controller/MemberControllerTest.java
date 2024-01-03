@@ -106,6 +106,29 @@ class MemberControllerTest {
     }
 
     @Test
+    @DisplayName("예외: RFC 2821 상 이메일은 320자를 넘을 수 없다. 상태코드 400을 반환한다.")
+    void createMemberWithTooLongEmail() throws Exception {
+        // given
+        MemberCreateRequest request = MemberCreateRequest.builder()
+                .email("e".repeat(64) + "@" + "e".repeat(255) + ".com")
+                .password("!@#$password1234")
+                .nickname("nickname")
+                .build();
+
+        // when // then
+        mockMvc.perform(
+                        post("/api/members/new")
+                                .content(objectMapper.writeValueAsString(request))
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("400"))
+                .andExpect(jsonPath("$.message").value("이메일은 320자를 넘을 수 없습니다."))
+                .andExpect(jsonPath("$.data").doesNotExist())
+                .andDo(print());
+    }
+
+    @Test
     @DisplayName("예외: 회원가입 시 비밀번호는 필수 값이다. 입력하지 않으면 상태코드 400을 반환한다.")
     void creatMemberWithoutPassword() throws Exception {
         // given
