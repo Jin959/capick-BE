@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.Optional;
 
 @Getter
 @Entity
@@ -53,5 +54,12 @@ public class Member extends BaseEntity {
 
     public void delete() {
         this.status = BaseStatus.INACTIVE;
+    }
+
+    public void updateInfo(String password, String nickname) {
+        Optional.ofNullable(password)
+                .ifPresent(passwordParam -> this.password = passwordParam);
+        Optional.ofNullable(nickname)
+                .ifPresent(nicknameParam -> this.nickname = nicknameParam);
     }
 }
