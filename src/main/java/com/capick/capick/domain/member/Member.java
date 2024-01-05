@@ -3,6 +3,7 @@ package com.capick.capick.domain.member;
 import com.capick.capick.domain.common.BaseEntity;
 import com.capick.capick.domain.common.BaseStatus;
 import com.capick.capick.domain.common.Location;
+import com.capick.capick.exception.DuplicateResourceException;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -10,6 +11,9 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.util.Optional;
+
+import static com.capick.capick.dto.ApiResponseStatus.DUPLICATE_NICKNAME;
+import static com.capick.capick.dto.ApiResponseStatus.NOT_CHANGED_PASSWORD;
 
 @Getter
 @Entity
@@ -58,8 +62,17 @@ public class Member extends BaseEntity {
 
     public void updateInfo(String password, String nickname) {
         Optional.ofNullable(password)
-                .ifPresent(passwordParam -> this.password = passwordParam);
+                .ifPresent(newPassword -> {
+                    if (newPassword.equals(this.password)) {
+                        throw DuplicateResourceException.of(NOT_CHANGED_PASSWORD);
+                    }
+                    this.password = newPassword;
+                });
         Optional.ofNullable(nickname)
-                .ifPresent(nicknameParam -> this.nickname = nicknameParam);
+                .ifPresent(newNickname -> {
+                    if (newNickname.equals(this.nickname))
+                        throw DuplicateResourceException.of(DUPLICATE_NICKNAME);
+                    this.nickname = newNickname;
+                });
     }
 }

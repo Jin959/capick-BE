@@ -12,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 import static com.capick.capick.domain.common.BaseStatus.*;
 import static com.capick.capick.dto.ApiResponseStatus.*;
 
@@ -25,7 +27,7 @@ public class MemberService {
     @Transactional
     public MemberCreateResponse createMember(MemberCreateRequest request) {
         ifExistsByEmailThrow(request.getEmail());
-        ifExistsByNickNameThrow(request.getNickname());
+        ifExistsByNicknameThrow(request.getNickname());
 
         Member member = memberRepository.save(request.toEntity());
         return MemberCreateResponse.of(member);
@@ -36,9 +38,16 @@ public class MemberService {
         return MemberResponse.of(member);
     }
 
+    @Transactional
     public MemberResponse updateMemberInfo(MemberUpdateRequest memberUpdateRequest) {
         Member member = FindMemberOrElseThrow(memberUpdateRequest.getId());
-        return MemberResponse.of(member);
+
+        String nickname = memberUpdateRequest.getNickname();
+        Optional.ofNullable(nickname).ifPresent(this::ifExistsByNicknameThrow);
+
+        member.updateInfo(memberUpdateRequest.getPassword(), nickname);
+        Member savedMember = memberRepository.save(member);
+        return MemberResponse.of(savedMember);
     }
 
     private void ifExistsByEmailThrow(String email) {
@@ -47,7 +56,7 @@ public class MemberService {
         }
     }
 
-    private void ifExistsByNickNameThrow(String nickname) {
+    private void ifExistsByNicknameThrow(String nickname) {
         if (memberRepository.existsByNicknameAndStatus(nickname, ACTIVE)) {
             throw DuplicateResourceException.of(DUPLICATE_NICKNAME);
         }
