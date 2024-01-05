@@ -147,13 +147,10 @@ class MemberServiceTest {
         Long memberId1 = memberRepository.save(member1).getId();
         Long memberId2 = memberRepository.save(member2).getId();
 
-        String newPassword = "new^&*password123";
-        String newNickname = "new_nickname";
-
-        MemberUpdateRequest request = updateMemberRequest(memberId1, newPassword, newNickname);
+        MemberUpdateRequest request = updateMemberRequest(memberId1, "new^&*password123", "new_nickname01");
         MemberUpdateRequest requestOnlyNickname = MemberUpdateRequest.builder()
                 .id(memberId2)
-                .nickname(newNickname)
+                .nickname("new_nickname02")
                 .build();
 
         // when
@@ -163,10 +160,10 @@ class MemberServiceTest {
         // then
         assertThat(response)
                 .extracting("id", "email", "nickname")
-                .contains(memberId1, "email01@naver.com", newNickname);
+                .contains(memberId1, "email01@naver.com", "new_nickname01");
         assertThat(responseOnlyNickname)
                 .extracting("id", "email", "nickname")
-                .contains(memberId2, "email02@naver.com", newNickname);
+                .contains(memberId2, "email02@naver.com", "new_nickname02");
     }
 
     @Test
@@ -181,6 +178,34 @@ class MemberServiceTest {
         assertThatThrownBy(() -> memberService.updateMemberInfo(request))
                 .isInstanceOf(NotFoundResourceException.class)
                 .hasMessage("존재하지 않는 회원입니다.");
+    }
+
+    @Test
+    @DisplayName("예외: 회원 정보 수정 시 다른 사람이 사용 중이거나 현재와 동일한 닉네임, 현재와 동일한 비밀번호로 변경 할 경우 예외가 발생한다.")
+    void updateMemberInfoWithUnchangedAndDuplicateInfo() {
+        // given
+        Member member1 = createMember("email01@naver.com", "password01%^&", "nickname01");
+        Member member2 = createMember("email02@naver.com", "password02%^&", "nickname02");
+        Member savedMember1 = memberRepository.save(member1);
+        Member savedMember2 = memberRepository.save(member2);
+
+        MemberUpdateRequest requestWithUnchangedNickname = updateMemberRequest(savedMember1.getId(), "new^&*password123", savedMember1.getNickname());
+        MemberUpdateRequest requestWithDuplicateNickname = MemberUpdateRequest.builder()
+                .id(savedMember1.getId())
+                .nickname(savedMember2.getNickname())
+                .build();
+        MemberUpdateRequest requestWithUnchangedPassword = updateMemberRequest(savedMember1.getId(), savedMember1.getPassword(), "new_nickname");
+
+        // when // then
+        assertThatThrownBy(() -> memberService.updateMemberInfo(requestWithUnchangedNickname))
+                .isInstanceOf(DuplicateResourceException.class)
+                .hasMessage("이미 사용 중인 닉네임 입니다.");
+        assertThatThrownBy(() -> memberService.updateMemberInfo(requestWithDuplicateNickname))
+                .isInstanceOf(DuplicateResourceException.class)
+                .hasMessage("이미 사용 중인 닉네임 입니다.");
+        assertThatThrownBy(() -> memberService.updateMemberInfo(requestWithUnchangedPassword))
+                .isInstanceOf(DuplicateResourceException.class)
+                .hasMessage("현재와 동일한 비밀번호 입니다.");
     }
 
     private Member createMember(String email, String password, String nickname) {
