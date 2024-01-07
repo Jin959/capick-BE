@@ -20,7 +20,7 @@ public class MemberUpdateRequest {
 
     @Pattern(
             regexp = "^(?=.*[.\\w가-힇ぁ-ゔァ-ヴー々〆〤一-龥])(?=\\S+$)[.\\w가-힇ぁ-ゔァ-ヴー々〆〤一-龥]{1,20}$",
-            message = "회원가입을 위해 닉네임의 특수문자는 마침표(.), 밑줄(_) 만 사용하여 20자리 이하로 작성해주세요."
+            message = "닉네임의 특수문자는 마침표(.), 밑줄(_) 만 사용하여 20자리 이하로 작성해주세요."
     )
     private String nickname;
 
