@@ -20,7 +20,7 @@ public class MemberController {
 
     @PostMapping("/new")
     public ApiResponse<MemberCreateResponse> createMember(@Valid @RequestBody MemberCreateRequest memberCreateRequest) {
-        return ApiResponse.ok(memberService.createMember(memberCreateRequest));
+        return ApiResponse.isCreated(memberService.createMember(memberCreateRequest));
     }
 
     @GetMapping("/{memberId}")

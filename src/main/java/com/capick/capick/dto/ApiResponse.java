@@ -42,4 +42,12 @@ public class ApiResponse<T> {
         return of(ApiResponseStatus.SUCCESS, data);
     }
 
+    public static <T> ApiResponse<T> isCreated(T data) {
+        return of(ApiResponseStatus.CREATED, data);
+    }
+
+    public static <T> ApiResponse<T> isDeleted() {
+        return of(ApiResponseStatus.DELETED);
+    }
+
 }
