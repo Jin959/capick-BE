@@ -18,6 +18,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -92,42 +93,40 @@ class MemberServiceTest {
         Member memberWithProfile = createMember("email@naver.com", "password12^&*", "닉네임", profile);
         Member memberWithProfileAndPreferTown = createMember("email@naver.com", "password12^&*", "닉네임", profile, preferTown);
         Member memberWithIntro = createMember("email@naver.com", "password12^&*", "닉네임", profileOnlyIntro);
-        memberRepository.saveAll(List.of(memberRequiredOnly, memberWithProfile, memberWithProfileAndPreferTown, memberWithIntro));
+        List<Long> memberIds = memberRepository.saveAll(List.of(memberRequiredOnly, memberWithProfile, memberWithProfileAndPreferTown, memberWithIntro))
+                .stream().map(Member::getId).collect(Collectors.toList());
 
         // when
-        MemberResponse response1 = memberService.getMember(memberRequiredOnly.getId());
-        MemberResponse response2 = memberService.getMember(memberWithProfile.getId());
-        MemberResponse response3 = memberService.getMember(memberWithProfileAndPreferTown.getId());
-        MemberResponse response4 = memberService.getMember(memberWithIntro.getId());
+        List<MemberResponse> responses = memberIds.stream()
+                .map(memberId -> memberService.getMember(memberId)).collect(Collectors.toList());
 
         // then
-        assertThat(response1)
+        assertThat(responses.get(0))
                 .extracting("id", "email", "nickname")
                 .contains(memberRequiredOnly.getId(), "email@naver.com", "닉네임");
-        assertThat(response2)
+        assertThat(responses.get(1))
                 .extracting("id", "email", "nickname",
                         "profile.imageUrl", "profile.introduction")
                 .contains(memberWithProfile.getId(), "email@naver.com", "닉네임", "image URL", "자기소개 글");
-        assertThat(response3)
+        assertThat(responses.get(2))
                 .extracting("id", "email", "nickname",
                         "profile.imageUrl", "profile.introduction",
                         "preferTown.latitude", "preferTown.longitude", "preferTown.city", "preferTown.street", "preferTown.number")
                 .contains(memberWithProfileAndPreferTown.getId(), "email@naver.com", "닉네임", "image URL", "자기소개 글", 48.8, 11.34, "뮌헨", "Marienplatz", "80331");
-        assertThat(response4)
+        assertThat(responses.get(3))
                 .extracting("id", "email", "nickname", "profile.introduction")
                 .contains(memberWithIntro.getId(), "email@naver.com", "닉네임", "자기소개 글");
     }
 
     @Test
-    @DisplayName("예외: 회원 탈퇴 처리가 되었거나 존재하지 않는 회원이면 예외가 발생한다.")
-    void getInactiveMember() {
+    @DisplayName("예외: 회원 정보 조회 시 회원 탈퇴 처리 되었거나 존재하지 않는 회원이면 예외가 발생한다.")
+    void getNotExistMember() {
         // given
         Member member1 = createMember("email01@naver.com", "password01%^&", "nickname01");
         member1.delete();
         Member member2 = createMember("email02@naver.com", "password02%^&", "nickname02");
-        memberRepository.saveAll(List.of(member1, member2));
-        Long deletedMemberId = 1L;
-        Long notJoinedMemberId = 3L;
+        Long deletedMemberId = memberRepository.save(member1).getId();
+        Long notJoinedMemberId = memberRepository.save(member2).getId() + 1;
 
         // when // then
         assertThatThrownBy(() -> memberService.getMember(deletedMemberId))
@@ -167,15 +166,23 @@ class MemberServiceTest {
     }
 
     @Test
-    @DisplayName("예외: 존재하지 않는 회원이 회원 정보 수정을 시도할 경우 예외가 발생한다.")
+    @DisplayName("예외: 회원 정보 수정 시 회원 탈퇴 처리 되었거나 존재하지 않는 회원이면 예외가 발생한다.")
     void updateNotExistMemberInfo() {
         // given
-        Member member = createMember("email01@naver.com", "password01%^&", "nickname01");
-        Long notExistId = memberRepository.save(member).getId() + 1;
-        MemberUpdateRequest request = updateMemberRequest(notExistId, "new^&*password123", "new_nickname");
+
+        Member member1 = createMember("email01@naver.com", "password01%^&", "nickname01");
+        member1.delete();
+        Member member2 = createMember("email02@naver.com", "password02%^&", "nickname02");
+        Long deletedMemberId = memberRepository.save(member1).getId();
+        Long notJoinedMemberId = memberRepository.save(member2).getId() + 1;
+        MemberUpdateRequest requestWithDeletedMember = updateMemberRequest(deletedMemberId, "new^&*password123", "new_nickname");
+        MemberUpdateRequest requestWithNotJoinedMember = updateMemberRequest(notJoinedMemberId, "new^&*password123", "new_nickname");
 
         // when // then
-        assertThatThrownBy(() -> memberService.updateMemberInfo(request))
+        assertThatThrownBy(() -> memberService.updateMemberInfo(requestWithDeletedMember))
+                .isInstanceOf(NotFoundResourceException.class)
+                .hasMessage("존재하지 않는 회원입니다.");
+        assertThatThrownBy(() -> memberService.updateMemberInfo(requestWithNotJoinedMember))
                 .isInstanceOf(NotFoundResourceException.class)
                 .hasMessage("존재하지 않는 회원입니다.");
     }
