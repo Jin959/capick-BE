@@ -35,7 +35,7 @@ class MemberControllerTest {
     private MemberService memberService;
 
     @Test
-    @DisplayName("성공: 방문자는 이메일, 비밀번호, 닉네임을 입력하고 가입할 수 있다. 상태코드 200을 반환한다.")
+    @DisplayName("성공: 방문자는 이메일, 비밀번호, 닉네임을 입력하고 가입할 수 있다. HTTP 상태 코드 200 및 자체 응답 코드 201을 반환한다.")
     void createMember() throws Exception {
         // given
         MemberCreateResponse response = MemberCreateResponse.builder().build();
@@ -54,14 +54,14 @@ class MemberControllerTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value("200"))
-                .andExpect(jsonPath("$.message").value("요청에 성공했습니다."))
+                .andExpect(jsonPath("$.code").value("201"))
+                .andExpect(jsonPath("$.message").value("리소스 생성에 성공했습니다."))
                 .andExpect(jsonPath("$.data").exists())
                 .andDo(print());
     }
 
     @Test
-    @DisplayName("예외: 회원가입 시 이메일은 필수 값이다. 입력하지 않으면 상태코드 400을 반환한다.")
+    @DisplayName("예외: 회원가입 시 이메일은 필수 값이다. 입력하지 않으면 HTTP 상태 코드 400 및 자체 응답 코드 400을 반환한다.")
     void createMemberWithoutEmail() throws Exception {
         // given
         MemberCreateRequest request = MemberCreateRequest.builder()
@@ -83,7 +83,7 @@ class MemberControllerTest {
     }
 
     @Test
-    @DisplayName("예외: 회원가입 시 이메일은 이메일 형식에 맞아야 한다. 그렇지 않으면 상태코드 400을 반환한다.")
+    @DisplayName("예외: 회원가입 시 이메일은 이메일 형식에 맞아야 한다. 그렇지 않으면 HTTP 상태 코드 400 및 자체 응답 코드 400을 반환한다.")
     void createMemberWithInvalidEmail() throws Exception {
         // given
         MemberCreateRequest request = MemberCreateRequest.builder()
@@ -106,7 +106,7 @@ class MemberControllerTest {
     }
 
     @Test
-    @DisplayName("예외: RFC 2821 상 이메일은 320자를 넘을 수 없다. 상태코드 400을 반환한다.")
+    @DisplayName("예외: RFC 2821 상 이메일은 320자를 넘을 수 없다. HTTP 상태 코드 400 및 자체 응답 코드 400을 반환한다.")
     void createMemberWithTooLongEmail() throws Exception {
         // given
         MemberCreateRequest request = MemberCreateRequest.builder()
@@ -129,7 +129,7 @@ class MemberControllerTest {
     }
 
     @Test
-    @DisplayName("예외: 회원가입 시 비밀번호는 필수 값이다. 입력하지 않으면 상태코드 400을 반환한다.")
+    @DisplayName("예외: 회원가입 시 비밀번호는 필수 값이다. 입력하지 않으면 HTTP 상태 코드 400 및 자체 응답 코드 400을 반환한다.")
     void creatMemberWithoutPassword() throws Exception {
         // given
         MemberCreateRequest request = MemberCreateRequest.builder()
@@ -151,7 +151,7 @@ class MemberControllerTest {
     }
 
     @Test
-    @DisplayName("예외: 회원가입 시 비밀번호 형식은 띄어쓰기 없는 영문/숫자/특수문자(!@#$%^&*()?)를 조합하여 8자~20자이다. 그렇지 않으면 상태코드 400을 반환한다.")
+    @DisplayName("예외: 회원가입 시 비밀번호 형식은 띄어쓰기 없는 영문/숫자/특수문자(!@#$%^&*()?)를 조합하여 8자~20자이다. 그렇지 않으면 HTTP 상태 코드 400 및 자체 응답 코드 400을 반환한다.")
     void createMemberWithInvalidPassword() throws Exception {
         // given
         MemberCreateRequest request = MemberCreateRequest.builder()
@@ -174,7 +174,7 @@ class MemberControllerTest {
     }
 
     @Test
-    @DisplayName("예외: 회원가입 시 닉네임은 필수 값이다. 입력하지 않으면 상태코드 400을 반환한다.")
+    @DisplayName("예외: 회원가입 시 닉네임은 필수 값이다. 입력하지 않으면 HTTP 상태 코드 400 및 자체 응답 코드 400을 반환한다.")
     void createMemberWithoutNickname() throws Exception {
         // given
         MemberCreateRequest request = MemberCreateRequest.builder()
@@ -196,7 +196,7 @@ class MemberControllerTest {
     }
 
     @Test
-    @DisplayName("예외: 회원가입 시 닉네임은 20자 이하로 특수문자는 마침표(.), 밑줄(_) 만 사용할 수 있다. 그렇지 않으면 상태코드 400을 반환한다.")
+    @DisplayName("예외: 회원가입 시 닉네임은 20자 이하로 특수문자는 마침표(.), 밑줄(_) 만 사용할 수 있다. 그렇지 않으면 HTTP 상태 코드 400 및 자체 응답 코드 400을 반환한다.")
     void createMemberWithInvalidNickname() throws Exception {
         // given
         MemberCreateRequest request = MemberCreateRequest.builder()
@@ -219,7 +219,7 @@ class MemberControllerTest {
     }
 
     @Test
-    @DisplayName("성공: 회원 정보를 조회한다. 상태코드 200 을 반환한다.")
+    @DisplayName("성공: 회원 정보를 조회한다. HTTP 상태 코드 200 및 자체 응답 코드 200 을 반환한다.")
     void getMember() throws Exception {
         // given
         MemberResponse response = MemberResponse.builder().build();
@@ -238,7 +238,7 @@ class MemberControllerTest {
     }
 
     @Test
-    @DisplayName("성공: 회원 정보인 닉네임 또는 비밀번호를 수정한다. HTTP 상태코드 200을 반환한다.")
+    @DisplayName("성공: 회원 정보인 닉네임 또는 비밀번호를 수정한다. HTTP 상태 코드 200 및 자체 응답 코드 200 을 반환한다.")
     void updateMemberInfo() throws Exception {
         // given
         MemberResponse response = MemberResponse.builder().build();
@@ -263,7 +263,7 @@ class MemberControllerTest {
     }
 
     @Test
-    @DisplayName("예외: 회원 정보 수정 시 비밀번호 형식은 띄어쓰기 없는 영문/숫자/특수문자(!@#$%^&*()?)를 조합하여 8자~20자이다. 그렇지 않으면 상태코드 400을 반환한다.")
+    @DisplayName("예외: 회원 정보 수정 시 비밀번호 형식은 띄어쓰기 없는 영문/숫자/특수문자(!@#$%^&*()?)를 조합하여 8자~20자이다. 그렇지 않으면 HTTP 상태 코드 400 및 자체 응답 코드 400을 반환한다.")
     void updateMemberInfoWithInvalidPassword() throws Exception {
         // given
         MemberUpdateRequest request = MemberUpdateRequest.builder()
@@ -285,7 +285,7 @@ class MemberControllerTest {
     }
 
     @Test
-    @DisplayName("예외: 회원 정보 수정 시 닉네임은 20자 이하로 특수문자는 마침표(.), 밑줄(_) 만 사용할 수 있다. 그렇지 않으면 상태코드 400을 반환한다.")
+    @DisplayName("예외: 회원 정보 수정 시 닉네임은 20자 이하로 특수문자는 마침표(.), 밑줄(_) 만 사용할 수 있다. 그렇지 않으면 HTTP 상태 코드 400 및 자체 응답 코드 400을 반환한다.")
     void updateMemberInfoWithInvalidNickname() throws Exception {
         // given
         MemberUpdateRequest request = MemberUpdateRequest.builder()
