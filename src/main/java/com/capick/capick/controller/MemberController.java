@@ -2,14 +2,17 @@ package com.capick.capick.controller;
 
 import com.capick.capick.dto.ApiResponse;
 import com.capick.capick.dto.request.MemberCreateRequest;
-import com.capick.capick.dto.request.MemberUpdateRequest;
-import com.capick.capick.dto.response.MemberCreateResponse;
+import com.capick.capick.dto.request.MemberPasswordRequest;
+import com.capick.capick.dto.request.MemberNicknameRequest;
+import com.capick.capick.dto.response.MemberSimpleResponse;
 import com.capick.capick.dto.response.MemberResponse;
 import com.capick.capick.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+
+import static com.capick.capick.dto.ApiResponseStatus.NO_DATA;
 
 @RestController
 @RequiredArgsConstructor
@@ -19,7 +22,7 @@ public class MemberController {
     private final MemberService memberService;
 
     @PostMapping("/new")
-    public ApiResponse<MemberCreateResponse> createMember(@Valid @RequestBody MemberCreateRequest memberCreateRequest) {
+    public ApiResponse<MemberSimpleResponse> createMember(@Valid @RequestBody MemberCreateRequest memberCreateRequest) {
         return ApiResponse.isCreated(memberService.createMember(memberCreateRequest));
     }
 
@@ -28,9 +31,15 @@ public class MemberController {
         return ApiResponse.ok(memberService.getMember(memberId));
     }
 
-    @PatchMapping("/me")
-    public ApiResponse<MemberResponse> updateMemberInfo(@Valid @RequestBody MemberUpdateRequest memberUpdateRequest) {
-        return ApiResponse.ok(memberService.updateMemberInfo(memberUpdateRequest));
+    @PatchMapping("/me/nickname")
+    public ApiResponse<MemberSimpleResponse> updateMemberNickname(@Valid @RequestBody MemberNicknameRequest memberNicknameRequest) {
+        return ApiResponse.ok(memberService.updateMemberNickname(memberNicknameRequest));
+    }
+
+    @PatchMapping("/me/password")
+    public ApiResponse<Void> updateMemberPassword(@Valid @RequestBody MemberPasswordRequest memberPasswordRequest) {
+        memberService.updateMemberPassword(memberPasswordRequest);
+        return ApiResponse.of(NO_DATA);
     }
 
 }

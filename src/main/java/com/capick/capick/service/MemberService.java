@@ -2,8 +2,9 @@ package com.capick.capick.service;
 
 import com.capick.capick.domain.member.Member;
 import com.capick.capick.dto.request.MemberCreateRequest;
-import com.capick.capick.dto.request.MemberUpdateRequest;
-import com.capick.capick.dto.response.MemberCreateResponse;
+import com.capick.capick.dto.request.MemberPasswordRequest;
+import com.capick.capick.dto.request.MemberNicknameRequest;
+import com.capick.capick.dto.response.MemberSimpleResponse;
 import com.capick.capick.dto.response.MemberResponse;
 import com.capick.capick.exception.DuplicateResourceException;
 import com.capick.capick.exception.NotFoundResourceException;
@@ -11,8 +12,6 @@ import com.capick.capick.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional;
 
 import static com.capick.capick.domain.common.BaseStatus.*;
 import static com.capick.capick.dto.ApiResponseStatus.*;
@@ -25,12 +24,12 @@ public class MemberService {
     private final MemberRepository memberRepository;
 
     @Transactional
-    public MemberCreateResponse createMember(MemberCreateRequest request) {
+    public MemberSimpleResponse createMember(MemberCreateRequest request) {
         ifExistsByEmailThrow(request.getEmail());
         ifExistsByNicknameThrow(request.getNickname());
 
         Member member = memberRepository.save(request.toEntity());
-        return MemberCreateResponse.of(member);
+        return MemberSimpleResponse.of(member);
     }
 
     public MemberResponse getMember(Long memberId) {
@@ -39,15 +38,22 @@ public class MemberService {
     }
 
     @Transactional
-    public MemberResponse updateMemberInfo(MemberUpdateRequest memberUpdateRequest) {
-        Member member = FindMemberOrElseThrow(memberUpdateRequest.getId());
+    public MemberSimpleResponse updateMemberNickname(MemberNicknameRequest memberNicknameRequest) {
+        Member member = FindMemberOrElseThrow(memberNicknameRequest.getId());
 
-        String nickname = memberUpdateRequest.getNickname();
-        Optional.ofNullable(nickname).ifPresent(this::ifExistsByNicknameThrow);
+        String nickname = memberNicknameRequest.getNickname();
+        ifExistsByNicknameThrow(nickname);
 
-        member.updateInfo(memberUpdateRequest.getPassword(), nickname);
+        member.updateNickname(nickname);
         Member savedMember = memberRepository.save(member);
-        return MemberResponse.of(savedMember);
+        return MemberSimpleResponse.of(savedMember);
+    }
+
+    @Transactional
+    public void updateMemberPassword(MemberPasswordRequest memberPasswordRequest) {
+        Member member = FindMemberOrElseThrow(memberPasswordRequest.getId());
+        member.updatePassword(memberPasswordRequest.getPassword());
+        memberRepository.save(member);
     }
 
     private void ifExistsByEmailThrow(String email) {

@@ -11,6 +11,7 @@ public enum ApiResponseStatus {
     SUCCESS(HttpStatus.OK, "요청에 성공했습니다."),
     CREATED(HttpStatus.CREATED, "리소스 생성에 성공했습니다."),
     DELETED(HttpStatus.NO_CONTENT, "리소스 삭제에 성공했습니다."),
+    NO_DATA(HttpStatus.NO_CONTENT, "요청에 성공했습니다."),
 
     // 400
     NOT_FOUND_MEMBER(HttpStatus.NOT_FOUND, "존재하지 않는 회원입니다."),

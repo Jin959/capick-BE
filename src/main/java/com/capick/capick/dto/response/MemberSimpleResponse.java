@@ -5,20 +5,20 @@ import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-public class MemberCreateResponse {
+public class MemberSimpleResponse {
 
     private Long id;
 
     private String nickname;
 
     @Builder
-    private MemberCreateResponse(Long id, String nickname) {
+    private MemberSimpleResponse(Long id, String nickname) {
         this.id = id;
         this.nickname = nickname;
     }
 
-    public static MemberCreateResponse of(Member member) {
-        return MemberCreateResponse.builder()
+    public static MemberSimpleResponse of(Member member) {
+        return MemberSimpleResponse.builder()
                 .id(member.getId())
                 .nickname(member.getNickname())
                 .build();
