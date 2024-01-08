@@ -1,8 +1,9 @@
 package com.capick.capick.controller;
 
 import com.capick.capick.dto.request.MemberCreateRequest;
-import com.capick.capick.dto.request.MemberUpdateRequest;
-import com.capick.capick.dto.response.MemberCreateResponse;
+import com.capick.capick.dto.request.MemberNicknameRequest;
+import com.capick.capick.dto.request.MemberPasswordRequest;
+import com.capick.capick.dto.response.MemberSimpleResponse;
 import com.capick.capick.dto.response.MemberResponse;
 import com.capick.capick.service.MemberService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -38,7 +39,7 @@ class MemberControllerTest {
     @DisplayName("성공: 방문자는 이메일, 비밀번호, 닉네임을 입력하고 가입할 수 있다. HTTP 상태 코드 200 및 자체 응답 코드 201을 반환한다.")
     void createMember() throws Exception {
         // given
-        MemberCreateResponse response = MemberCreateResponse.builder().build();
+        MemberSimpleResponse response = MemberSimpleResponse.builder().build();
         when(memberService.createMember(any(MemberCreateRequest.class))).thenReturn(response);
 
         MemberCreateRequest request = MemberCreateRequest.builder()
@@ -238,20 +239,20 @@ class MemberControllerTest {
     }
 
     @Test
-    @DisplayName("성공: 회원 정보인 닉네임 또는 비밀번호를 수정한다. HTTP 상태 코드 200 및 자체 응답 코드 200 을 반환한다.")
-    void updateMemberInfo() throws Exception {
+    @DisplayName("성공: 닉네임을 수정한다. HTTP 상태 코드 200 및 자체 응답 코드 200 을 반환한다.")
+    void updateMemberNickname() throws Exception {
         // given
-        MemberResponse response = MemberResponse.builder().build();
-        when(memberService.updateMemberInfo(any(MemberUpdateRequest.class))).thenReturn(response);
+        MemberSimpleResponse response = MemberSimpleResponse.builder().build();
+        when(memberService.updateMemberNickname(any(MemberNicknameRequest.class))).thenReturn(response);
 
-        MemberUpdateRequest request = MemberUpdateRequest.builder()
-                .password("!@#$password1234")
+        MemberNicknameRequest request = MemberNicknameRequest.builder()
+                .id(1L)
                 .nickname("nickname")
                 .build();
 
         // when // then
         mockMvc.perform(
-                        patch("/api/members/me")
+                        patch("/api/members/me/nickname")
                                 .content(objectMapper.writeValueAsString(request))
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
@@ -263,45 +264,151 @@ class MemberControllerTest {
     }
 
     @Test
-    @DisplayName("예외: 회원 정보 수정 시 비밀번호 형식은 띄어쓰기 없는 영문/숫자/특수문자(!@#$%^&*()?)를 조합하여 8자~20자이다. 그렇지 않으면 HTTP 상태 코드 400 및 자체 응답 코드 400을 반환한다.")
-    void updateMemberInfoWithInvalidPassword() throws Exception {
+    @DisplayName("예외: 닉네임 수정 시 회원 리소스 아이디는 필수값이다. 입력하지 않으면 HTTP 상태 코드 400 및 자체 응답 코드 400을 반환한다.")
+    void updateMemberNicknameWithoutMemberId() throws Exception {
         // given
-        MemberUpdateRequest request = MemberUpdateRequest.builder()
-                .password("password")
+        MemberNicknameRequest request = MemberNicknameRequest.builder()
                 .nickname("nickname")
                 .build();
 
         // when // then
         mockMvc.perform(
-                        patch("/api/members/me")
+                        patch("/api/members/me/nickname")
                                 .content(objectMapper.writeValueAsString(request))
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value("400"))
-                .andExpect(jsonPath("$.message").value("비밀번호는 띄어쓰기 없는 영문/숫자/특수문자(!@#$%^&*()?)를 조합하여 8자~20자리로 작성해주세요."))
+                .andExpect(jsonPath("$.message").value("리소스 아이디를 입력해주세요."))
                 .andExpect(jsonPath("$.data").doesNotExist())
                 .andDo(print());
     }
 
     @Test
-    @DisplayName("예외: 회원 정보 수정 시 닉네임은 20자 이하로 특수문자는 마침표(.), 밑줄(_) 만 사용할 수 있다. 그렇지 않으면 HTTP 상태 코드 400 및 자체 응답 코드 400을 반환한다.")
-    void updateMemberInfoWithInvalidNickname() throws Exception {
+    @DisplayName("예외: 닉네임 수정 시 닉네임은 필수값이다. 입력하지 않으면 HTTP 상태 코드 400 및 자체 응답 코드 400을 반환한다.")
+    void updateMemberNicknameWithoutNickname() throws Exception {
         // given
-        MemberUpdateRequest request = MemberUpdateRequest.builder()
-                .password("!@#$password1234")
+        MemberNicknameRequest request = MemberNicknameRequest.builder()
+                .id(1L)
+                .build();
+
+        // when // then
+        mockMvc.perform(
+                        patch("/api/members/me/nickname")
+                                .content(objectMapper.writeValueAsString(request))
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("400"))
+                .andExpect(jsonPath("$.message").value("닉네임을 입력해주세요."))
+                .andExpect(jsonPath("$.data").doesNotExist())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("예외: 닉네임 수정 시 닉네임은 20자 이하로 특수문자는 마침표(.), 밑줄(_) 만 사용할 수 있다. 그렇지 않으면 HTTP 상태 코드 400 및 자체 응답 코드 400을 반환한다.")
+    void updateMemberNicknameWithInvalidNickname() throws Exception {
+        // given
+        MemberNicknameRequest request = MemberNicknameRequest.builder()
+                .id(1L)
                 .nickname("nickname@@$#$")
                 .build();
 
         // when // then
         mockMvc.perform(
-                        patch("/api/members/me")
+                        patch("/api/members/me/nickname")
                                 .content(objectMapper.writeValueAsString(request))
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value("400"))
                 .andExpect(jsonPath("$.message").value("닉네임의 특수문자는 마침표(.), 밑줄(_) 만 사용하여 20자리 이하로 작성해주세요."))
+                .andExpect(jsonPath("$.data").doesNotExist())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("성공: 비밀번호를 수정한다. HTTP 상태 코드 200 및 자체 응답 코드 204 를 반환한다.")
+    void updateMemberPassword() throws Exception {
+        // given
+        MemberPasswordRequest request = MemberPasswordRequest.builder()
+                .id(1L)
+                .password("pass!*word13")
+                .build();
+
+        // when // then
+        mockMvc.perform(
+                        patch("/api/members/me/password")
+                                .content(objectMapper.writeValueAsString(request))
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value("204"))
+                .andExpect(jsonPath("$.message").value("요청에 성공했습니다."))
+                .andExpect(jsonPath("$.data").doesNotExist())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("예외: 비밀번호 수정 시 회원 리소스 아이디는 필수값이다. 입력하지 않으면 HTTP 상태 코드 400 및 자체 응답 코드 400을 반환한다.")
+    void updateMemberPasswordWithoutMemberId() throws Exception {
+        // given
+        MemberPasswordRequest request = MemberPasswordRequest.builder()
+                .password("pass!*word13")
+                .build();
+
+        // when // then
+        mockMvc.perform(
+                        patch("/api/members/me/password")
+                                .content(objectMapper.writeValueAsString(request))
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("400"))
+                .andExpect(jsonPath("$.message").value("리소스 아이디를 입력해주세요."))
+                .andExpect(jsonPath("$.data").doesNotExist())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("예외: 비밀번호 수정 시 비밀번호는 필수값이다. 입력하지 않으면 HTTP 상태 코드 400 및 자체 응답 코드 400을 반환한다.")
+    void updateMemberPasswordWithoutPassword() throws Exception {
+        // given
+        MemberPasswordRequest request = MemberPasswordRequest.builder()
+                .id(1L)
+                .build();
+
+        // when // then
+        mockMvc.perform(
+                        patch("/api/members/me/password")
+                                .content(objectMapper.writeValueAsString(request))
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("400"))
+                .andExpect(jsonPath("$.message").value("비밀번호를 입력해주세요."))
+                .andExpect(jsonPath("$.data").doesNotExist())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("예외: 비밀번호 수정 시 형식은 띄어쓰기 없는 영문/숫자/특수문자(!@#$%^&*()?)를 조합하여 8자~20자이다. 그렇지 않으면 HTTP 상태 코드 400 및 자체 응답 코드 400을 반환한다.")
+    void updateMemberPasswordWithInvalidPassword() throws Exception {
+        // given
+        MemberPasswordRequest request = MemberPasswordRequest.builder()
+                .id(1L)
+                .password("pass!*word")
+                .build();
+
+        // when // then
+        mockMvc.perform(
+                        patch("/api/members/me/password")
+                                .content(objectMapper.writeValueAsString(request))
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("400"))
+                .andExpect(jsonPath("$.message").value("비밀번호는 띄어쓰기 없는 영문/숫자/특수문자(!@#$%^&*()?)를 조합하여 8자~20자리로 작성해주세요."))
                 .andExpect(jsonPath("$.data").doesNotExist())
                 .andDo(print());
     }
