@@ -2,11 +2,11 @@ package com.capick.capick.exception;
 
 import com.capick.capick.dto.ApiResponse;
 import com.capick.capick.dto.ApiResponseStatus;
-import com.fasterxml.jackson.core.exc.StreamReadException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.TypeMismatchException;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.http.converter.HttpMessageConversionException;
 import org.springframework.validation.BindException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -28,11 +28,19 @@ public class GlobalExceptionHandler {
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler({StreamReadException.class, HttpMessageNotReadableException.class})
-    public ApiResponse<ApiResponseStatus> JsonNotReadableExceptionHandler(Exception exception) {
-        log.warn("Jackson or JSON related Exception Message : {}", exception.getMessage());
-        log.warn("Jackson or JSON related Exception : ", exception);
+    @ExceptionHandler(HttpMessageConversionException.class)
+    public ApiResponse<ApiResponseStatus> JsonParseExceptionHandler(HttpMessageConversionException exception) {
+        log.warn("Exception Message : {}", exception.getMessage());
+        log.warn("Exception : ", exception);
         return ApiResponse.of(JSON_PARSE_ERROR);
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(TypeMismatchException.class)
+    public ApiResponse<ApiResponseStatus> UriFormatExceptionHandler(TypeMismatchException exception) {
+        log.warn("Exception Message : {}", exception.getMessage());
+        log.warn("Exception : ", exception);
+        return ApiResponse.of(URI_FORMAT_ERROR);
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
