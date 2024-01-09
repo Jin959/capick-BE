@@ -413,4 +413,21 @@ class MemberControllerTest {
                 .andDo(print());
     }
 
+    @Test
+    @DisplayName("성공: 회원 탈퇴를 요청 한다. HTTP 상태 코드 200 및 자체 응답 코드 204 를 반환한다.")
+    void deleteMember() throws Exception {
+        // given
+        int requestMemberId = 1234;
+
+        // when // then
+        mockMvc.perform(
+                        delete("/api/members/{memberId}", requestMemberId)
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value("204"))
+                .andExpect(jsonPath("$.message").value("리소스 삭제에 성공했습니다."))
+                .andExpect(jsonPath("$.data").doesNotExist())
+                .andDo(print());
+    }
+
 }

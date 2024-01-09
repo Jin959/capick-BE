@@ -21,6 +21,7 @@ import org.springframework.test.context.ActiveProfiles;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.capick.capick.domain.common.BaseStatus.INACTIVE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -251,6 +252,42 @@ class MemberServiceTest {
         assertThatThrownBy(() -> memberService.updateMemberPassword(requestWithUnchangedPassword))
                 .isInstanceOf(DuplicateResourceException.class)
                 .hasMessage("현재와 동일한 비밀번호 입니다.");
+    }
+
+    @Test
+    @DisplayName("성공: 서비스 이용을 종료하기 위해 회원 탈퇴를 할 수 있다.")
+    void deleteMember() {
+        // given
+        Member member = createMember("email@naver.com", "13password%^&", "nickname");
+        Long memberId = memberRepository.save(member).getId();
+
+        // when
+        memberService.deleteMember(memberId);
+
+        // then
+        Member updatedMember = memberRepository.findById(memberId).orElse(member);
+        assertThat(updatedMember)
+                .extracting("id", "status")
+                .contains(updatedMember.getId(), INACTIVE);
+    }
+
+    @Test
+    @DisplayName("예외: 회원 탈퇴 시 이미 탈퇴 처리 되었거나 존재하지 않는 회원이면 예외가 발생한다.")
+    void deleteNotExistMember() {
+        // given
+        Member member1 = createMember("email01@naver.com", "password01%^&", "nickname01");
+        member1.delete();
+        Member member2 = createMember("email02@naver.com", "password02%^&", "nickname02");
+        Long deletedMemberId = memberRepository.save(member1).getId();
+        Long notJoinedMemberId = memberRepository.save(member2).getId() + 1;
+
+        // when // then
+        assertThatThrownBy(() -> memberService.deleteMember(deletedMemberId))
+                .isInstanceOf(NotFoundResourceException.class)
+                .hasMessage("존재하지 않는 회원입니다.");
+        assertThatThrownBy(() -> memberService.deleteMember(notJoinedMemberId))
+                .isInstanceOf(NotFoundResourceException.class)
+                .hasMessage("존재하지 않는 회원입니다.");
     }
 
     private Member createMember(String email, String password, String nickname) {
