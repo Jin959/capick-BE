@@ -58,6 +58,9 @@ public class MemberService {
 
     @Transactional
     public void deleteMember(Long memberId) {
+        Member member = findMemberByIdOrElseThrow(memberId);
+        member.delete();
+        memberRepository.save(member);
     }
 
     private void ifExistsByEmailThrow(String email) {
