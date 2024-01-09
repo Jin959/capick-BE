@@ -42,4 +42,10 @@ public class MemberController {
         return ApiResponse.of(NO_DATA);
     }
 
+    @DeleteMapping("/{memberId}")
+    public ApiResponse<Void> deleteMember(@PathVariable("memberId") Long memberId) {
+        memberService.deleteMember(memberId);
+        return ApiResponse.isDeleted();
+    }
+
 }

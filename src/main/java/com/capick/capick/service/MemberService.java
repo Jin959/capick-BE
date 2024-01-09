@@ -33,13 +33,13 @@ public class MemberService {
     }
 
     public MemberResponse getMember(Long memberId) {
-        Member member = FindMemberOrElseThrow(memberId);
+        Member member = findMemberByIdOrElseThrow(memberId);
         return MemberResponse.of(member);
     }
 
     @Transactional
     public MemberSimpleResponse updateMemberNickname(MemberNicknameRequest memberNicknameRequest) {
-        Member member = FindMemberOrElseThrow(memberNicknameRequest.getId());
+        Member member = findMemberByIdOrElseThrow(memberNicknameRequest.getId());
 
         String nickname = memberNicknameRequest.getNickname();
         ifExistsByNicknameThrow(nickname);
@@ -51,9 +51,13 @@ public class MemberService {
 
     @Transactional
     public void updateMemberPassword(MemberPasswordRequest memberPasswordRequest) {
-        Member member = FindMemberOrElseThrow(memberPasswordRequest.getId());
+        Member member = findMemberByIdOrElseThrow(memberPasswordRequest.getId());
         member.updatePassword(memberPasswordRequest.getPassword());
         memberRepository.save(member);
+    }
+
+    @Transactional
+    public void deleteMember(Long memberId) {
     }
 
     private void ifExistsByEmailThrow(String email) {
@@ -68,7 +72,7 @@ public class MemberService {
         }
     }
 
-    private Member FindMemberOrElseThrow(Long id) {
+    private Member findMemberByIdOrElseThrow(Long id) {
         return memberRepository.findByIdAndStatus(id, ACTIVE)
                 .orElseThrow(() -> NotFoundResourceException.of(NOT_FOUND_MEMBER));
     }
