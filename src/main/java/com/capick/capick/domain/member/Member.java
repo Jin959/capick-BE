@@ -1,12 +1,17 @@
 package com.capick.capick.domain.member;
 
 import com.capick.capick.domain.common.BaseEntity;
+import com.capick.capick.domain.common.BaseStatus;
 import com.capick.capick.domain.common.Location;
+import com.capick.capick.exception.DuplicateResourceException;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+
+import static com.capick.capick.dto.ApiResponseStatus.NOT_CHANGED_PASSWORD;
 
 @Getter
 @Entity
@@ -17,7 +22,7 @@ public class Member extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 100)
+    @Column(nullable = false, length = 320)
     private String email;
 
     @Column(nullable = false)
@@ -40,4 +45,27 @@ public class Member extends BaseEntity {
     })
     private Location preferTown;
 
+    @Builder
+    private Member(String email, String password, String nickname, Profile profile, Location location) {
+        this.email = email;
+        this.password = password;
+        this.nickname = nickname;
+        this.profile = profile;
+        this.preferTown = location;
+    }
+
+    public void delete() {
+        this.status = BaseStatus.INACTIVE;
+    }
+
+    public void updateNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+    public void updatePassword(String password) {
+        if (password.equals(this.password)) {
+            throw DuplicateResourceException.of(NOT_CHANGED_PASSWORD);
+        }
+        this.password = password;
+    }
 }
