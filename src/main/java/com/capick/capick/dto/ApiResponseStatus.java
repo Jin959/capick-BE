@@ -14,6 +14,7 @@ public enum ApiResponseStatus {
     NO_DATA(HttpStatus.NO_CONTENT, "요청에 성공했습니다."),
 
     // 400
+    INCORRECT_PASSWORD_ERROR(HttpStatus.UNAUTHORIZED, "기존에 등록된 비밀번호와 일치하지 않습니다."),
     NOT_FOUND_MEMBER(HttpStatus.NOT_FOUND, "존재하지 않는 회원입니다."),
     DUPLICATE_EMAIL(HttpStatus.CONFLICT, "이미 존재하는 계정의 이메일 입니다."),
     DUPLICATE_NICKNAME(HttpStatus.CONFLICT, "이미 사용 중인 닉네임 입니다."),
