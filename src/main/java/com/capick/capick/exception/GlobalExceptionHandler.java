@@ -83,4 +83,12 @@ public class GlobalExceptionHandler {
         return ApiResponse.of(exception.getStatus());
     }
 
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    @ExceptionHandler(UnauthorizedException.class)
+    public ApiResponse<ApiResponseStatus> UnauthorizedExceptionHandler(UnauthorizedException exception) {
+        log.warn("Exception Message : {}", exception.getMessage());
+        log.warn("NotFoundResourceException : ", exception);
+        return ApiResponse.of(exception.getStatus());
+    }
+
 }
