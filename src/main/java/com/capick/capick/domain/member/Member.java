@@ -4,6 +4,7 @@ import com.capick.capick.domain.common.BaseEntity;
 import com.capick.capick.domain.common.BaseStatus;
 import com.capick.capick.domain.common.Location;
 import com.capick.capick.exception.DuplicateResourceException;
+import com.capick.capick.exception.UnauthorizedException;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -11,6 +12,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
+import static com.capick.capick.dto.ApiResponseStatus.INCORRECT_PASSWORD_ERROR;
 import static com.capick.capick.dto.ApiResponseStatus.NOT_CHANGED_PASSWORD;
 
 @Getter
@@ -62,10 +64,13 @@ public class Member extends BaseEntity {
         this.nickname = nickname;
     }
 
-    public void updatePassword(String password) {
-        if (password.equals(this.password)) {
+    public void updatePassword(String password, String newPassword) {
+        if (newPassword.equals(this.password)) {
             throw DuplicateResourceException.of(NOT_CHANGED_PASSWORD);
         }
-        this.password = password;
+        if (!password.equals(this.password)) {
+            throw UnauthorizedException.of(INCORRECT_PASSWORD_ERROR);
+        }
+        this.password = newPassword;
     }
 }
