@@ -10,6 +10,7 @@ import com.capick.capick.dto.response.MemberSimpleResponse;
 import com.capick.capick.dto.response.MemberResponse;
 import com.capick.capick.exception.DuplicateResourceException;
 import com.capick.capick.exception.NotFoundResourceException;
+import com.capick.capick.exception.UnauthorizedException;
 import com.capick.capick.repository.MemberRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -206,7 +207,7 @@ class MemberServiceTest {
         Member member = createMember("email@naver.com", "13password%^&", "nickname");
         Long memberId = memberRepository.save(member).getId();
 
-        MemberPasswordRequest request = createMemberPasswordRequest(memberId, "new13password%^&");
+        MemberPasswordRequest request = createMemberPasswordRequest(memberId, "13password%^&", "new13password%^&");
 
         // when
         memberService.updateMemberPassword(request);
@@ -227,8 +228,8 @@ class MemberServiceTest {
         Member member2 = createMember("email02@naver.com", "password02%^&", "nickname02");
         Long deletedMemberId = memberRepository.save(member1).getId();
         Long notJoinedMemberId = memberRepository.save(member2).getId() + 1;
-        MemberPasswordRequest requestWithDeletedMember = createMemberPasswordRequest(deletedMemberId, "new13password%^&1");
-        MemberPasswordRequest requestWithNotJoinedMember = createMemberPasswordRequest(notJoinedMemberId, "new13password%^&2");
+        MemberPasswordRequest requestWithDeletedMember = createMemberPasswordRequest(deletedMemberId, "password01%^&", "new13password%^&1");
+        MemberPasswordRequest requestWithNotJoinedMember = createMemberPasswordRequest(notJoinedMemberId, "password02%^&", "new13password%^&2");
 
         // when // then
         assertThatThrownBy(() -> memberService.updateMemberPassword(requestWithDeletedMember))
@@ -246,12 +247,27 @@ class MemberServiceTest {
         Member member = createMember("email@naver.com", "13password%^&", "nickname");
         Member savedMember = memberRepository.save(member);
 
-        MemberPasswordRequest requestWithUnchangedPassword = createMemberPasswordRequest(savedMember.getId(), savedMember.getPassword());
+        MemberPasswordRequest requestWithUnchangedPassword = createMemberPasswordRequest(savedMember.getId(), savedMember.getPassword(), savedMember.getPassword());
 
         // when // then
         assertThatThrownBy(() -> memberService.updateMemberPassword(requestWithUnchangedPassword))
                 .isInstanceOf(DuplicateResourceException.class)
                 .hasMessage("현재와 동일한 비밀번호 입니다.");
+    }
+
+    @Test
+    @DisplayName("예외: 비밀번호 수정 시 현재 비밀번호가 일치하지 않으면, 현재 비밀번호를 모르면, 비밀번호 수정 자격이 없다. 예외가 발생한다.")
+    void updateMemberPasswordWithIncorrectPassword() {
+        // given
+        Member member = createMember("email@naver.com", "13password%^&", "nickname");
+        Member savedMember = memberRepository.save(member);
+
+        MemberPasswordRequest requestWithIncorrectPassword = createMemberPasswordRequest(savedMember.getId(), "incorrect13password%", "new13password%^&");
+
+        // when // then
+        assertThatThrownBy(() -> memberService.updateMemberPassword(requestWithIncorrectPassword))
+                .isInstanceOf(UnauthorizedException.class)
+                .hasMessage("기존에 등록된 비밀번호와 일치하지 않습니다.");
     }
 
     @Test
@@ -332,10 +348,11 @@ class MemberServiceTest {
                 .build();
     }
 
-    private MemberPasswordRequest createMemberPasswordRequest(Long id, String password) {
+    private MemberPasswordRequest createMemberPasswordRequest(Long id, String password, String newPassword) {
         return MemberPasswordRequest.builder()
                 .id(id)
                 .password(password)
+                .newPassword(newPassword)
                 .build();
     }
 

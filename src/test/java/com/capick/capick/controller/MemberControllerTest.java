@@ -334,6 +334,7 @@ class MemberControllerTest {
         MemberPasswordRequest request = MemberPasswordRequest.builder()
                 .id(1L)
                 .password("pass!*word13")
+                .newPassword("new!*password13")
                 .build();
 
         // when // then
@@ -355,6 +356,7 @@ class MemberControllerTest {
         // given
         MemberPasswordRequest request = MemberPasswordRequest.builder()
                 .password("pass!*word13")
+                .newPassword("new!*password13")
                 .build();
 
         // when // then
@@ -371,11 +373,12 @@ class MemberControllerTest {
     }
 
     @Test
-    @DisplayName("예외: 비밀번호 수정 시 비밀번호는 필수값이다. 입력하지 않으면 HTTP 상태 코드 400 및 자체 응답 코드 400을 반환한다.")
+    @DisplayName("예외: 비밀번호 수정 시 기존 비밀번호는 필수값이다. 입력하지 않으면 HTTP 상태 코드 400 및 자체 응답 코드 400을 반환한다.")
     void updateMemberPasswordWithoutPassword() throws Exception {
         // given
         MemberPasswordRequest request = MemberPasswordRequest.builder()
                 .id(1L)
+                .newPassword("new!*password13")
                 .build();
 
         // when // then
@@ -386,7 +389,29 @@ class MemberControllerTest {
                 )
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value("400"))
-                .andExpect(jsonPath("$.message").value("비밀번호를 입력해주세요."))
+                .andExpect(jsonPath("$.message").value("기존 비밀번호를 입력해주세요."))
+                .andExpect(jsonPath("$.data").doesNotExist())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("예외: 비밀번호 수정 시 새 비밀번호는 필수값이다. 입력하지 않으면 HTTP 상태 코드 400 및 자체 응답 코드 400을 반환한다.")
+    void updateMemberPasswordWithoutNewPassword() throws Exception {
+        // given
+        MemberPasswordRequest request = MemberPasswordRequest.builder()
+                .id(1L)
+                .password("pass!*word13")
+                .build();
+
+        // when // then
+        mockMvc.perform(
+                        patch("/api/members/me/password")
+                                .content(objectMapper.writeValueAsString(request))
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("400"))
+                .andExpect(jsonPath("$.message").value("새 비밀번호를 입력해주세요."))
                 .andExpect(jsonPath("$.data").doesNotExist())
                 .andDo(print());
     }
@@ -395,20 +420,36 @@ class MemberControllerTest {
     @DisplayName("예외: 비밀번호 수정 시 형식은 띄어쓰기 없는 영문/숫자/특수문자(!@#$%^&*()?)를 조합하여 8자~20자이다. 그렇지 않으면 HTTP 상태 코드 400 및 자체 응답 코드 400을 반환한다.")
     void updateMemberPasswordWithInvalidPassword() throws Exception {
         // given
-        MemberPasswordRequest request = MemberPasswordRequest.builder()
+        MemberPasswordRequest requestWithInvalidPassword = MemberPasswordRequest.builder()
                 .id(1L)
                 .password("pass!*word")
+                .newPassword("new!*password13")
+                .build();
+        MemberPasswordRequest requestWithInvalidNewPassword = MemberPasswordRequest.builder()
+                .id(1L)
+                .password("pass!*word13")
+                .newPassword("new!*password")
                 .build();
 
         // when // then
         mockMvc.perform(
                         patch("/api/members/me/password")
-                                .content(objectMapper.writeValueAsString(request))
+                                .content(objectMapper.writeValueAsString(requestWithInvalidPassword))
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value("400"))
-                .andExpect(jsonPath("$.message").value("비밀번호는 띄어쓰기 없는 영문/숫자/특수문자(!@#$%^&*()?)를 조합하여 8자~20자리로 작성해주세요."))
+                .andExpect(jsonPath("$.message").value("기존 비밀번호는 띄어쓰기 없는 영문/숫자/특수문자(!@#$%^&*()?)를 조합하여 8자~20자리로 작성해주세요."))
+                .andExpect(jsonPath("$.data").doesNotExist())
+                .andDo(print());
+        mockMvc.perform(
+                        patch("/api/members/me/password")
+                                .content(objectMapper.writeValueAsString(requestWithInvalidNewPassword))
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("400"))
+                .andExpect(jsonPath("$.message").value("새 비밀번호는 띄어쓰기 없는 영문/숫자/특수문자(!@#$%^&*()?)를 조합하여 8자~20자리로 작성해주세요."))
                 .andExpect(jsonPath("$.data").doesNotExist())
                 .andDo(print());
     }

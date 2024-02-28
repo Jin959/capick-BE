@@ -52,7 +52,7 @@ public class MemberService {
     @Transactional
     public void updateMemberPassword(MemberPasswordRequest memberPasswordRequest) {
         Member member = findMemberByIdOrElseThrow(memberPasswordRequest.getId());
-        member.updatePassword(memberPasswordRequest.getPassword());
+        member.updatePassword(memberPasswordRequest.getPassword(), memberPasswordRequest.getNewPassword());
         memberRepository.save(member);
     }
 

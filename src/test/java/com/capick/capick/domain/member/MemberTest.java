@@ -2,6 +2,7 @@ package com.capick.capick.domain.member;
 
 import com.capick.capick.domain.common.BaseStatus;
 import com.capick.capick.exception.DuplicateResourceException;
+import com.capick.capick.exception.UnauthorizedException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -45,7 +46,7 @@ class MemberTest {
         Member member = createMember("email@naver.com", "pass!*word13", "nickname");
 
         // when
-        member.updatePassword("new!*password12");
+        member.updatePassword("pass!*word13", "new!*password12");
 
         // then
         assertThat(member)
@@ -61,9 +62,22 @@ class MemberTest {
         String unchangedPassword = "pass!*word13";
 
         // when // then
-        assertThatThrownBy(() -> member.updatePassword(unchangedPassword))
+        assertThatThrownBy(() -> member.updatePassword("pass!*word13", unchangedPassword))
                 .isInstanceOf(DuplicateResourceException.class)
                 .hasMessage("현재와 동일한 비밀번호 입니다.");
+    }
+
+    @Test
+    @DisplayName("예외: 비밀번호 수정 시 기존 비밀번호가 일치하지 않는 경우 예외가 발생한다.")
+    void updatePasswordWithIncorrectPassword() {
+        // given
+        Member member = createMember("email@naver.com", "pass!*word13", "nickname");
+        String incorrectPassword = "incorrect13password%";
+
+        // when // then
+        assertThatThrownBy(() -> member.updatePassword(incorrectPassword, "new!*password12"))
+                .isInstanceOf(UnauthorizedException.class)
+                .hasMessage("기존에 등록된 비밀번호와 일치하지 않습니다.");
     }
 
     private Member createMember(String email, String password, String nickname) {
