@@ -21,10 +21,8 @@ public class Cafe extends BaseEntity {
     @AttributeOverrides({
             @AttributeOverride(name = "latitude", column = @Column(name = "location_latitude")),
             @AttributeOverride(name = "longitude", column = @Column(name = "location_longitude")),
-            @AttributeOverride(name = "state", column = @Column(name = "location_state")),
-            @AttributeOverride(name = "city", column = @Column(name = "location_city")),
-            @AttributeOverride(name = "street", column = @Column(name = "location_street")),
-            @AttributeOverride(name = "number", column = @Column(name = "location_number"))
+            @AttributeOverride(name = "address", column = @Column(name = "location_address")),
+            @AttributeOverride(name = "roadAddress", column = @Column(name = "location_road_address")),
     })
     private Location location;
 

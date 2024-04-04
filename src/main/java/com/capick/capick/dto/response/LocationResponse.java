@@ -11,32 +11,24 @@ public class LocationResponse {
 
     private Double longitude;
 
-    private String state;
+    private String address;
 
-    private String city;
-
-    private String street;
-
-    private String number;
+    private String roadAddress;
 
     @Builder
-    private LocationResponse(Double latitude, Double longitude, String state, String city, String street, String number) {
+    private LocationResponse(Double latitude, Double longitude, String address, String roadAddress) {
         this.latitude = latitude;
         this.longitude = longitude;
-        this.state = state;
-        this.city = city;
-        this.street = street;
-        this.number = number;
+        this.address = address;
+        this.roadAddress = roadAddress;
     }
 
     public static LocationResponse of(Location location) {
         return LocationResponse.builder()
                 .latitude(location.getLatitude())
                 .longitude(location.getLongitude())
-                .state(location.getState())
-                .city(location.getCity())
-                .street(location.getStreet())
-                .number(location.getNumber())
+                .address(location.getAddress())
+                .roadAddress(location.getRoadAddress())
                 .build();
     }
 }

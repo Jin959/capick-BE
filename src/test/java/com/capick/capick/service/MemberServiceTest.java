@@ -84,9 +84,8 @@ class MemberServiceTest {
         Location preferTown = Location.builder()
                 .latitude(48.8)
                 .longitude(11.34)
-                .city("뮌헨")
-                .street("Marienplatz")
-                .number("80331")
+                .address("독일 뮌헨")
+                .roadAddress("독일 뮌헨로")
                 .build();
         Profile profileOnlyIntro = Profile.builder()
                 .introduction("자기소개 글")
@@ -114,8 +113,8 @@ class MemberServiceTest {
         assertThat(responses.get(2))
                 .extracting("id", "email", "nickname",
                         "profile.imageUrl", "profile.introduction",
-                        "preferTown.latitude", "preferTown.longitude", "preferTown.city", "preferTown.street", "preferTown.number")
-                .contains(memberWithProfileAndPreferTown.getId(), "email@naver.com", "닉네임", "image URL", "자기소개 글", 48.8, 11.34, "뮌헨", "Marienplatz", "80331");
+                        "preferTown.latitude", "preferTown.longitude", "preferTown.address", "preferTown.roadAddress")
+                .contains(memberWithProfileAndPreferTown.getId(), "email@naver.com", "닉네임", "image URL", "자기소개 글", 48.8, 11.34, "독일 뮌헨", "독일 뮌헨로");
         assertThat(responses.get(3))
                 .extracting("id", "email", "nickname", "profile.introduction")
                 .contains(memberWithIntro.getId(), "email@naver.com", "닉네임", "자기소개 글");
