@@ -3,6 +3,7 @@ package com.capick.capick.domain.cafe;
 import com.capick.capick.domain.common.BaseEntity;
 import com.capick.capick.domain.common.Location;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -30,5 +31,17 @@ public class Cafe extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     private CafeType cafeType;
+
+    @Builder
+    private Cafe(String kakaoPlaceId, Location location) {
+        this.kakaoPlaceId = kakaoPlaceId;
+        this.location = location;
+    }
+
+    // TODO: 리뷰 생성 DTO 개발 후 인자로 받아서 마저 개발
+    public static Cafe create() {
+        return Cafe.builder()
+                .build();
+    }
 
 }
