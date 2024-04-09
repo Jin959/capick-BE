@@ -40,10 +40,8 @@ public class Member extends BaseEntity {
     @AttributeOverrides({
             @AttributeOverride(name = "latitude", column = @Column(name = "prefer_town_latitude")),
             @AttributeOverride(name = "longitude", column = @Column(name = "prefer_town_longitude")),
-            @AttributeOverride(name = "state", column = @Column(name = "prefer_town_state")),
-            @AttributeOverride(name = "city", column = @Column(name = "prefer_town_city")),
-            @AttributeOverride(name = "street", column = @Column(name = "prefer_town_street")),
-            @AttributeOverride(name = "number", column = @Column(name = "prefer_town_number"))
+            @AttributeOverride(name = "address", column = @Column(name = "prefer_town_address")),
+            @AttributeOverride(name = "roadAddress", column = @Column(name = "prefer_town_road_address")),
     })
     private Location preferTown;
 

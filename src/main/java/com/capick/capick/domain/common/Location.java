@@ -17,15 +17,9 @@ public class Location {
     private Double longitude;
 
     @Column(length = 100)
-    private String state;
+    private String address;
 
     @Column(length = 100)
-    private String city;
-
-    @Column(length = 100)
-    private String street;
-
-    @Column(length = 10)
-    private String number;
+    private String roadAddress;
 
 }
