@@ -18,7 +18,13 @@ public class Cafe extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false, length = 30)
+    private String name;
+
     private String kakaoPlaceId;
+
+    @Column(length = 30)
+    private String kakaoDetailPageUrl;
 
     @Embedded
     @AttributeOverrides({
