@@ -4,6 +4,7 @@ import com.capick.capick.domain.cafe.Cafe;
 import com.capick.capick.domain.common.BaseEntity;
 import com.capick.capick.domain.member.Member;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -44,5 +45,19 @@ public class Review extends BaseEntity {
 
     @Column(nullable = false)
     private int noiseIndex;
+
+    @Builder
+    private Review(Member writer, Cafe cafe, String visitPurpose, String content,
+                   String menu, int coffeeIndex, int priceIndex, int spaceIndex, int noiseIndex) {
+        this.writer = writer;
+        this.cafe = cafe;
+        this.visitPurpose = visitPurpose;
+        this.content = content;
+        this.menu = menu;
+        this.coffeeIndex = coffeeIndex;
+        this.priceIndex = priceIndex;
+        this.spaceIndex = spaceIndex;
+        this.noiseIndex = noiseIndex;
+    }
 
 }
