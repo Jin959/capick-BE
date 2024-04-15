@@ -1,5 +1,7 @@
 package com.capick.capick.service;
 
+import com.capick.capick.domain.cafe.Cafe;
+import com.capick.capick.domain.member.Member;
 import com.capick.capick.domain.review.Review;
 import com.capick.capick.dto.request.ReviewCreateRequest;
 import com.capick.capick.dto.response.ReviewResponse;
@@ -15,8 +17,12 @@ public class ReviewService {
 
     private final ReviewRepository reviewRepository;
 
+    private final MemberServiceHelper memberServiceHelper;
+
     public ReviewResponse createReview(ReviewCreateRequest reviewCreateRequest) {
-        Review review = reviewRepository.save(reviewCreateRequest.toEntity());
+        Member writer = memberServiceHelper.findMemberByIdOrElseThrow(reviewCreateRequest.getWriterId());
+        Cafe cafe = Cafe.create();
+        Review review = reviewRepository.save(reviewCreateRequest.toEntity(writer, cafe));
         return ReviewResponse.of(review);
     }
 }
