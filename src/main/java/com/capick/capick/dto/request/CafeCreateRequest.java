@@ -11,6 +11,6 @@ public class CafeCreateRequest {
 
     private String kakaoDetailPageUrl;
 
-    private LocationRequest location;
+    private LocationCreateRequest location;
 
 }

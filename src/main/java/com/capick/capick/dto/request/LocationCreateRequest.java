@@ -3,7 +3,7 @@ package com.capick.capick.dto.request;
 import lombok.Getter;
 
 @Getter
-public class LocationRequest {
+public class LocationCreateRequest {
 
     private Double latitude;
 

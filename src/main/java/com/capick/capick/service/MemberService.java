@@ -21,11 +21,11 @@ public class MemberService {
     private final MemberServiceHelper memberServiceHelper;
 
     @Transactional
-    public MemberSimpleResponse createMember(MemberCreateRequest request) {
-        memberServiceHelper.ifExistsByEmailThrow(request.getEmail());
-        memberServiceHelper.ifExistsByNicknameThrow(request.getNickname());
+    public MemberSimpleResponse createMember(MemberCreateRequest memberCreateRequest) {
+        memberServiceHelper.ifExistsByEmailThrow(memberCreateRequest.getEmail());
+        memberServiceHelper.ifExistsByNicknameThrow(memberCreateRequest.getNickname());
 
-        Member member = memberRepository.save(request.toEntity());
+        Member member = memberRepository.save(memberCreateRequest.toEntity());
         return MemberSimpleResponse.of(member);
     }
 
