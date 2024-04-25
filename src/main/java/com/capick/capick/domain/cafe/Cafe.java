@@ -39,8 +39,10 @@ public class Cafe extends BaseEntity {
     private CafeType cafeType;
 
     @Builder
-    private Cafe(String kakaoPlaceId, Location location) {
+    private Cafe(String name, String kakaoPlaceId, String kakaoDetailPageUrl, Location location) {
+        this.name = name;
         this.kakaoPlaceId = kakaoPlaceId;
+        this.kakaoDetailPageUrl = kakaoDetailPageUrl;
         this.location = location;
     }
 

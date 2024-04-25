@@ -3,6 +3,7 @@ package com.capick.capick.dto.request;
 import com.capick.capick.domain.cafe.Cafe;
 import com.capick.capick.domain.member.Member;
 import com.capick.capick.domain.review.Review;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -28,6 +29,20 @@ public class ReviewCreateRequest {
 
     private int noiseIndex;
 
+    @Builder
+    public ReviewCreateRequest(Long writerId, CafeCreateRequest cafe, String visitPurpose, String content,
+                               String menu, int coffeeIndex, int spaceIndex, int priceIndex, int noiseIndex) {
+        this.writerId = writerId;
+        this.cafe = cafe;
+        this.visitPurpose = visitPurpose;
+        this.content = content;
+        this.menu = menu;
+        this.coffeeIndex = coffeeIndex;
+        this.spaceIndex = spaceIndex;
+        this.priceIndex = priceIndex;
+        this.noiseIndex = noiseIndex;
+    }
+
     public Review toEntity(Member writer, Cafe cafe) {
         return Review.builder()
                 .writer(writer)
@@ -36,8 +51,8 @@ public class ReviewCreateRequest {
                 .content(content)
                 .menu(menu)
                 .coffeeIndex(coffeeIndex)
-                .priceIndex(priceIndex)
                 .spaceIndex(spaceIndex)
+                .priceIndex(priceIndex)
                 .noiseIndex(noiseIndex)
                 .build();
     }
