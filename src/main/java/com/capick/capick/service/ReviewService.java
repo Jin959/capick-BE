@@ -23,6 +23,7 @@ public class ReviewService {
         Member writer = memberServiceHelper.findMemberByIdOrElseThrow(reviewCreateRequest.getWriterId());
         Cafe cafe = Cafe.create();
         Review review = reviewRepository.save(reviewCreateRequest.toEntity(writer, cafe));
+        cafe.updateCafeType(review);
         return ReviewResponse.of(review);
     }
 }

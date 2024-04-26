@@ -2,12 +2,17 @@ package com.capick.capick.domain.cafe;
 
 import com.capick.capick.domain.common.BaseEntity;
 import com.capick.capick.domain.common.Location;
+import com.capick.capick.domain.review.Review;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
 
 @Getter
 @Entity
@@ -35,6 +40,18 @@ public class Cafe extends BaseEntity {
     })
     private Location location;
 
+    @Column(nullable = false)
+    private int coffeeIndex;
+
+    @Column(nullable = false)
+    private int priceIndex;
+
+    @Column(nullable = false)
+    private int spaceIndex;
+
+    @Column(nullable = false)
+    private int noiseIndex;
+
     @Enumerated(EnumType.STRING)
     private CafeType cafeType;
 
@@ -50,6 +67,34 @@ public class Cafe extends BaseEntity {
     public static Cafe create() {
         return Cafe.builder()
                 .build();
+    }
+
+    public void updateCafeType(Review review) {
+        this.updateIndexes(review);
+
+        Map<String, Integer> indexMap = new HashMap<>();
+        indexMap.put("coffeeIndex", this.coffeeIndex);
+        indexMap.put("spaceIndex", this.spaceIndex);
+        indexMap.put("priceIndex", this.priceIndex);
+        indexMap.put("noiseIndex", this.noiseIndex);
+
+        // TODO: 최대값 반환 로직 메서드 추출하기, 가독성 측면, extractMaxIndexName
+        String maxIndexName = indexMap.keySet().stream()
+                .max(Comparator.comparing(indexMap::get))
+                .orElseGet(() -> "none");
+
+        // TODO: findeByIndexName 으로 분리하기, enum 에 책임이 있는지 고민해보기
+        this.cafeType = Arrays.stream(CafeType.values())
+                .filter(cafeType -> cafeType.getIndexName().equals(maxIndexName))
+                .findFirst()
+                .orElseGet(() -> CafeType.NONE);
+    }
+
+    private void updateIndexes(Review review) {
+        this.coffeeIndex += review.getCoffeeIndex();
+        this.spaceIndex += review.getSpaceIndex();
+        this.priceIndex += review.getPriceIndex();
+        this.noiseIndex += review.getNoiseIndex();
     }
 
 }
