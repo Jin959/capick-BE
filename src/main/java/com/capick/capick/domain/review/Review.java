@@ -38,25 +38,25 @@ public class Review extends BaseEntity {
     private int coffeeIndex;
 
     @Column(nullable = false)
-    private int priceIndex;
+    private int spaceIndex;
 
     @Column(nullable = false)
-    private int spaceIndex;
+    private int priceIndex;
 
     @Column(nullable = false)
     private int noiseIndex;
 
     @Builder
     private Review(Member writer, Cafe cafe, String visitPurpose, String content,
-                   String menu, int coffeeIndex, int priceIndex, int spaceIndex, int noiseIndex) {
+                   String menu, int coffeeIndex, int spaceIndex, int priceIndex, int noiseIndex) {
         this.writer = writer;
         this.cafe = cafe;
         this.visitPurpose = visitPurpose;
         this.content = content;
         this.menu = menu;
         this.coffeeIndex = coffeeIndex;
-        this.priceIndex = priceIndex;
         this.spaceIndex = spaceIndex;
+        this.priceIndex = priceIndex;
         this.noiseIndex = noiseIndex;
     }
 

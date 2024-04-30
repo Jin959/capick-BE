@@ -44,10 +44,10 @@ public class Cafe extends BaseEntity {
     private int coffeeIndex;
 
     @Column(nullable = false)
-    private int priceIndex;
+    private int spaceIndex;
 
     @Column(nullable = false)
-    private int spaceIndex;
+    private int priceIndex;
 
     @Column(nullable = false)
     private int noiseIndex;
