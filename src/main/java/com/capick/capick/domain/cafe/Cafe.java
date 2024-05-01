@@ -9,10 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @Getter
 @Entity
@@ -78,16 +75,26 @@ public class Cafe extends BaseEntity {
         indexMap.put("priceIndex", this.priceIndex);
         indexMap.put("noiseIndex", this.noiseIndex);
 
-        // TODO: 최대값 반환 로직 메서드 추출하기, 가독성 측면, extractMaxIndexName
-        String maxIndexName = indexMap.keySet().stream()
-                .max(Comparator.comparing(indexMap::get))
-                .orElseGet(() -> "none");
+        // TODO: 최대값이 몇개 존재하는 지 세는 행위 추출하기, countMaxIndex
+        Integer maxIndexValue = Collections.max(indexMap.values());
+        long maxIndexCount = indexMap.keySet().stream()
+                .filter(indexKey -> indexMap.get(indexKey).equals(maxIndexValue))
+                .count();
 
-        // TODO: findeByIndexName 으로 분리하기, enum 에 책임이 있는지 고민해보기
-        this.cafeType = Arrays.stream(CafeType.values())
-                .filter(cafeType -> cafeType.getIndexName().equals(maxIndexName))
-                .findFirst()
-                .orElseGet(() -> CafeType.NONE);
+        if (maxIndexCount == indexMap.size()) {
+            this.cafeType = CafeType.NONE;
+        } else {
+            // TODO: 최대값 반환 로직 메서드 추출하기, 가독성 측면, extractMaxIndexName
+            String maxIndexKey = indexMap.keySet().stream()
+                    .max(Comparator.comparing(indexMap::get))
+                    .orElseGet(() -> "none");
+
+            // TODO: findeByIndexName 으로 분리하기, enum 에 책임이 있는지 고민해보기
+            this.cafeType = Arrays.stream(CafeType.values())
+                    .filter(cafeType -> cafeType.getIndexName().equals(maxIndexKey))
+                    .findFirst()
+                    .orElseGet(() -> CafeType.NONE);
+        }
     }
 
     private void updateIndexes(Review review) {
