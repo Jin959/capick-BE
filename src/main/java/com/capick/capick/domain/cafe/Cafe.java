@@ -68,32 +68,15 @@ public class Cafe extends BaseEntity {
 
     public void updateCafeType(Review review) {
         this.updateIndexes(review);
+        Map<String, Integer> indexMap = createIndexMap();
 
-        Map<String, Integer> indexMap = new HashMap<>();
-        indexMap.put("coffeeIndex", this.coffeeIndex);
-        indexMap.put("spaceIndex", this.spaceIndex);
-        indexMap.put("priceIndex", this.priceIndex);
-        indexMap.put("noiseIndex", this.noiseIndex);
-
-        // TODO: 최대값이 몇개 존재하는 지 세는 행위 추출하기, countMaxIndex
         Integer maxIndexValue = Collections.max(indexMap.values());
-        long maxIndexCount = indexMap.keySet().stream()
-                .filter(indexKey -> indexMap.get(indexKey).equals(maxIndexValue))
-                .count();
 
-        if (maxIndexCount == indexMap.size()) {
+        if (countMaxIndex(indexMap, maxIndexValue) == indexMap.size()) {
             this.cafeType = CafeType.NONE;
         } else {
-            // TODO: 최대값 반환 로직 메서드 추출하기, 가독성 측면, extractMaxIndexName
-            String maxIndexKey = indexMap.keySet().stream()
-                    .max(Comparator.comparing(indexMap::get))
-                    .orElseGet(() -> "none");
-
-            // TODO: findeByIndexName 으로 분리하기, enum 에 책임이 있는지 고민해보기
-            this.cafeType = Arrays.stream(CafeType.values())
-                    .filter(cafeType -> cafeType.getIndexName().equals(maxIndexKey))
-                    .findFirst()
-                    .orElseGet(() -> CafeType.NONE);
+            String maxIndexKey = findMaxIndexName(indexMap);
+            this.cafeType = CafeType.findByIndexName(maxIndexKey);
         }
     }
 
@@ -102,6 +85,27 @@ public class Cafe extends BaseEntity {
         this.spaceIndex += review.getSpaceIndex();
         this.priceIndex += review.getPriceIndex();
         this.noiseIndex += review.getNoiseIndex();
+    }
+
+    private Map<String, Integer> createIndexMap() {
+        Map<String, Integer> indexMap = new HashMap<>();
+        indexMap.put("coffeeIndex", this.coffeeIndex);
+        indexMap.put("spaceIndex", this.spaceIndex);
+        indexMap.put("priceIndex", this.priceIndex);
+        indexMap.put("noiseIndex", this.noiseIndex);
+        return indexMap;
+    }
+
+    private long countMaxIndex(Map<String, Integer> indexMap, Integer maxIndexValue) {
+        return indexMap.keySet().stream()
+                .filter(indexKey -> indexMap.get(indexKey).equals(maxIndexValue))
+                .count();
+    }
+
+    private String findMaxIndexName(Map<String, Integer> indexMap) {
+        return indexMap.keySet().stream()
+                .max(Comparator.comparing(indexMap::get))
+                .orElseGet(() -> "none");
     }
 
 }

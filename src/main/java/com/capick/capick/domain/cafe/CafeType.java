@@ -3,6 +3,8 @@ package com.capick.capick.domain.cafe;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+import java.util.Arrays;
+
 @Getter
 @RequiredArgsConstructor
 public enum CafeType {
@@ -16,4 +18,10 @@ public enum CafeType {
     private final String text;
     private final String indexName;
 
+    public static CafeType findByIndexName(String indexName) {
+        return Arrays.stream(CafeType.values())
+                .filter(cafeType -> cafeType.getIndexName().equals(indexName))
+                .findFirst()
+                .orElseGet(() -> CafeType.NONE);
+    }
 }
