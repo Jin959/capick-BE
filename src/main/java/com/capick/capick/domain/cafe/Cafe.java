@@ -9,7 +9,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.*;
 
 @Getter
 @Entity
@@ -37,20 +36,8 @@ public class Cafe extends BaseEntity {
     })
     private Location location;
 
-    @Column(nullable = false)
-    private int coffeeIndex;
-
-    @Column(nullable = false)
-    private int spaceIndex;
-
-    @Column(nullable = false)
-    private int priceIndex;
-
-    @Column(nullable = false)
-    private int noiseIndex;
-
-    @Enumerated(EnumType.STRING)
-    private CafeType cafeType;
+    @Embedded
+    private CafeTypeInfo cafeTypeInfo = new CafeTypeInfo(0, 0, 0, 0, CafeType.NONE);
 
     @Builder
     private Cafe(String name, String kakaoPlaceId, String kakaoDetailPageUrl, Location location) {
@@ -67,45 +54,7 @@ public class Cafe extends BaseEntity {
     }
 
     public void updateCafeType(Review review) {
-        this.updateIndexes(review);
-        Map<String, Integer> indexMap = createIndexMap();
-
-        Integer maxIndexValue = Collections.max(indexMap.values());
-
-        if (countMaxIndex(indexMap, maxIndexValue) == indexMap.size()) {
-            this.cafeType = CafeType.NONE;
-        } else {
-            String maxIndexKey = findMaxIndexName(indexMap);
-            this.cafeType = CafeType.findByIndexName(maxIndexKey);
-        }
-    }
-
-    private void updateIndexes(Review review) {
-        this.coffeeIndex += review.getCoffeeIndex();
-        this.spaceIndex += review.getSpaceIndex();
-        this.priceIndex += review.getPriceIndex();
-        this.noiseIndex += review.getNoiseIndex();
-    }
-
-    private Map<String, Integer> createIndexMap() {
-        Map<String, Integer> indexMap = new HashMap<>();
-        indexMap.put("coffeeIndex", this.coffeeIndex);
-        indexMap.put("spaceIndex", this.spaceIndex);
-        indexMap.put("priceIndex", this.priceIndex);
-        indexMap.put("noiseIndex", this.noiseIndex);
-        return indexMap;
-    }
-
-    private long countMaxIndex(Map<String, Integer> indexMap, Integer maxIndexValue) {
-        return indexMap.keySet().stream()
-                .filter(indexKey -> indexMap.get(indexKey).equals(maxIndexValue))
-                .count();
-    }
-
-    private String findMaxIndexName(Map<String, Integer> indexMap) {
-        return indexMap.keySet().stream()
-                .max(Comparator.comparing(indexMap::get))
-                .orElseGet(() -> "none");
+        cafeTypeInfo.updateCafeType(review);
     }
 
 }
