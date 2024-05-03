@@ -92,7 +92,7 @@ class ReviewServiceTest {
         // then
         List<Cafe> cafes = cafeRepository.findAll();
         assertThat(cafes).hasSize(1)
-                .extracting("name", "kakaoPlaceId", "kakaoDetailPageUrl", "cafeType")
+                .extracting("name", "kakaoPlaceId", "kakaoDetailPageUrl", "cafeTypeInfo.cafeType")
                 .contains(
                         tuple("스타벅스 광화문점", "1234567", "https://place.url", COST_EFFECTIVE)
                 );

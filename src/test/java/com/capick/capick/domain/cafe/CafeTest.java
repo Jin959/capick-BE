@@ -19,7 +19,7 @@ class CafeTest {
         cafe.updateCafeType(review);
 
         // then
-        assertThat(cafe)
+        assertThat(cafe.getCafeTypeInfo())
                 .extracting("coffeeIndex", "spaceIndex", "priceIndex", "noiseIndex")
                 .contains(3, 3, 4, 3);
 
@@ -36,7 +36,7 @@ class CafeTest {
         cafe.updateCafeType(review);
 
         // then
-        assertThat(cafe.getCafeType()).isEqualByComparingTo(CafeType.COST_EFFECTIVE);
+        assertThat(cafe.getCafeTypeInfo().getCafeType()).isEqualByComparingTo(CafeType.COST_EFFECTIVE);
 
     }
 
@@ -51,7 +51,7 @@ class CafeTest {
         cafe.updateCafeType(review);
 
         // then
-        assertThat(cafe.getCafeType()).isEqualByComparingTo(CafeType.NONE);
+        assertThat(cafe.getCafeTypeInfo().getCafeType()).isEqualByComparingTo(CafeType.NONE);
 
     }
 
