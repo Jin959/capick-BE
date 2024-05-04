@@ -7,10 +7,7 @@ import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @Getter
 @Embeddable
@@ -34,7 +31,8 @@ public class CafeTypeInfo {
     private CafeType cafeType;
 
     protected void updateCafeType(Review review) {
-        this.updateIndexes(review);
+        preventIndexOverflow();
+        updateIndexes(review);
         Map<String, Integer> indexMap = createIndexMap();
 
         Integer maxIndexValue = Collections.max(indexMap.values());
@@ -42,6 +40,18 @@ public class CafeTypeInfo {
         if (hasMaxIndex(indexMap, maxIndexValue)) {
             String maxIndexKey = findMaxIndexName(indexMap);
             this.cafeType = CafeType.findByIndexName(maxIndexKey);
+        }
+    }
+
+    private void preventIndexOverflow() {
+        List<Integer> indexes = List.of(this.coffeeIndex, this.spaceIndex, this.priceIndex, this.noiseIndex);
+        int overflowBoundary = Integer.MAX_VALUE - 10000;
+
+        if (indexes.stream().anyMatch(index -> index > overflowBoundary)) {
+            this.coffeeIndex = 0;
+            this.spaceIndex = 0;
+            this.priceIndex = 0;
+            this.noiseIndex = 0;
         }
     }
 
