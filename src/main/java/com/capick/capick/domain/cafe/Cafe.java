@@ -39,6 +39,9 @@ public class Cafe extends BaseEntity {
     @Embedded
     private CafeTypeInfo cafeTypeInfo = new CafeTypeInfo(0, 0, 0, 0, CafeType.NONE);
 
+    @Embedded
+    private CafeThemeInfo cafeThemeInfo = new CafeThemeInfo(0, 0, 0, 0, 0, 0, 0, 0, CafeTheme.NORMAL);
+
     @Builder
     private Cafe(String name, String kakaoPlaceId, String kakaoDetailPageUrl, Location location) {
         this.name = name;

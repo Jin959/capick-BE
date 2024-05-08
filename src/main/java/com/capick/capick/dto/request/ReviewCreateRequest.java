@@ -29,9 +29,11 @@ public class ReviewCreateRequest {
 
     private int noiseIndex;
 
+    private String theme;
+
     @Builder
-    public ReviewCreateRequest(Long writerId, CafeCreateRequest cafe, String visitPurpose, String content,
-                               String menu, int coffeeIndex, int spaceIndex, int priceIndex, int noiseIndex) {
+    public ReviewCreateRequest(Long writerId, CafeCreateRequest cafe, String visitPurpose, String content, String menu,
+                               int coffeeIndex, int spaceIndex, int priceIndex, int noiseIndex, String theme) {
         this.writerId = writerId;
         this.cafe = cafe;
         this.visitPurpose = visitPurpose;
@@ -41,6 +43,7 @@ public class ReviewCreateRequest {
         this.spaceIndex = spaceIndex;
         this.priceIndex = priceIndex;
         this.noiseIndex = noiseIndex;
+        this.theme = theme;
     }
 
     public Review toEntity(Member writer, Cafe cafe) {
@@ -54,6 +57,7 @@ public class ReviewCreateRequest {
                 .spaceIndex(spaceIndex)
                 .priceIndex(priceIndex)
                 .noiseIndex(noiseIndex)
+                .theme(theme)
                 .build();
     }
 

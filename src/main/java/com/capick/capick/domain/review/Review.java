@@ -46,9 +46,12 @@ public class Review extends BaseEntity {
     @Column(nullable = false)
     private int noiseIndex;
 
+    @Column(nullable = false)
+    private String theme;
+
     @Builder
-    private Review(Member writer, Cafe cafe, String visitPurpose, String content,
-                   String menu, int coffeeIndex, int spaceIndex, int priceIndex, int noiseIndex) {
+    private Review(Member writer, Cafe cafe, String visitPurpose, String content, String menu,
+                   int coffeeIndex, int spaceIndex, int priceIndex, int noiseIndex, String theme) {
         this.writer = writer;
         this.cafe = cafe;
         this.visitPurpose = visitPurpose;
@@ -58,6 +61,7 @@ public class Review extends BaseEntity {
         this.spaceIndex = spaceIndex;
         this.priceIndex = priceIndex;
         this.noiseIndex = noiseIndex;
+        this.theme = theme;
     }
 
 }
