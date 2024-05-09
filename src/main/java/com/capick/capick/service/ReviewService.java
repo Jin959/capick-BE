@@ -24,6 +24,7 @@ public class ReviewService {
         Cafe cafe = Cafe.create();
         Review review = reviewRepository.save(reviewCreateRequest.toEntity(writer, cafe));
         cafe.updateCafeType(review);
+        cafe.updateCafeTheme(review);
         return ReviewResponse.of(review);
     }
 }

@@ -60,4 +60,8 @@ public class Cafe extends BaseEntity {
         cafeTypeInfo.updateCafeType(review);
     }
 
+    public void updateCafeTheme(Review review) {
+        cafeThemeInfo.updateCafeTheme(review);
+    }
+
 }
