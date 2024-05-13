@@ -23,7 +23,7 @@ class CafeTest {
         // then
         assertThat(cafe.getCafeTypeInfo())
                 .extracting("coffeeIndex", "spaceIndex", "priceIndex", "noiseIndex")
-                .contains(3, 3, 4, 3);
+                .containsExactly(3, 3, 4, 3);
 
     }
 
@@ -43,8 +43,8 @@ class CafeTest {
     }
 
     @Test
-    @DisplayName("경계: 까페 타입 갱신 시 누적된 지수 중 최대값이 없으면 NONE 으로 기록한다.")
-    void updateCafeTypeNone() {
+    @DisplayName("경계: 까페 타입 갱신 시 누적된 지수 중 최대값이 없으면 갱신 이전 까페 타입을 유지한다.")
+    void updateCafeTypeWithoutMaxIndex() {
         // given
         Review review = createReview("일하거나 책읽기 좋아요", "리뷰 내용", "아메리카노", 3, 3, 3, 3, "normal");
         Cafe cafe = createCafe("스타벅스 광화문점", "1234567", "https://place.url");
