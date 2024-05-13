@@ -118,7 +118,7 @@ public class CafeThemeInfo {
     }
 
     private boolean hasMaxThemeCount(Map<String, Integer> themeCountMap, Integer maxCountValue) {
-        return countMaxTheme(themeCountMap, maxCountValue) < themeCountMap.size();
+        return countMaxTheme(themeCountMap, maxCountValue) == 1;
     }
 
     private long countMaxTheme(Map<String, Integer> themeCountMap, Integer maxCountValue) {
