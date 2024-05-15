@@ -18,6 +18,7 @@ import org.springframework.test.context.ActiveProfiles;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static com.capick.capick.domain.cafe.CafeTheme.NORMAL;
 import static com.capick.capick.domain.cafe.CafeType.COST_EFFECTIVE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
@@ -59,7 +60,7 @@ class ReviewServiceTest {
         CafeCreateRequest cafeCreateRequest
                 = createCafeCreateRequest("스타벅스 광화문점", "1234567", "https://place.url");
         ReviewCreateRequest reviewCreateRequest
-                = createReviewCreateRequest(writerId, cafeCreateRequest, "일하거나 책읽기 좋아요", "리뷰 내용", "아메리카노", 3, 3, 3, 3);
+                = createReviewCreateRequest(writerId, cafeCreateRequest, "일하거나 책읽기 좋아요", "리뷰 내용", "아메리카노", 3, 3, 3, 3, "normal");
 
         // when
         ReviewResponse response = reviewService.createReview(reviewCreateRequest);
@@ -73,8 +74,8 @@ class ReviewServiceTest {
     }
 
     @Test
-    @DisplayName("성공: 어떤 까페에 리뷰가 처음 작성되는 경우, 까페가 등록되면서 까페 타입이 정해진다.")
-    void createFirstReview() {
+    @DisplayName("성공: 어떤 까페에 리뷰가 처음 작성되는 경우, 까페가 등록된다.")
+    void createFirstReviewWithCreateCafe() {
         // given
         Member writer = createMember("email01@naver.com", "password01%^&", "nickname01");
         memberRepository.save(writer);
@@ -82,19 +83,43 @@ class ReviewServiceTest {
 
         CafeCreateRequest cafeCreateRequest
                 = createCafeCreateRequest("스타벅스 광화문점", "1234567", "https://place.url");
-
         ReviewCreateRequest reviewCreateRequestForCostEffectiveTypeCafe
-                = createReviewCreateRequest(writerId, cafeCreateRequest, "일하거나 책읽기 좋아요", "리뷰 내용", "아메리카노", 3, 3, 4, 3);
+                = createReviewCreateRequest(writerId, cafeCreateRequest, "일하거나 책읽기 좋아요", "리뷰 내용", "아메리카노", 3, 3, 4, 3, "normal");
 
         // when
-        ReviewResponse response = reviewService.createReview(reviewCreateRequestForCostEffectiveTypeCafe);
+        reviewService.createReview(reviewCreateRequestForCostEffectiveTypeCafe);
+
+        // then
+        List<Cafe> cafes = cafeRepository.findAll();
+        assertThat(cafes).hasSize(1).extracting("name", "kakaoPlaceId", "kakaoDetailPageUrl")
+                .contains(
+                        tuple("스타벅스 광화문점", "1234567", "https://place.url")
+                );
+
+    }
+
+    @Test
+    @DisplayName("성공: 리뷰가 작성 될때 까페 타입과 테마가 갱신 된다.")
+    void createReviewWithUpdateCafeTypeAndCafeTheme() {
+        // given
+        Member writer = createMember("email01@naver.com", "password01%^&", "nickname01");
+        memberRepository.save(writer);
+        Long writerId = writer.getId();
+
+        CafeCreateRequest cafeCreateRequest
+                = createCafeCreateRequest("스타벅스 광화문점", "1234567", "https://place.url");
+        ReviewCreateRequest reviewCreateRequestForCostEffectiveTypeCafe
+                = createReviewCreateRequest(writerId, cafeCreateRequest, "일하거나 책읽기 좋아요", "리뷰 내용", "아메리카노", 3, 3, 4, 3, "normal");
+
+        // when
+        reviewService.createReview(reviewCreateRequestForCostEffectiveTypeCafe);
 
         // then
         List<Cafe> cafes = cafeRepository.findAll();
         assertThat(cafes).hasSize(1)
-                .extracting("name", "kakaoPlaceId", "kakaoDetailPageUrl", "cafeTypeInfo.cafeType")
+                .extracting("cafeTypeInfo.cafeType", "cafeThemeInfo.cafeTheme")
                 .contains(
-                        tuple("스타벅스 광화문점", "1234567", "https://place.url", COST_EFFECTIVE)
+                        tuple(COST_EFFECTIVE, NORMAL)
                 );
 
     }
@@ -126,7 +151,7 @@ class ReviewServiceTest {
 
     private static ReviewCreateRequest createReviewCreateRequest(
             Long writerId, CafeCreateRequest cafe, String visitPurpose, String content,
-            String menu, int coffeeIndex, int spaceIndex, int priceIndex, int noiseIndex) {
+            String menu, int coffeeIndex, int spaceIndex, int priceIndex, int noiseIndex, String theme) {
         return ReviewCreateRequest.builder()
                 .writerId(writerId)
                 .cafe(cafe)
@@ -137,6 +162,7 @@ class ReviewServiceTest {
                 .spaceIndex(spaceIndex)
                 .priceIndex(priceIndex)
                 .noiseIndex(noiseIndex)
+                .theme(theme)
                 .build();
     }
 
