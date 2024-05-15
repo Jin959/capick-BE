@@ -73,7 +73,7 @@ public class CafeTypeInfo {
     }
 
     private boolean hasMaxIndex(Map<String, Integer> indexMap, Integer maxIndexValue) {
-        return countMaxIndex(indexMap, maxIndexValue) < indexMap.size();
+        return countMaxIndex(indexMap, maxIndexValue) == 1;
     }
 
     private long countMaxIndex(Map<String, Integer> indexMap, Integer maxIndexValue) {
