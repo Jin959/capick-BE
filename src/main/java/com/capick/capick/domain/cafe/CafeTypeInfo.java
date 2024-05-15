@@ -31,43 +31,44 @@ public class CafeTypeInfo {
     private CafeType cafeType;
 
     protected void updateCafeType(Review review) {
-        preventIndexOverflow();
-        updateIndexes(review);
-        Map<String, Integer> indexMap = createIndexMap();
+        List<Integer> indexes = List.of(coffeeIndex, spaceIndex, priceIndex, noiseIndex);
 
+        preventIndexOverflow(indexes);
+        updateIndexes(review);
+
+        Map<String, Integer> indexMap = createIndexMap();
         Integer maxIndexValue = Collections.max(indexMap.values());
 
         if (hasMaxIndex(indexMap, maxIndexValue)) {
             String maxIndexKey = findMaxIndexName(indexMap);
-            this.cafeType = CafeType.findByIndexName(maxIndexKey);
+            cafeType = CafeType.findByIndexName(maxIndexKey);
         }
     }
 
-    private void preventIndexOverflow() {
-        List<Integer> indexes = List.of(this.coffeeIndex, this.spaceIndex, this.priceIndex, this.noiseIndex);
+    private void preventIndexOverflow(List<Integer> indexes) {
         int overflowBoundary = Integer.MAX_VALUE - 10000;
 
         if (indexes.stream().anyMatch(index -> index > overflowBoundary)) {
-            this.coffeeIndex = 0;
-            this.spaceIndex = 0;
-            this.priceIndex = 0;
-            this.noiseIndex = 0;
+            coffeeIndex /= 2;
+            spaceIndex /= 2;
+            priceIndex /= 2;
+            noiseIndex /= 2;
         }
     }
 
     private void updateIndexes(Review review) {
-        this.coffeeIndex += review.getCoffeeIndex();
-        this.spaceIndex += review.getSpaceIndex();
-        this.priceIndex += review.getPriceIndex();
-        this.noiseIndex += review.getNoiseIndex();
+        coffeeIndex += review.getCoffeeIndex();
+        spaceIndex += review.getSpaceIndex();
+        priceIndex += review.getPriceIndex();
+        noiseIndex += review.getNoiseIndex();
     }
 
     private Map<String, Integer> createIndexMap() {
         Map<String, Integer> indexMap = new HashMap<>();
-        indexMap.put("coffeeIndex", this.coffeeIndex);
-        indexMap.put("spaceIndex", this.spaceIndex);
-        indexMap.put("priceIndex", this.priceIndex);
-        indexMap.put("noiseIndex", this.noiseIndex);
+        indexMap.put("coffeeIndex", coffeeIndex);
+        indexMap.put("spaceIndex", spaceIndex);
+        indexMap.put("priceIndex", priceIndex);
+        indexMap.put("noiseIndex", noiseIndex);
         return indexMap;
     }
 
