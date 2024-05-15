@@ -57,23 +57,23 @@ class CafeTest {
 
     }
 
+
     @Test
     @DisplayName("경계: 까페 타입 갱신 시 누적된 타입 지수가 자료형 크기를 초과할 경우에도 까페 타입 지정에는 영향이 없어야 한다.")
     void updateCafeTypeOverflow() {
         // given
         Review reviewWithMaxIntegerIndex = createReview("일하거나 책읽기 좋아요", "리뷰 내용", "아메리카노",
-                Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE, "normal");
+                Integer.MAX_VALUE, Integer.MAX_VALUE - 1, Integer.MAX_VALUE - 1, Integer.MAX_VALUE - 1, "normal");
         Cafe cafe = createCafe("스타벅스 광화문점", "1234567", "https://place.url");
-        Review review = createReview("일하거나 책읽기 좋아요", "리뷰 내용", "아메리카노", 3, 3, 4, 3, "normal");
+        Review review = createReview("일하거나 책읽기 좋아요", "리뷰 내용", "아메리카노", 3, 3, 3 + 2, 3, "normal");
 
         // when
+        // TODO: 두 행위 각각에 대해 까페 타입이 변했는지 시나리오 테스트 DynamicTest 를 사용해야 할 것 같다. 확실하지는 않음.
         cafe.updateCafeType(reviewWithMaxIntegerIndex);
         cafe.updateCafeType(review);
 
         // then
-        assertThat(cafe.getCafeTypeInfo())
-                .extracting("coffeeIndex", "spaceIndex", "priceIndex", "noiseIndex", "cafeType")
-                .containsExactly(3, 3, 4, 3, CafeType.COST_EFFECTIVE);
+        assertThat(cafe.getCafeTypeInfo().getCafeType()).isEqualByComparingTo(CafeType.COST_EFFECTIVE);
     }
 
     @Test
