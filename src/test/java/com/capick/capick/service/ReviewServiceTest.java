@@ -1,8 +1,10 @@
 package com.capick.capick.service;
 
 import com.capick.capick.domain.cafe.Cafe;
+import com.capick.capick.domain.common.Location;
 import com.capick.capick.domain.member.Member;
 import com.capick.capick.dto.request.CafeCreateRequest;
+import com.capick.capick.dto.request.LocationCreateRequest;
 import com.capick.capick.dto.request.ReviewCreateRequest;
 import com.capick.capick.dto.response.ReviewResponse;
 import com.capick.capick.repository.CafeRepository;
@@ -47,14 +49,15 @@ class ReviewServiceTest {
     }
 
     @Test
-    @DisplayName("성공: 회원은 까페 후기를 남기고 공유하기 위해 리뷰를 생성할 수 있다.")
+    @DisplayName("성공: 회원은 까페 후기를 남기고 공유하기 위해 등록된 까페에 대해 리뷰를 생성할 수 있다.")
     void createReview() {
         // given
         Member writer = createMember("email01@naver.com", "password01%^&", "nickname01");
         memberRepository.save(writer);
         Long writerId = writer.getId();
 
-        Cafe cafe = createCafe("스타벅스 광화문점", "1234567", "https://place.url");
+        Location cafeLocation = createLocation(37.57122962143047, 126.97629649901215, "서울 종로구 세종로 00-0", "서울 종로구 세종대로 000");
+        Cafe cafe = createCafe("스타벅스 광화문점", "1234567", "https://place.url", cafeLocation);
         cafeRepository.save(cafe);
 
         CafeCreateRequest cafeCreateRequest
@@ -74,15 +77,17 @@ class ReviewServiceTest {
     }
 
     @Test
-    @DisplayName("성공: 어떤 까페에 리뷰가 처음 작성되는 경우, 까페가 등록된다.")
+    @DisplayName("성공: 어떤 까페에 리뷰가 처음 작성되는 경우 까페가 등록 된 적이 없으므로 까페 위치정보가 함께 주어지며 까페가 등록된다.")
     void createFirstReviewWithCreateCafe() {
         // given
         Member writer = createMember("email01@naver.com", "password01%^&", "nickname01");
         memberRepository.save(writer);
         Long writerId = writer.getId();
 
+        LocationCreateRequest locationCreateRequest
+                = createLocationCreateRequest(37.57122962143047, 126.97629649901215, "서울 종로구 세종로 00-0", "서울 종로구 세종대로 000");
         CafeCreateRequest cafeCreateRequest
-                = createCafeCreateRequest("스타벅스 광화문점", "1234567", "https://place.url");
+                = createCafeCreateRequest("스타벅스 광화문점", "1234567", "https://place.url", locationCreateRequest);
         ReviewCreateRequest reviewCreateRequestForCostEffectiveTypeCafe
                 = createReviewCreateRequest(writerId, cafeCreateRequest, "일하거나 책읽기 좋아요", "리뷰 내용", "아메리카노", 3, 3, 4, 3, "normal");
 
@@ -105,6 +110,10 @@ class ReviewServiceTest {
         Member writer = createMember("email01@naver.com", "password01%^&", "nickname01");
         memberRepository.save(writer);
         Long writerId = writer.getId();
+
+        Location cafeLocation = createLocation(37.57122962143047, 126.97629649901215, "서울 종로구 세종로 00-0", "서울 종로구 세종대로 000");
+        Cafe cafe = createCafe("스타벅스 광화문점", "1234567", "https://place.url", cafeLocation);
+        cafeRepository.save(cafe);
 
         CafeCreateRequest cafeCreateRequest
                 = createCafeCreateRequest("스타벅스 광화문점", "1234567", "https://place.url");
@@ -132,11 +141,30 @@ class ReviewServiceTest {
                 .build();
     }
 
-    private Cafe createCafe(String name, String kakaoPlaceId, String kakaoDetailPageUrl) {
+    private Location createLocation(double latitude, double longitude, String address, String roadAddress) {
+        return Location.builder()
+                .latitude(latitude)
+                .longitude(longitude)
+                .address(address)
+                .roadAddress(roadAddress)
+                .build();
+    }
+
+    private Cafe createCafe(String name, String kakaoPlaceId, String kakaoDetailPageUrl, Location location) {
         return Cafe.builder()
                 .name(name)
                 .kakaoPlaceId(kakaoPlaceId)
                 .kakaoDetailPageUrl(kakaoDetailPageUrl)
+                .location(location)
+                .build();
+    }
+
+    private LocationCreateRequest createLocationCreateRequest(double latitude, double longitude, String address, String roadAddress) {
+        return LocationCreateRequest.builder()
+                .latitude(latitude)
+                .longitude(longitude)
+                .address(address)
+                .roadAddress(roadAddress)
                 .build();
     }
 
@@ -146,6 +174,16 @@ class ReviewServiceTest {
                 .name(name)
                 .kakaoPlaceId(kakaoPlaceId)
                 .kakaoDetailPageUrl(kakaoDetailPageUrl)
+                .build();
+    }
+
+    private static CafeCreateRequest createCafeCreateRequest(
+            String name, String kakaoPlaceId, String kakaoDetailPageUrl, LocationCreateRequest location) {
+        return CafeCreateRequest.builder()
+                .name(name)
+                .kakaoPlaceId(kakaoPlaceId)
+                .kakaoDetailPageUrl(kakaoDetailPageUrl)
+                .location(location)
                 .build();
     }
 
