@@ -67,11 +67,27 @@ public class GlobalExceptionHandler {
         return ApiResponse.of(exception.getStatus());
     }
 
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(DomainPoliticalArgumentException.class)
+    public ApiResponse<ApiResponseStatus> DomainPoliticalArgumentException(DomainPoliticalArgumentException exception) {
+        log.warn("Exception Message : {}", exception.getMessage());
+        log.warn("DomainPoliticalArgumentException : ", exception);
+        return ApiResponse.of(exception.getStatus());
+    }
+
     @ResponseStatus(HttpStatus.CONFLICT)
     @ExceptionHandler(DuplicateResourceException.class)
     public ApiResponse<ApiResponseStatus> DuplicateResourceExceptionHandler(DuplicateResourceException exception) {
         log.warn("Exception Message : {}", exception.getMessage());
         log.warn("DuplicateResourceException : ", exception);
+        return ApiResponse.of(exception.getStatus());
+    }
+
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ExceptionHandler(DomainLogicalException.class)
+    public ApiResponse<ApiResponseStatus> DomainLogicalExceptionHandler(DomainLogicalException exception) {
+        log.warn("Exception Message : {}", exception.getMessage());
+        log.warn("DomainLogicalException : ", exception);
         return ApiResponse.of(exception.getStatus());
     }
 
