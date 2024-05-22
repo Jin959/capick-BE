@@ -206,6 +206,36 @@ class ReviewServiceTest {
 
     }
 
+    @Test
+    @DisplayName("경계: 리뷰 작성 시 간접적인 설문을 통해 까페의 타입 지수를 1 에서 5 로 매길 수 있다. 1 과 5 는 가능해야 한다.")
+    void createReviewWithCafeTypeIndexOutOfRangeBoundary() {
+        // given
+        Member writer = createMember("email01@naver.com", "password01%^&", "nickname01");
+        memberRepository.save(writer);
+        Long writerId = writer.getId();
+
+        Location cafeLocation = createLocation(37.57122962143047, 126.97629649901215, "서울 종로구 세종로 00-0", "서울 종로구 세종대로 000");
+        Cafe cafe = createCafe("스타벅스 광화문점", "1234567", "https://place.url", cafeLocation);
+        cafeRepository.save(cafe);
+
+        CafeCreateRequest cafeCreateRequest
+                = createCafeCreateRequest("스타벅스 광화문점", "1234567", "https://place.url");
+        ReviewCreateRequest reviewCreateRequest
+                = createReviewCreateRequest(writerId, cafeCreateRequest, "일하거나 책읽기 좋아요", "리뷰 내용", "아메리카노", 1, 3, 5, 3, "normal");
+
+        // when
+        reviewService.createReview(reviewCreateRequest);
+
+        // then
+        List<Cafe> cafes = cafeRepository.findAll();
+        assertThat(cafes).hasSize(1)
+                .extracting("cafeTypeInfo.cafeType")
+                .contains(
+                        tuple(COST_EFFECTIVE)
+                );
+
+    }
+
     private Member createMember(String email, String password, String nickname) {
         return Member.builder()
                 .email(email)
