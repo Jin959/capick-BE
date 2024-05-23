@@ -3,12 +3,16 @@ package com.capick.capick.domain.review;
 import com.capick.capick.domain.cafe.Cafe;
 import com.capick.capick.domain.common.BaseEntity;
 import com.capick.capick.domain.member.Member;
+import com.capick.capick.exception.DomainPoliticalArgumentException;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.List;
+
+import static com.capick.capick.dto.ApiResponseStatus.REVIEW_WITH_CAFE_TYPE_INDEX_OUT_OF_RANGE;
 
 @Getter
 @Entity
@@ -62,6 +66,19 @@ public class Review extends BaseEntity {
         this.priceIndex = priceIndex;
         this.noiseIndex = noiseIndex;
         this.theme = theme;
+    }
+
+    public void updateIndexes(int coffeeIndex, int spaceIndex, int priceIndex, int noiseIndex) {
+        List<Integer> indexes = List.of(coffeeIndex, spaceIndex, priceIndex, noiseIndex);
+        boolean isIndexOutOfRange = indexes.stream().anyMatch(index -> index < 1 || index > 5);
+        if (isIndexOutOfRange) {
+            throw DomainPoliticalArgumentException.of(REVIEW_WITH_CAFE_TYPE_INDEX_OUT_OF_RANGE);
+        }
+
+        this.coffeeIndex = coffeeIndex;
+        this.spaceIndex = spaceIndex;
+        this.priceIndex = priceIndex;
+        this.noiseIndex = noiseIndex;
     }
 
 }

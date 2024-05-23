@@ -53,10 +53,6 @@ public class ReviewCreateRequest {
                 .visitPurpose(visitPurpose)
                 .content(content)
                 .menu(menu)
-                .coffeeIndex(coffeeIndex)
-                .spaceIndex(spaceIndex)
-                .priceIndex(priceIndex)
-                .noiseIndex(noiseIndex)
                 .theme(theme)
                 .build();
     }
