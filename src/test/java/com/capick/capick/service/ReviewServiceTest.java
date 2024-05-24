@@ -45,9 +45,9 @@ class ReviewServiceTest {
 
     @AfterEach
     void tearDown() {
+        reviewRepository.deleteAllInBatch();
         memberRepository.deleteAllInBatch();
         cafeRepository.deleteAllInBatch();
-        reviewRepository.deleteAllInBatch();
     }
 
     @Test
@@ -230,9 +230,7 @@ class ReviewServiceTest {
         List<Cafe> cafes = cafeRepository.findAll();
         assertThat(cafes).hasSize(1)
                 .extracting("cafeTypeInfo.cafeType")
-                .contains(
-                        tuple(COST_EFFECTIVE)
-                );
+                .contains(COST_EFFECTIVE);
 
     }
 
