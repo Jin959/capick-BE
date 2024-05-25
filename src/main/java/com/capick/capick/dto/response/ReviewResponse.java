@@ -19,16 +19,17 @@ public class ReviewResponse {
 
     private String menu;
 
-    private LocalDateTime createdAt;
+    private LocalDateTime registeredAt;
 
     @Builder
-    private ReviewResponse(Long id, MemberSimpleResponse writer, String visitPurpose, String content, String menu, LocalDateTime createdAt) {
+    private ReviewResponse(Long id, MemberSimpleResponse writer, String visitPurpose,
+                           String content, String menu, LocalDateTime registeredAt) {
         this.id = id;
         this.writer = writer;
         this.visitPurpose = visitPurpose;
         this.content = content;
         this.menu = menu;
-        this.createdAt = createdAt;
+        this.registeredAt = registeredAt;
     }
 
     public static ReviewResponse of(Review review) {
@@ -40,7 +41,7 @@ public class ReviewResponse {
                 .visitPurpose(review.getVisitPurpose())
                 .content(review.getContent())
                 .menu(review.getMenu())
-                .createdAt(review.getCreatedAt())
+                .registeredAt(review.getRegisteredAt())
                 .build();
     }
 

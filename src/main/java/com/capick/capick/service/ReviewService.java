@@ -12,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+
 import static com.capick.capick.domain.common.BaseStatus.ACTIVE;
 
 @Service
@@ -26,7 +28,7 @@ public class ReviewService {
     private final MemberServiceHelper memberServiceHelper;
 
     @Transactional
-    public ReviewResponse createReview(ReviewCreateRequest reviewCreateRequest) {
+    public ReviewResponse createReview(ReviewCreateRequest reviewCreateRequest, LocalDateTime registeredAt) {
         Member writer = memberServiceHelper.findMemberByIdOrElseThrow(reviewCreateRequest.getWriterId());
 
         CafeCreateRequest cafeCreateRequest = reviewCreateRequest.getCafe();
@@ -36,7 +38,7 @@ public class ReviewService {
                             cafeCreateRequest.getKakaoDetailPageUrl(), cafeCreateRequest.getLocation()
                     ));
 
-        Review review = reviewCreateRequest.toEntity(writer, cafe);
+        Review review = reviewCreateRequest.toEntity(writer, cafe, registeredAt);
         review.updateIndexes(
                 reviewCreateRequest.getCoffeeIndex(), reviewCreateRequest.getSpaceIndex(),
                 reviewCreateRequest.getPriceIndex(), reviewCreateRequest.getNoiseIndex());
