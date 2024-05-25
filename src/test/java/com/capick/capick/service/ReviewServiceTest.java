@@ -269,7 +269,7 @@ class ReviewServiceTest {
                 .build();
     }
 
-    private static CafeCreateRequest createCafeCreateRequest(
+    private CafeCreateRequest createCafeCreateRequest(
             String name, String kakaoPlaceId, String kakaoDetailPageUrl) {
         return CafeCreateRequest.builder()
                 .name(name)
@@ -278,7 +278,7 @@ class ReviewServiceTest {
                 .build();
     }
 
-    private static CafeCreateRequest createCafeCreateRequest(
+    private CafeCreateRequest createCafeCreateRequest(
             String name, String kakaoPlaceId, String kakaoDetailPageUrl, LocationCreateRequest location) {
         return CafeCreateRequest.builder()
                 .name(name)
@@ -288,7 +288,7 @@ class ReviewServiceTest {
                 .build();
     }
 
-    private static ReviewCreateRequest createReviewCreateRequest(
+    private ReviewCreateRequest createReviewCreateRequest(
             Long writerId, CafeCreateRequest cafe, String visitPurpose, String content,
             String menu, int coffeeIndex, int spaceIndex, int priceIndex, int noiseIndex, String theme) {
         return ReviewCreateRequest.builder()
