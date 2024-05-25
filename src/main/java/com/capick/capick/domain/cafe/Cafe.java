@@ -47,6 +47,7 @@ public class Cafe extends BaseEntity {
     @Embedded
     private CafeThemeInfo cafeThemeInfo = new CafeThemeInfo(0, 0, 0, 0, 0, 0, 0, 0, CafeTheme.NORMAL);
 
+    // TODO: 지금 빌더로 location 을 받아서 지정할 수 있게 하였다. JPA 임베디드 타입은 공유참조에 주의해야 한다. 지금 외부에서 Location 을 대입 지정한다면 공유참조의 여지가 있다. 리팩토링하기
     @Builder
     private Cafe(String name, String kakaoPlaceId, String kakaoDetailPageUrl, Location location) {
         this.name = name;
