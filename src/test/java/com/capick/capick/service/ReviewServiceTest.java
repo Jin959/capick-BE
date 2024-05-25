@@ -67,15 +67,16 @@ class ReviewServiceTest {
         ReviewCreateRequest reviewCreateRequest
                 = createReviewCreateRequest(writerId, cafeCreateRequest, "일하거나 책읽기 좋아요", "리뷰 내용", "아메리카노", 3, 3, 3, 3, "normal");
 
+        LocalDateTime registeredAt = LocalDateTime.now();
+
         // when
-        ReviewResponse response = reviewService.createReview(reviewCreateRequest);
+        ReviewResponse response = reviewService.createReview(reviewCreateRequest, registeredAt);
 
         // then
         assertThat(response.getId()).isNotNull();
-        // TODO: 등록 시간에 대해서 테스트하는 데 문제가 있다. 테스트를 위해 reviewService.createReview 에서 파라미터로 등록 시간을 받아야할까?
         assertThat(response)
-                .extracting("writer.id", "writer.nickname", "visitPurpose", "content", "menu", "createdAt")
-                .contains(writerId, "nickname01", "일하거나 책읽기 좋아요", "리뷰 내용", "아메리카노", LocalDateTime.now());
+                .extracting("writer.id", "writer.nickname", "visitPurpose", "content", "menu", "registeredAt")
+                .contains(writerId, "nickname01", "일하거나 책읽기 좋아요", "리뷰 내용", "아메리카노", registeredAt);
     }
 
     @Test
@@ -93,8 +94,10 @@ class ReviewServiceTest {
         ReviewCreateRequest reviewCreateRequestForCostEffectiveTypeCafe
                 = createReviewCreateRequest(writerId, cafeCreateRequest, "일하거나 책읽기 좋아요", "리뷰 내용", "아메리카노", 3, 3, 4, 3, "normal");
 
+        LocalDateTime registeredAt = LocalDateTime.now();
+
         // when
-        reviewService.createReview(reviewCreateRequestForCostEffectiveTypeCafe);
+        reviewService.createReview(reviewCreateRequestForCostEffectiveTypeCafe, registeredAt);
 
         // then
         List<Cafe> cafes = cafeRepository.findAll();
@@ -122,8 +125,10 @@ class ReviewServiceTest {
         ReviewCreateRequest reviewCreateRequestForCostEffectiveTypeCafe
                 = createReviewCreateRequest(writerId, cafeCreateRequest, "일하거나 책읽기 좋아요", "리뷰 내용", "아메리카노", 3, 3, 4, 3, "normal");
 
+        LocalDateTime registeredAt = LocalDateTime.now();
+
         // when
-        reviewService.createReview(reviewCreateRequestForCostEffectiveTypeCafe);
+        reviewService.createReview(reviewCreateRequestForCostEffectiveTypeCafe, registeredAt);
 
         // then
         List<Cafe> cafes = cafeRepository.findAll();
@@ -149,9 +154,11 @@ class ReviewServiceTest {
                 = createCafeCreateRequest("스타벅스 광화문점", "1234567", "https://place.url");
         ReviewCreateRequest reviewCreateRequest
                 = createReviewCreateRequest(notExistWriterId, cafeCreateRequest, "일하거나 책읽기 좋아요", "리뷰 내용", "아메리카노", 3, 3, 3, 3, "normal");
+
+        LocalDateTime registeredAt = LocalDateTime.now();
         
         // when // then
-        assertThatThrownBy(() -> reviewService.createReview(reviewCreateRequest))
+        assertThatThrownBy(() -> reviewService.createReview(reviewCreateRequest, registeredAt))
                 .isInstanceOf(NotFoundResourceException.class)
                 .hasMessage("존재하지 않는 회원입니다.");
 
@@ -170,8 +177,10 @@ class ReviewServiceTest {
         ReviewCreateRequest reviewCreateRequest
                 = createReviewCreateRequest(writerId, cafeCreateRequest, "일하거나 책읽기 좋아요", "리뷰 내용", "아메리카노", 3, 3, 4, 3, "normal");
 
+        LocalDateTime registeredAt = LocalDateTime.now();
+
         // when // then
-        assertThatThrownBy(() -> reviewService.createReview(reviewCreateRequest))
+        assertThatThrownBy(() -> reviewService.createReview(reviewCreateRequest, registeredAt))
                 .isInstanceOf(DomainLogicalException.class)
                 .hasMessage("까페에 첫 리뷰를 등록할 때는 까페의 위치 정보가 필요합니다.");
 
@@ -196,11 +205,13 @@ class ReviewServiceTest {
         ReviewCreateRequest reviewCreateRequestOver
                 = createReviewCreateRequest(writerId, cafeCreateRequest, "일하거나 책읽기 좋아요", "리뷰 내용", "아메리카노", 3, 6, 3, 3, "normal");
 
+        LocalDateTime registeredAt = LocalDateTime.now();
+
         // when // then
-        assertThatThrownBy(() -> reviewService.createReview(reviewCreateRequestMinus))
+        assertThatThrownBy(() -> reviewService.createReview(reviewCreateRequestMinus, registeredAt))
                 .isInstanceOf(DomainPoliticalArgumentException.class)
                 .hasMessage("리뷰 작성 시 까페 타입 지수는 1 부터 5 여야 합니다.");
-        assertThatThrownBy(() -> reviewService.createReview(reviewCreateRequestOver))
+        assertThatThrownBy(() -> reviewService.createReview(reviewCreateRequestOver, registeredAt))
                 .isInstanceOf(DomainPoliticalArgumentException.class)
                 .hasMessage("리뷰 작성 시 까페 타입 지수는 1 부터 5 여야 합니다.");
 
@@ -223,8 +234,10 @@ class ReviewServiceTest {
         ReviewCreateRequest reviewCreateRequest
                 = createReviewCreateRequest(writerId, cafeCreateRequest, "일하거나 책읽기 좋아요", "리뷰 내용", "아메리카노", 1, 3, 5, 3, "normal");
 
+        LocalDateTime registeredAt = LocalDateTime.now();
+
         // when
-        reviewService.createReview(reviewCreateRequest);
+        reviewService.createReview(reviewCreateRequest, registeredAt);
 
         // then
         List<Cafe> cafes = cafeRepository.findAll();
