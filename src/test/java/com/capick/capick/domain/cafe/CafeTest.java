@@ -1,14 +1,60 @@
 package com.capick.capick.domain.cafe;
 
 import com.capick.capick.domain.review.Review;
+import com.capick.capick.dto.request.LocationCreateRequest;
+import com.capick.capick.exception.DomainLogicalException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class CafeTest {
+
+    @Test
+    @DisplayName("성공: 까페 생성 시 타입 초기 값은 NONE 이다.")
+    void createCafeInitType() {
+        // given
+        LocationCreateRequest locationCreateRequest
+                = createLocationCreateRequest(37.57122962143047, 126.97629649901215, "서울 종로구 세종로 00-0", "서울 종로구 세종대로 000");
+
+        // when
+        Cafe cafe = Cafe.create("스타벅스 광화문점", "1234567", "https://place.url", locationCreateRequest);
+
+        // then
+        assertThat(cafe.getCafeTypeInfo().getCafeType()).isEqualByComparingTo(CafeType.NONE);
+
+    }
+
+    @Test
+    @DisplayName("성공: 까페 생성 시 테마 초기 값은 NORMAL 이다.")
+    void createCafeInitTheme() {
+        // given
+        LocationCreateRequest locationCreateRequest
+                = createLocationCreateRequest(37.57122962143047, 126.97629649901215, "서울 종로구 세종로 00-0", "서울 종로구 세종대로 000");
+
+        // when
+        Cafe cafe = Cafe.create("스타벅스 광화문점", "1234567", "https://place.url", locationCreateRequest);
+
+        // then
+        assertThat(cafe.getCafeThemeInfo().getCafeTheme()).isEqualByComparingTo(CafeTheme.NORMAL);
+
+    }
+
+    @Test
+    @DisplayName("예외: 까페 생성 시 위치 정보가 없으면 예외가 발생한다.")
+    void createCafeWithoutLocation() {
+        // given
+        LocationCreateRequest locationCreateRequest = null;
+
+        // when // then
+        assertThatThrownBy(() -> Cafe.create("스타벅스 광화문점", "1234567", "https://place.url", locationCreateRequest))
+                .isInstanceOf(DomainLogicalException.class)
+                .hasMessage("까페에 첫 리뷰를 등록할 때는 까페의 위치 정보가 필요합니다.");
+
+    }
 
     @Test
     @DisplayName("성공: 까페 타입 갱신 시 리뷰에서 매겨진 지수들이 누적되어 더해진다.")
@@ -146,7 +192,7 @@ class CafeTest {
 //                .containsExactly(Integer.MAX_VALUE / 2, 1, CafeTheme.VIBE);
 //    }
 
-    private static Review createReview(String visitPurpose, String content, String menu,
+    private Review createReview(String visitPurpose, String content, String menu,
                                        int coffeeIndex, int spaceIndex, int priceIndex, int noiseIndex, String theme) {
         return Review.builder()
                 .visitPurpose(visitPurpose)
@@ -165,6 +211,15 @@ class CafeTest {
                 .name(name)
                 .kakaoPlaceId(kakaoPlaceId)
                 .kakaoDetailPageUrl(kakaoDetailPageUrl)
+                .build();
+    }
+
+    private LocationCreateRequest createLocationCreateRequest(double latitude, double longitude, String address, String roadAddress) {
+        return LocationCreateRequest.builder()
+                .latitude(latitude)
+                .longitude(longitude)
+                .address(address)
+                .roadAddress(roadAddress)
                 .build();
     }
 
