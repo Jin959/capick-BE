@@ -1,5 +1,6 @@
 package com.capick.capick.dto.request;
 
+import com.capick.capick.domain.common.Location;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -20,6 +21,15 @@ public class LocationCreateRequest {
         this.longitude = longitude;
         this.address = address;
         this.roadAddress = roadAddress;
+    }
+
+    public Location toLocation() {
+        return Location.builder()
+                .latitude(latitude)
+                .longitude(longitude)
+                .address(address)
+                .roadAddress(roadAddress)
+                .build();
     }
 
 }

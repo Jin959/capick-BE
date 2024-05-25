@@ -1,5 +1,6 @@
 package com.capick.capick.dto.request;
 
+import com.capick.capick.domain.cafe.Cafe;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -21,6 +22,15 @@ public class CafeCreateRequest {
         this.kakaoPlaceId = kakaoPlaceId;
         this.kakaoDetailPageUrl = kakaoDetailPageUrl;
         this.location = location;
+    }
+
+    public Cafe toEntity() {
+        return Cafe.builder()
+                .name(name)
+                .kakaoPlaceId(kakaoPlaceId)
+                .kakaoDetailPageUrl(kakaoDetailPageUrl)
+                .location(location.toLocation())
+                .build();
     }
 
 }

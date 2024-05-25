@@ -38,7 +38,7 @@ public class ReviewService {
                 .orElseGet(() -> {
                     Optional.ofNullable(cafeCreateRequest.getLocation())
                             .orElseThrow(() -> DomainLogicalException.of(FIRST_REVIEW_WITHOUT_CAFE_LOCATION));
-                    return Cafe.create();
+                    return cafeCreateRequest.toEntity();
                 });
 
         Review review = reviewCreateRequest.toEntity(writer, cafe);
