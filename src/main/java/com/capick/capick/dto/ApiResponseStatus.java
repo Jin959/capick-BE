@@ -26,8 +26,7 @@ public enum ApiResponseStatus {
 
     // 500
     DATABASE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "데이터베이스 연결 또는 접근에 실패하였습니다. 관리자에게 문의해 주세요."),
-    UNEXPECTED_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부에서 예상치 못한 오류가 발생 했습니다. 관리자에게 문의해 주세요."),
-    ;
+    UNEXPECTED_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부에서 예상치 못한 오류가 발생 했습니다. 관리자에게 문의해 주세요.");
 
     private final HttpStatus status;
     private final String message;
