@@ -8,6 +8,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 @Getter
 @NoArgsConstructor
@@ -33,9 +36,12 @@ public class ReviewCreateRequest {
 
     private String theme;
 
+    private List<String> imageUrls;
+
     @Builder
-    public ReviewCreateRequest(Long writerId, CafeCreateRequest cafe, String visitPurpose, String content, String menu,
-                               int coffeeIndex, int spaceIndex, int priceIndex, int noiseIndex, String theme) {
+    public ReviewCreateRequest(Long writerId, CafeCreateRequest cafe, String visitPurpose,
+                               String content, String menu, int coffeeIndex, int spaceIndex,
+                               int priceIndex, int noiseIndex, String theme, List<String> imageUrls) {
         this.writerId = writerId;
         this.cafe = cafe;
         this.visitPurpose = visitPurpose;
@@ -46,6 +52,7 @@ public class ReviewCreateRequest {
         this.priceIndex = priceIndex;
         this.noiseIndex = noiseIndex;
         this.theme = theme;
+        this.imageUrls = Optional.ofNullable(imageUrls).orElseGet(ArrayList::new);
     }
 
     // TODO: 테스트를 위해 리뷰 등록 시간 registeredAt 을 기록하는 로직을 일단 여기에 개발한다. toEntity 는 제거하고 Review.create 으로 개발하고 등록시간 테스트 작성하기
