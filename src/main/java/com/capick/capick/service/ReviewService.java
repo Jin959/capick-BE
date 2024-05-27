@@ -7,6 +7,7 @@ import com.capick.capick.domain.review.ReviewImage;
 import com.capick.capick.dto.request.CafeCreateRequest;
 import com.capick.capick.dto.request.ReviewCreateRequest;
 import com.capick.capick.dto.response.ReviewResponse;
+import com.capick.capick.exception.DomainPoliticalArgumentException;
 import com.capick.capick.repository.CafeRepository;
 import com.capick.capick.repository.ReviewImageRepository;
 import com.capick.capick.repository.ReviewRepository;
@@ -19,6 +20,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.capick.capick.domain.common.BaseStatus.ACTIVE;
+import static com.capick.capick.dto.ApiResponseStatus.NUMBER_OF_REVIEW_IMAGE_EXCEEDED;
 
 @Service
 @Transactional(readOnly = true)
@@ -50,7 +52,11 @@ public class ReviewService {
                 reviewCreateRequest.getPriceIndex(), reviewCreateRequest.getNoiseIndex());
         Review savedReview = reviewRepository.save(review);
 
-        List<ReviewImage> reviewImages = reviewCreateRequest.getImageUrls().stream()
+        List<String> imageUrls = reviewCreateRequest.getImageUrls();
+        if (imageUrls.size() > 3) {
+            throw DomainPoliticalArgumentException.of(NUMBER_OF_REVIEW_IMAGE_EXCEEDED);
+        }
+        List<ReviewImage> reviewImages = imageUrls.stream()
                 .map(imageUrl -> ReviewImage.create(imageUrl, savedReview)).collect(Collectors.toList());
         reviewImageRepository.saveAll(reviewImages);
 
