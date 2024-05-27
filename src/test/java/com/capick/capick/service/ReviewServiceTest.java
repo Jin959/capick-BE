@@ -12,6 +12,7 @@ import com.capick.capick.exception.DomainPoliticalArgumentException;
 import com.capick.capick.exception.NotFoundResourceException;
 import com.capick.capick.repository.CafeRepository;
 import com.capick.capick.repository.MemberRepository;
+import com.capick.capick.repository.ReviewImageRepository;
 import com.capick.capick.repository.ReviewRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -43,8 +44,12 @@ class ReviewServiceTest {
     @Autowired
     private CafeRepository cafeRepository;
 
+    @Autowired
+    private ReviewImageRepository reviewImageRepository;
+
     @AfterEach
     void tearDown() {
+        reviewImageRepository.deleteAllInBatch();
         reviewRepository.deleteAllInBatch();
         memberRepository.deleteAllInBatch();
         cafeRepository.deleteAllInBatch();
@@ -218,6 +223,31 @@ class ReviewServiceTest {
     }
 
     @Test
+    @DisplayName("예외: 리뷰 작성 시 사진을 3개 보다 많이 등록 할 경우 도메인 정책상 예외가 발생한다.")
+    void createReviewWithImagesExceeded() {
+        // given
+        Member writer = createMember("email01@naver.com", "password01%^&", "nickname01");
+        memberRepository.save(writer);
+        Long writerId = writer.getId();
+
+        Location cafeLocation = createLocation(37.57122962143047, 126.97629649901215, "서울 종로구 세종로 00-0", "서울 종로구 세종대로 000");
+        Cafe cafe = createCafe("스타벅스 광화문점", "1234567", "https://place.url", cafeLocation);
+        cafeRepository.save(cafe);
+
+        CafeCreateRequest cafeCreateRequest = createCafeCreateRequest("스타벅스 광화문점", "1234567", "https://place.url");
+        List<String> imageUrls = List.of("https://image1.url", "https://image2.url", "https://image3.url", "https://image4.url");
+        ReviewCreateRequest reviewCreateRequest = createReviewCreateRequest(
+                writerId, cafeCreateRequest, "일하거나 책읽기 좋아요", "리뷰 내용", "아메리카노",3, 3, 3, 3, "normal", imageUrls);
+
+        LocalDateTime registeredAt = LocalDateTime.now();
+
+        // when // then
+        assertThatThrownBy(() -> reviewService.createReview(reviewCreateRequest, registeredAt))
+                .isInstanceOf(DomainPoliticalArgumentException.class)
+                .hasMessage("이미지는 최대 3개 까지 등록할 수 있습니다.");
+    }
+
+    @Test
     @DisplayName("경계: 리뷰 작성 시 간접적인 설문을 통해 까페의 타입 지수를 1 에서 5 로 매길 수 있다. 1 과 5 는 가능해야 한다.")
     void createReviewWithCafeTypeIndexOutOfRangeBoundary() {
         // given
@@ -245,6 +275,33 @@ class ReviewServiceTest {
                 .extracting("cafeTypeInfo.cafeType")
                 .contains(COST_EFFECTIVE);
 
+    }
+
+    @Test
+    @DisplayName("경계: 리뷰 작성 시 사진을 3개까지는 등록 할 수 있다.")
+    void createReviewWithMaxNumberOfImages() {
+        // given
+        Member writer = createMember("email01@naver.com", "password01%^&", "nickname01");
+        memberRepository.save(writer);
+        Long writerId = writer.getId();
+
+        Location cafeLocation = createLocation(37.57122962143047, 126.97629649901215, "서울 종로구 세종로 00-0", "서울 종로구 세종대로 000");
+        Cafe cafe = createCafe("스타벅스 광화문점", "1234567", "https://place.url", cafeLocation);
+        cafeRepository.save(cafe);
+
+        CafeCreateRequest cafeCreateRequest = createCafeCreateRequest("스타벅스 광화문점", "1234567", "https://place.url");
+        List<String> imageUrls = List.of("https://image1.url", "https://image2.url", "https://image3.url");
+        ReviewCreateRequest reviewCreateRequest = createReviewCreateRequest(
+                writerId, cafeCreateRequest, "일하거나 책읽기 좋아요", "리뷰 내용", "아메리카노",3, 3, 3, 3, "normal", imageUrls);
+
+        LocalDateTime registeredAt = LocalDateTime.now();
+
+        // when
+        ReviewResponse response = reviewService.createReview(reviewCreateRequest, registeredAt);
+
+        // then
+        assertThat(response.getImageUrls()).hasSize(3)
+                .containsOnly("https://image1.url", "https://image2.url", "https://image3.url");
     }
 
     private Member createMember(String email, String password, String nickname) {
@@ -315,6 +372,24 @@ class ReviewServiceTest {
                 .priceIndex(priceIndex)
                 .noiseIndex(noiseIndex)
                 .theme(theme)
+                .build();
+    }
+
+    private ReviewCreateRequest createReviewCreateRequest(
+            Long writerId, CafeCreateRequest cafe, String visitPurpose, String content, String menu,
+            int coffeeIndex, int spaceIndex, int priceIndex, int noiseIndex, String theme, List<String> imageUrls) {
+        return ReviewCreateRequest.builder()
+                .writerId(writerId)
+                .cafe(cafe)
+                .visitPurpose(visitPurpose)
+                .content(content)
+                .menu(menu)
+                .coffeeIndex(coffeeIndex)
+                .spaceIndex(spaceIndex)
+                .priceIndex(priceIndex)
+                .noiseIndex(noiseIndex)
+                .theme(theme)
+                .imageUrls(imageUrls)
                 .build();
     }
 
