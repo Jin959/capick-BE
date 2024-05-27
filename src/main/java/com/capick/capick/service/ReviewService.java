@@ -38,11 +38,7 @@ public class ReviewService {
         Member writer = memberServiceHelper.findMemberByIdOrElseThrow(reviewCreateRequest.getWriterId());
 
         CafeCreateRequest cafeCreateRequest = reviewCreateRequest.getCafe();
-        Cafe cafe = cafeRepository.findByKakaoPlaceIdAndStatus(cafeCreateRequest.getKakaoPlaceId(), ACTIVE)
-                .orElseGet(() -> Cafe.create(
-                            cafeCreateRequest.getName(), cafeCreateRequest.getKakaoPlaceId(),
-                            cafeCreateRequest.getKakaoDetailPageUrl(), cafeCreateRequest.getLocation()
-                    ));
+        Cafe cafe = findCafeByKakakoPlaceIdOrElseCreate(cafeCreateRequest);
 
         Review review = reviewCreateRequest.toEntity(writer, cafe, registeredAt);
         review.updateIndexes(
@@ -58,5 +54,13 @@ public class ReviewService {
         cafeRepository.save(cafe);
 
         return ReviewResponse.of(savedReview, reviewImages);
+    }
+
+    private Cafe findCafeByKakakoPlaceIdOrElseCreate(CafeCreateRequest cafeCreateRequest) {
+        return cafeRepository.findByKakaoPlaceIdAndStatus(cafeCreateRequest.getKakaoPlaceId(), ACTIVE)
+                .orElseGet(() -> Cafe.create(
+                        cafeCreateRequest.getName(), cafeCreateRequest.getKakaoPlaceId(),
+                        cafeCreateRequest.getKakaoDetailPageUrl(), cafeCreateRequest.getLocation()
+                ));
     }
 }
