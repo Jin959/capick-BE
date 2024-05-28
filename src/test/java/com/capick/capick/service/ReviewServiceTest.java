@@ -146,6 +146,33 @@ class ReviewServiceTest {
     }
 
     @Test
+    @DisplayName("성공: 리뷰 작성 시 중복 된 사진이 업로드 될 경우 중복은 제거하고 저장한다.")
+    void createReviewWithDuplicateImages() {
+        // given
+        Member writer = createMember("email01@naver.com", "password01%^&", "nickname01");
+        memberRepository.save(writer);
+        Long writerId = writer.getId();
+
+        Location cafeLocation = createLocation(37.57122962143047, 126.97629649901215, "서울 종로구 세종로 00-0", "서울 종로구 세종대로 000");
+        Cafe cafe = createCafe("스타벅스 광화문점", "1234567", "https://place.url", cafeLocation);
+        cafeRepository.save(cafe);
+
+        CafeCreateRequest cafeCreateRequest = createCafeCreateRequest("스타벅스 광화문점", "1234567", "https://place.url");
+        List<String> imageUrls = List.of("https://image1.url", "https://image2.url", "https://image2.url");
+        ReviewCreateRequest reviewCreateRequest = createReviewCreateRequest(
+                writerId, cafeCreateRequest, "일하거나 책읽기 좋아요", "리뷰 내용", "아메리카노",3, 3, 3, 3, "normal", imageUrls);
+
+        LocalDateTime registeredAt = LocalDateTime.now();
+
+        // when
+        ReviewResponse response = reviewService.createReview(reviewCreateRequest, registeredAt);
+
+        // then
+        assertThat(response.getImageUrls()).hasSize(2)
+                .containsExactlyInAnyOrder("https://image1.url", "https://image2.url");
+    }
+
+    @Test
     @DisplayName("예외: 리뷰를 생성하는 회원이 탈퇴 처리 되었거나 존재하지 않는 회원이면 예외가 발생한다.")
     void createReviewNotExistMember() {
         // given
@@ -301,7 +328,7 @@ class ReviewServiceTest {
 
         // then
         assertThat(response.getImageUrls()).hasSize(3)
-                .containsOnly("https://image1.url", "https://image2.url", "https://image3.url");
+                .containsExactlyInAnyOrder("https://image1.url", "https://image2.url", "https://image3.url");
     }
 
     private Member createMember(String email, String password, String nickname) {
