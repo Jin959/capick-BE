@@ -46,7 +46,9 @@ public class ReviewImage extends BaseEntity {
             throw DomainPoliticalArgumentException.of(NUMBER_OF_REVIEW_IMAGE_EXCEEDED);
         }
         return imageUrls.stream()
-                .map(imageUrl -> ReviewImage.create(imageUrl, review)).collect(Collectors.toList());
+                .distinct()
+                .map(imageUrl -> ReviewImage.create(imageUrl, review))
+                .collect(Collectors.toList());
     }
 
 }
