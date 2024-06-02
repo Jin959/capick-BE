@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
 import java.time.LocalDateTime;
 
 @RestController
@@ -20,7 +21,7 @@ public class ReviewController {
     private final ReviewService reviewService;
 
     @PostMapping("/new")
-    public ApiResponse<ReviewResponse> createReview(@RequestBody ReviewCreateRequest reviewCreateRequest) {
+    public ApiResponse<ReviewResponse> createReview(@Valid @RequestBody ReviewCreateRequest reviewCreateRequest) {
         LocalDateTime registeredAt = LocalDateTime.now();
         return ApiResponse.isCreated(reviewService.createReview(reviewCreateRequest, registeredAt));
     }
