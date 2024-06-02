@@ -37,7 +37,7 @@ class ReviewControllerTest {
     private ReviewService reviewService;
 
     @Test
-    @DisplayName("성공: 회원은 등록된 까페에 대해 리뷰를 생성할 수 있다. HTTP 상태 코드 200 및 자체 응답 코드 201을 반환한다.")
+    @DisplayName("성공: 회원은 등록된 카페에 대해 리뷰를 생성할 수 있다. HTTP 상태 코드 200 및 자체 응답 코드 201을 반환한다.")
     void createReview() throws Exception {
         // given
         ReviewResponse response = ReviewResponse.builder()
@@ -119,8 +119,73 @@ class ReviewControllerTest {
     }
 
     @Test
-    @DisplayName("예외: 리뷰 생성 시 외부 지도 서비스의 대상 까페에 대한 리소스 아이디는 필수값이다. 입력하지 않으면 HTTP 상태 코드 400 및 자체 응답 코드 400을 반환한다.")
+    @DisplayName("예외: 리뷰 생성 시 대상 카페에 대한 정보는 일부 필수값이다. 카페 자체를 입력하지 않으면 HTTP 상태 코드 400 및 자체 응답 코드 400을 반환한다.")
     void createReviewWithoutCafe() throws Exception {
+        // given
+        ReviewCreateRequest request = ReviewCreateRequest.builder()
+                .writerId(1L)
+                .visitPurpose("일하거나 책읽기 좋아요")
+                .content("리뷰 내용")
+                .menu("아메리카노")
+                .coffeeIndex(3)
+                .spaceIndex(3)
+                .priceIndex(3)
+                .noiseIndex(3)
+                .theme("normal")
+                .build();
+
+        // when // then
+        mockMvc.perform(
+                        post("/api/reviews/new")
+                                .content(objectMapper.writeValueAsString(request))
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("400"))
+                .andExpect(jsonPath("$.message").value("리뷰를 작성할 카페의 정보를 입력해 주세요."))
+                .andExpect(jsonPath("$.data").doesNotExist())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("예외: 리뷰 생성 시 대상 카페 이름은 필수값이다. 입력하지 않으면 HTTP 상태 코드 400 및 자체 응답 코드 400을 반환한다.")
+    void createReviewWithoutCafeName() throws Exception {
+        // given
+        ReviewCreateRequest request = ReviewCreateRequest.builder()
+                .writerId(1L)
+                .cafe(
+                        CafeCreateRequest.builder()
+                                .name(" ")
+                                .kakaoPlaceId("1234567")
+                                .kakaoDetailPageUrl("https://place.url")
+                                .build()
+                )
+                .visitPurpose("일하거나 책읽기 좋아요")
+                .content("리뷰 내용")
+                .menu("아메리카노")
+                .coffeeIndex(3)
+                .spaceIndex(3)
+                .priceIndex(3)
+                .noiseIndex(3)
+                .theme("normal")
+                .build();
+
+        // when // then
+        mockMvc.perform(
+                        post("/api/reviews/new")
+                                .content(objectMapper.writeValueAsString(request))
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("400"))
+                .andExpect(jsonPath("$.message").value("카페 이름을 입력해 주세요."))
+                .andExpect(jsonPath("$.data").doesNotExist())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("예외: 리뷰 생성 시 대상 카페에 대한 외부 지도 서비스의 리소스 아이디는 필수값이다. 입력하지 않으면 HTTP 상태 코드 400 및 자체 응답 코드 400을 반환한다.")
+    void createReviewWithoutCafePlaceId() throws Exception {
         // given
         ReviewCreateRequest request = ReviewCreateRequest.builder()
                 .writerId(1L)
@@ -148,7 +213,43 @@ class ReviewControllerTest {
                 )
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value("400"))
-                .andExpect(jsonPath("$.message").value("외부 지도 서비스의 대상 카페에 대한 리소스 아이디를 입력해 주세요."))
+                .andExpect(jsonPath("$.message").value("카페에 대한 외부 지도 서비스 상의 리소스 아이디를 입력해 주세요."))
+                .andExpect(jsonPath("$.data").doesNotExist())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("예외: 리뷰 생성 시 대상 카페에 대한 상세 페이지는 HTTP 또는 HTTPS 프로토콜을 사용한 URL 이다. 그렇지 않으면 HTTP 상태 코드 400 및 자체 응답 코드 400을 반환한다.")
+    void createReviewWithInvalidCafeDetailPageUrl() throws Exception {
+        // given
+        ReviewCreateRequest request = ReviewCreateRequest.builder()
+                .writerId(1L)
+                .cafe(
+                        CafeCreateRequest.builder()
+                                .name("스타벅스 광화문점")
+                                .kakaoPlaceId("1234567")
+                                .kakaoDetailPageUrl("https://pl     ace.url")
+                                .build()
+                )
+                .visitPurpose("일하거나 책읽기 좋아요")
+                .content("리뷰 내용")
+                .menu("아메리카노")
+                .coffeeIndex(3)
+                .spaceIndex(3)
+                .priceIndex(3)
+                .noiseIndex(3)
+                .theme("normal")
+                .build();
+
+        // when // then
+        mockMvc.perform(
+                        post("/api/reviews/new")
+                                .content(objectMapper.writeValueAsString(request))
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("400"))
+                .andExpect(jsonPath("$.message").value("카페 상세 페이지에 허용되지 않는 URL 입니다. URL 형식에 맞추고 프로토콜은 HTTP, HTTPS 를 사용해 주세요."))
                 .andExpect(jsonPath("$.data").doesNotExist())
                 .andDo(print());
     }
@@ -331,7 +432,7 @@ class ReviewControllerTest {
     }
 
     @Test
-    @DisplayName("예외: 리뷰 생성 시 설문을 통한 까페 타입 지수는 필수값이다. 하나라도 입력하지 않으면 HTTP 상태 코드 400 및 자체 응답 코드 400을 반환한다.")
+    @DisplayName("예외: 리뷰 생성 시 설문을 통한 카페 타입 지수는 필수값이다. 하나라도 입력하지 않으면 HTTP 상태 코드 400 및 자체 응답 코드 400을 반환한다.")
     void createReviewWithoutCafeTypeIndex() throws Exception {
         // given
         ReviewCreateRequest request = ReviewCreateRequest.builder()
@@ -366,7 +467,7 @@ class ReviewControllerTest {
     }
 
     @Test
-    @DisplayName("예외: 리뷰 생성 시 까페 테마는 필수값이다. 입력하지 않으면 HTTP 상태 코드 400 및 자체 응답 코드 400을 반환한다.")
+    @DisplayName("예외: 리뷰 생성 시 카페 테마는 필수값이다. 입력하지 않으면 HTTP 상태 코드 400 및 자체 응답 코드 400을 반환한다.")
     void createReviewWithoutCafeTheme() throws Exception {
         // given
         ReviewCreateRequest request = ReviewCreateRequest.builder()
