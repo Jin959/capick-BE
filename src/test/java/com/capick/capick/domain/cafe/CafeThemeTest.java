@@ -7,6 +7,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class CafeThemeTest {
 
+    // TODO: Parameterized 가능한가
     @Test
     @DisplayName("성공: 전달 받은 까페 테마 이름과 일치하는 까페 테마를 검색한다.")
     void findByThemeName() {

@@ -7,6 +7,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class CafeTypeTest {
 
+    // TODO: Parameterized 가능한가
     @Test
     @DisplayName("성공: 전달 받은 까페 타입 인덱스 이름과 일치하는 까페 타입을 검색한다.")
     void findByIndexName() {
