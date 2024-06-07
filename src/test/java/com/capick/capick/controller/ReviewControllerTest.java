@@ -255,6 +255,42 @@ class ReviewControllerTest {
     }
 
     @Test
+    @DisplayName("예외: 리뷰 생성 시 대상 카페에 대한 상세 페이지 URL은 최대 50자이다. 그렇지 않으면 HTTP 상태 코드 400 및 자체 응답 코드 400을 반환한다.")
+    void createReviewWithCafeDetailPageUrlLengthOutOfRange() throws Exception {
+        // given
+        ReviewCreateRequest request = ReviewCreateRequest.builder()
+                .writerId(1L)
+                .cafe(
+                        CafeCreateRequest.builder()
+                                .name("스타벅스 광화문점")
+                                .kakaoPlaceId("1234567")
+                                .kakaoDetailPageUrl("https://" + "place.".repeat(50) + "url")
+                                .build()
+                )
+                .visitPurpose("일하거나 책읽기 좋아요")
+                .content("리뷰 내용")
+                .menu("아메리카노")
+                .coffeeIndex(3)
+                .spaceIndex(3)
+                .priceIndex(3)
+                .noiseIndex(3)
+                .theme("normal")
+                .build();
+
+        // when // then
+        mockMvc.perform(
+                        post("/api/reviews/new")
+                                .content(objectMapper.writeValueAsString(request))
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("400"))
+                .andExpect(jsonPath("$.message").value("카페 상세 페이지 URL은 50자가 넘을 수 없습니다."))
+                .andExpect(jsonPath("$.data").doesNotExist())
+                .andDo(print());
+    }
+
+    @Test
     @DisplayName("예외: 리뷰 생성 시 카페 방문 목적은 필수값이다. 입력하지 않으면 HTTP 상태 코드 400 및 자체 응답 코드 400을 반환한다.")
     void createReviewWithoutVisitPurpose() throws Exception {
         // given
