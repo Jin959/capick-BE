@@ -57,7 +57,7 @@ public class ReviewCreateRequest {
     private List<@Pattern(
             regexp = "((https?)://)?([\\w가-힇ぁ-ゔァ-ヴー々〆〤一-龥][%\\-_./&#?]?(\\?=)?)+",
             message = "리뷰 이미지 중 허용되지 않는 URL 이 존재합니다. URL 형식에 맞추고 프로토콜은 HTTP, HTTPS 를 사용해 주세요."
-    ) String> imageUrls;
+    ) String> imageUrls = new ArrayList<>();
 
     @Builder
     public ReviewCreateRequest(Long writerId, CafeCreateRequest cafe, String visitPurpose,
@@ -73,6 +73,7 @@ public class ReviewCreateRequest {
         this.priceIndex = priceIndex;
         this.noiseIndex = noiseIndex;
         this.theme = theme;
+        // TODO: 리뷰 생성 서비스 테스트를 위해 다음과 같이 작성함. 더 좋은 방법이 없을지 생각해보기
         this.imageUrls = Optional.ofNullable(imageUrls).orElseGet(ArrayList::new);
     }
 
