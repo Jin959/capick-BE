@@ -29,7 +29,7 @@ public class Cafe extends BaseEntity {
 
     private String kakaoPlaceId;
 
-    @Column(length = 30)
+    @Column(length = 50)
     private String kakaoDetailPageUrl;
 
     @Embedded
