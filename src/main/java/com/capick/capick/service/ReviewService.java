@@ -56,6 +56,11 @@ public class ReviewService {
         return ReviewResponse.of(savedReview, reviewImages);
     }
 
+    public ReviewResponse getReview(Long reviewId) {
+        reviewRepository.findByIdAndStatus(reviewId, ACTIVE);
+        return null;
+    }
+
     private Cafe findCafeByKakakoPlaceIdOrElseCreate(CafeCreateRequest cafeCreateRequest) {
         return cafeRepository.findByKakaoPlaceIdAndStatus(cafeCreateRequest.getKakaoPlaceId(), ACTIVE)
                 .orElseGet(() -> Cafe.create(
