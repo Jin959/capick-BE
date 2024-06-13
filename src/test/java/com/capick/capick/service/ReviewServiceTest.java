@@ -24,6 +24,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -75,7 +76,7 @@ class ReviewServiceTest {
         ReviewCreateRequest reviewCreateRequest
                 = createReviewCreateRequest(writerId, cafeCreateRequest, "일하거나 책읽기 좋아요", "리뷰 내용", "아메리카노", 3, 3, 3, 3, "normal");
 
-        LocalDateTime registeredAt = LocalDateTime.now();
+        LocalDateTime registeredAt = LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS);
 
         // when
         ReviewResponse response = reviewService.createReview(reviewCreateRequest, registeredAt);
@@ -102,7 +103,7 @@ class ReviewServiceTest {
         ReviewCreateRequest reviewCreateRequestForCostEffectiveTypeCafe
                 = createReviewCreateRequest(writerId, cafeCreateRequest, "일하거나 책읽기 좋아요", "리뷰 내용", "아메리카노", 3, 3, 4, 3, "normal");
 
-        LocalDateTime registeredAt = LocalDateTime.now();
+        LocalDateTime registeredAt = LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS);
 
         // when
         reviewService.createReview(reviewCreateRequestForCostEffectiveTypeCafe, registeredAt);
@@ -133,7 +134,7 @@ class ReviewServiceTest {
         ReviewCreateRequest reviewCreateRequestForCostEffectiveTypeCafe
                 = createReviewCreateRequest(writerId, cafeCreateRequest, "일하거나 책읽기 좋아요", "리뷰 내용", "아메리카노", 3, 3, 4, 3, "normal");
 
-        LocalDateTime registeredAt = LocalDateTime.now();
+        LocalDateTime registeredAt = LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS);
 
         // when
         reviewService.createReview(reviewCreateRequestForCostEffectiveTypeCafe, registeredAt);
@@ -165,7 +166,7 @@ class ReviewServiceTest {
         ReviewCreateRequest reviewCreateRequest = createReviewCreateRequest(
                 writerId, cafeCreateRequest, "일하거나 책읽기 좋아요", "리뷰 내용", "아메리카노",3, 3, 3, 3, "normal", imageUrls);
 
-        LocalDateTime registeredAt = LocalDateTime.now();
+        LocalDateTime registeredAt = LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS);
 
         // when
         ReviewResponse response = reviewService.createReview(reviewCreateRequest, registeredAt);
@@ -190,7 +191,7 @@ class ReviewServiceTest {
         ReviewCreateRequest reviewCreateRequest
                 = createReviewCreateRequest(notExistWriterId, cafeCreateRequest, "일하거나 책읽기 좋아요", "리뷰 내용", "아메리카노", 3, 3, 3, 3, "normal");
 
-        LocalDateTime registeredAt = LocalDateTime.now();
+        LocalDateTime registeredAt = LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS);
         
         // when // then
         assertThatThrownBy(() -> reviewService.createReview(reviewCreateRequest, registeredAt))
@@ -212,7 +213,7 @@ class ReviewServiceTest {
         ReviewCreateRequest reviewCreateRequest
                 = createReviewCreateRequest(writerId, cafeCreateRequest, "일하거나 책읽기 좋아요", "리뷰 내용", "아메리카노", 3, 3, 4, 3, "normal");
 
-        LocalDateTime registeredAt = LocalDateTime.now();
+        LocalDateTime registeredAt = LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS);
 
         // when // then
         assertThatThrownBy(() -> reviewService.createReview(reviewCreateRequest, registeredAt))
@@ -240,7 +241,7 @@ class ReviewServiceTest {
         ReviewCreateRequest reviewCreateRequestOver
                 = createReviewCreateRequest(writerId, cafeCreateRequest, "일하거나 책읽기 좋아요", "리뷰 내용", "아메리카노", 3, 6, 3, 3, "normal");
 
-        LocalDateTime registeredAt = LocalDateTime.now();
+        LocalDateTime registeredAt = LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS);
 
         // when // then
         assertThatThrownBy(() -> reviewService.createReview(reviewCreateRequestMinus, registeredAt))
@@ -269,7 +270,7 @@ class ReviewServiceTest {
         ReviewCreateRequest reviewCreateRequest = createReviewCreateRequest(
                 writerId, cafeCreateRequest, "일하거나 책읽기 좋아요", "리뷰 내용", "아메리카노",3, 3, 3, 3, "normal", imageUrls);
 
-        LocalDateTime registeredAt = LocalDateTime.now();
+        LocalDateTime registeredAt = LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS);
 
         // when // then
         assertThatThrownBy(() -> reviewService.createReview(reviewCreateRequest, registeredAt))
@@ -294,7 +295,7 @@ class ReviewServiceTest {
         ReviewCreateRequest reviewCreateRequest
                 = createReviewCreateRequest(writerId, cafeCreateRequest, "일하거나 책읽기 좋아요", "리뷰 내용", "아메리카노", 1, 3, 5, 3, "normal");
 
-        LocalDateTime registeredAt = LocalDateTime.now();
+        LocalDateTime registeredAt = LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS);
 
         // when
         reviewService.createReview(reviewCreateRequest, registeredAt);
@@ -324,7 +325,7 @@ class ReviewServiceTest {
         ReviewCreateRequest reviewCreateRequest = createReviewCreateRequest(
                 writerId, cafeCreateRequest, "일하거나 책읽기 좋아요", "리뷰 내용", "아메리카노",3, 3, 3, 3, "normal", imageUrls);
 
-        LocalDateTime registeredAt = LocalDateTime.now();
+        LocalDateTime registeredAt = LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS);
 
         // when
         ReviewResponse response = reviewService.createReview(reviewCreateRequest, registeredAt);
@@ -345,7 +346,7 @@ class ReviewServiceTest {
         Cafe cafe = createCafe("스타벅스 광화문점", "1234567", "https://place.url", cafeLocation);
         cafeRepository.save(cafe);
 
-        LocalDateTime registeredAt = LocalDateTime.now();
+        LocalDateTime registeredAt = LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS);
 
         Review review = createReview(writer, cafe, "일하거나 책읽기 좋아요", "리뷰 내용", "아메리카노", 3, 3, 4, 3, "normal", registeredAt);
 
