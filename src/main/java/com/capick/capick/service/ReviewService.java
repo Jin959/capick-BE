@@ -54,13 +54,13 @@ public class ReviewService {
         cafe.updateCafeTheme(savedReview);
         cafeRepository.save(cafe);
 
-        return ReviewResponse.of(savedReview, reviewImages);
+        return ReviewResponse.of(savedReview, reviewImages, writer);
     }
 
     public ReviewResponse getReview(Long reviewId) {
         Review review = reviewRepository.findByIdAndStatus(reviewId, ACTIVE)
                 .orElseThrow(() -> NotFoundResourceException.of(NOT_FOUND_REVIEW));
-        return ReviewResponse.of(review, review.getReviewImages());
+        return ReviewResponse.of(review, review.getReviewImages(), review.getWriter());
     }
 
     private Cafe findCafeByKakakoPlaceIdOrElseCreate(CafeCreateRequest cafeCreateRequest) {
