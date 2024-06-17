@@ -58,9 +58,13 @@ public class ReviewService {
     }
 
     public ReviewResponse getReview(Long reviewId) {
-        Review review = reviewRepository.findByIdAndStatus(reviewId, ACTIVE)
-                .orElseThrow(() -> NotFoundResourceException.of(NOT_FOUND_REVIEW));
+        Review review = findReviewByIdOrElseThrow(reviewId);
         return ReviewResponse.of(review, review.getReviewImages(), review.getWriter());
+    }
+
+    private Review findReviewByIdOrElseThrow(Long reviewId) {
+        return reviewRepository.findByIdAndStatus(reviewId, ACTIVE)
+                .orElseThrow(() -> NotFoundResourceException.of(NOT_FOUND_REVIEW));
     }
 
     private Cafe findCafeByKakakoPlaceIdOrElseCreate(CafeCreateRequest cafeCreateRequest) {
