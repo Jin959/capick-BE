@@ -8,6 +8,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 
 import static com.capick.capick.domain.common.BaseStatus.ACTIVE;
@@ -24,7 +25,7 @@ class ReviewRepositoryTest {
     @DisplayName("성공: 삭제되지 않았거나 작성된 리뷰를 조회할 수 있다.")
     void findByIdAndStatus() {
         // given
-        LocalDateTime registeredAt = LocalDateTime.now();
+        LocalDateTime registeredAt = LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS);
         Review review = createReview("일하거나 책읽기 좋아요", "리뷰 내용", "아메리카노", 3, 3, 4, 3, "normal", registeredAt);
         reviewRepository.save(review);
 
