@@ -7,6 +7,7 @@ import com.capick.capick.domain.review.ReviewImage;
 import com.capick.capick.dto.request.CafeCreateRequest;
 import com.capick.capick.dto.request.ReviewCreateRequest;
 import com.capick.capick.dto.response.ReviewResponse;
+import com.capick.capick.exception.NotFoundResourceException;
 import com.capick.capick.repository.CafeRepository;
 import com.capick.capick.repository.ReviewImageRepository;
 import com.capick.capick.repository.ReviewRepository;
@@ -16,9 +17,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.capick.capick.domain.common.BaseStatus.ACTIVE;
+import static com.capick.capick.dto.ApiResponseStatus.NOT_FOUND_REVIEW;
 
 @Service
 @Transactional(readOnly = true)
@@ -53,7 +54,17 @@ public class ReviewService {
         cafe.updateCafeTheme(savedReview);
         cafeRepository.save(cafe);
 
-        return ReviewResponse.of(savedReview, reviewImages);
+        return ReviewResponse.of(savedReview, reviewImages, writer);
+    }
+
+    public ReviewResponse getReview(Long reviewId) {
+        Review review = findReviewByIdOrElseThrow(reviewId);
+        return ReviewResponse.of(review, review.getReviewImages(), review.getWriter());
+    }
+
+    private Review findReviewByIdOrElseThrow(Long reviewId) {
+        return reviewRepository.findByIdAndStatus(reviewId, ACTIVE)
+                .orElseThrow(() -> NotFoundResourceException.of(NOT_FOUND_REVIEW));
     }
 
     private Cafe findCafeByKakakoPlaceIdOrElseCreate(CafeCreateRequest cafeCreateRequest) {

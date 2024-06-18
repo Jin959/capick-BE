@@ -3,6 +3,8 @@ package com.capick.capick.service;
 import com.capick.capick.domain.cafe.Cafe;
 import com.capick.capick.domain.common.Location;
 import com.capick.capick.domain.member.Member;
+import com.capick.capick.domain.review.Review;
+import com.capick.capick.domain.review.ReviewImage;
 import com.capick.capick.dto.request.CafeCreateRequest;
 import com.capick.capick.dto.request.LocationCreateRequest;
 import com.capick.capick.dto.request.ReviewCreateRequest;
@@ -22,7 +24,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.capick.capick.domain.cafe.CafeTheme.NORMAL;
 import static com.capick.capick.domain.cafe.CafeType.COST_EFFECTIVE;
@@ -72,7 +76,7 @@ class ReviewServiceTest {
         ReviewCreateRequest reviewCreateRequest
                 = createReviewCreateRequest(writerId, cafeCreateRequest, "일하거나 책읽기 좋아요", "리뷰 내용", "아메리카노", 3, 3, 3, 3, "normal");
 
-        LocalDateTime registeredAt = LocalDateTime.now();
+        LocalDateTime registeredAt = LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS);
 
         // when
         ReviewResponse response = reviewService.createReview(reviewCreateRequest, registeredAt);
@@ -99,7 +103,7 @@ class ReviewServiceTest {
         ReviewCreateRequest reviewCreateRequestForCostEffectiveTypeCafe
                 = createReviewCreateRequest(writerId, cafeCreateRequest, "일하거나 책읽기 좋아요", "리뷰 내용", "아메리카노", 3, 3, 4, 3, "normal");
 
-        LocalDateTime registeredAt = LocalDateTime.now();
+        LocalDateTime registeredAt = LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS);
 
         // when
         reviewService.createReview(reviewCreateRequestForCostEffectiveTypeCafe, registeredAt);
@@ -130,7 +134,7 @@ class ReviewServiceTest {
         ReviewCreateRequest reviewCreateRequestForCostEffectiveTypeCafe
                 = createReviewCreateRequest(writerId, cafeCreateRequest, "일하거나 책읽기 좋아요", "리뷰 내용", "아메리카노", 3, 3, 4, 3, "normal");
 
-        LocalDateTime registeredAt = LocalDateTime.now();
+        LocalDateTime registeredAt = LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS);
 
         // when
         reviewService.createReview(reviewCreateRequestForCostEffectiveTypeCafe, registeredAt);
@@ -162,7 +166,7 @@ class ReviewServiceTest {
         ReviewCreateRequest reviewCreateRequest = createReviewCreateRequest(
                 writerId, cafeCreateRequest, "일하거나 책읽기 좋아요", "리뷰 내용", "아메리카노",3, 3, 3, 3, "normal", imageUrls);
 
-        LocalDateTime registeredAt = LocalDateTime.now();
+        LocalDateTime registeredAt = LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS);
 
         // when
         ReviewResponse response = reviewService.createReview(reviewCreateRequest, registeredAt);
@@ -187,7 +191,7 @@ class ReviewServiceTest {
         ReviewCreateRequest reviewCreateRequest
                 = createReviewCreateRequest(notExistWriterId, cafeCreateRequest, "일하거나 책읽기 좋아요", "리뷰 내용", "아메리카노", 3, 3, 3, 3, "normal");
 
-        LocalDateTime registeredAt = LocalDateTime.now();
+        LocalDateTime registeredAt = LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS);
         
         // when // then
         assertThatThrownBy(() -> reviewService.createReview(reviewCreateRequest, registeredAt))
@@ -209,7 +213,7 @@ class ReviewServiceTest {
         ReviewCreateRequest reviewCreateRequest
                 = createReviewCreateRequest(writerId, cafeCreateRequest, "일하거나 책읽기 좋아요", "리뷰 내용", "아메리카노", 3, 3, 4, 3, "normal");
 
-        LocalDateTime registeredAt = LocalDateTime.now();
+        LocalDateTime registeredAt = LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS);
 
         // when // then
         assertThatThrownBy(() -> reviewService.createReview(reviewCreateRequest, registeredAt))
@@ -237,7 +241,7 @@ class ReviewServiceTest {
         ReviewCreateRequest reviewCreateRequestOver
                 = createReviewCreateRequest(writerId, cafeCreateRequest, "일하거나 책읽기 좋아요", "리뷰 내용", "아메리카노", 3, 6, 3, 3, "normal");
 
-        LocalDateTime registeredAt = LocalDateTime.now();
+        LocalDateTime registeredAt = LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS);
 
         // when // then
         assertThatThrownBy(() -> reviewService.createReview(reviewCreateRequestMinus, registeredAt))
@@ -266,7 +270,7 @@ class ReviewServiceTest {
         ReviewCreateRequest reviewCreateRequest = createReviewCreateRequest(
                 writerId, cafeCreateRequest, "일하거나 책읽기 좋아요", "리뷰 내용", "아메리카노",3, 3, 3, 3, "normal", imageUrls);
 
-        LocalDateTime registeredAt = LocalDateTime.now();
+        LocalDateTime registeredAt = LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS);
 
         // when // then
         assertThatThrownBy(() -> reviewService.createReview(reviewCreateRequest, registeredAt))
@@ -291,7 +295,7 @@ class ReviewServiceTest {
         ReviewCreateRequest reviewCreateRequest
                 = createReviewCreateRequest(writerId, cafeCreateRequest, "일하거나 책읽기 좋아요", "리뷰 내용", "아메리카노", 1, 3, 5, 3, "normal");
 
-        LocalDateTime registeredAt = LocalDateTime.now();
+        LocalDateTime registeredAt = LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS);
 
         // when
         reviewService.createReview(reviewCreateRequest, registeredAt);
@@ -321,7 +325,7 @@ class ReviewServiceTest {
         ReviewCreateRequest reviewCreateRequest = createReviewCreateRequest(
                 writerId, cafeCreateRequest, "일하거나 책읽기 좋아요", "리뷰 내용", "아메리카노",3, 3, 3, 3, "normal", imageUrls);
 
-        LocalDateTime registeredAt = LocalDateTime.now();
+        LocalDateTime registeredAt = LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS);
 
         // when
         ReviewResponse response = reviewService.createReview(reviewCreateRequest, registeredAt);
@@ -331,6 +335,60 @@ class ReviewServiceTest {
                 .containsExactlyInAnyOrder("https://image1.url", "https://image2.url", "https://image3.url");
     }
 
+    @Test
+    @DisplayName("성공: 방문자 및 회원은 까페 정보와 후기를 보기 위해 등록된 리뷰를 조회할 수 있다.")
+    void getReview() {
+        // given
+        Member writer = createMember("email01@naver.com", "password01%^&", "nickname01");
+        memberRepository.save(writer);
+
+        Location cafeLocation = createLocation(37.57122962143047, 126.97629649901215, "서울 종로구 세종로 00-0", "서울 종로구 세종대로 000");
+        Cafe cafe = createCafe("스타벅스 광화문점", "1234567", "https://place.url", cafeLocation);
+        cafeRepository.save(cafe);
+
+        LocalDateTime registeredAt = LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS);
+
+        Review review = createReview(writer, cafe, "일하거나 책읽기 좋아요", "리뷰 내용", "아메리카노", 3, 3, 4, 3, "normal", registeredAt);
+
+        Review reviewWithImages = createReview(writer, cafe, "일하거나 책읽기 좋아요", "리뷰 내용", "라떼", 3, 3, 4, 3, "vibe", registeredAt);
+        List<String> imageUrls = List.of("https://image1.url", "https://image2.url", "https://image3.url");
+        List<ReviewImage> reviewImages = imageUrls.stream()
+                .map(imageUrl -> createReviewImage(imageUrl, reviewWithImages)).collect(Collectors.toList());
+
+        List<Long> reviewIds = reviewRepository.saveAll(List.of(review, reviewWithImages)).stream()
+                .map(Review::getId).collect(Collectors.toList());
+        reviewImageRepository.saveAll(reviewImages);
+
+        // when
+        List<ReviewResponse> responses = reviewIds.stream()
+                .map(reviewId -> reviewService.getReview(reviewId)).collect(Collectors.toList());
+
+        // then
+        assertThat(responses.get(0))
+                .extracting("id", "writer.id", "writer.nickname", "visitPurpose", "content", "menu", "registeredAt")
+                .contains(review.getId(), writer.getId(), writer.getNickname(),
+                        "일하거나 책읽기 좋아요", "리뷰 내용", "아메리카노", registeredAt);
+        assertThat(responses.get(1))
+                .extracting("id", "writer.id", "writer.nickname", "visitPurpose", "content", "menu", "registeredAt", "imageUrls")
+                .contains(reviewWithImages.getId(), writer.getId(), writer.getNickname(),
+                        "일하거나 책읽기 좋아요", "리뷰 내용", "라떼", registeredAt, imageUrls);
+    }
+
+    @Test
+    @DisplayName("예외: 리뷰 조회 시 삭제 되었거나 존재하지 않는 리뷰이면 예외가 발생한다.")
+    void getNotExistReview() {
+        // given
+        Member writer = createMember("email01@naver.com", "password01%^&", "nickname01");
+        memberRepository.save(writer);
+
+        Long notCreatedReviewId = 1L;
+        
+        // when // then
+        assertThatThrownBy(() -> reviewService.getReview(notCreatedReviewId))
+                .isInstanceOf(NotFoundResourceException.class)
+                .hasMessage("존재하지 않는 리뷰입니다.");
+    }
+    
     private Member createMember(String email, String password, String nickname) {
         return Member.builder()
                 .email(email)
@@ -354,6 +412,31 @@ class ReviewServiceTest {
                 .kakaoPlaceId(kakaoPlaceId)
                 .kakaoDetailPageUrl(kakaoDetailPageUrl)
                 .location(location)
+                .build();
+    }
+
+    private Review createReview(Member writer, Cafe cafe, String visitPurpose,
+                                String content, String menu, int coffeeIndex, int spaceIndex,
+                                int priceIndex, int noiseIndex, String theme, LocalDateTime registeredAt) {
+        return Review.builder()
+                .writer(writer)
+                .cafe(cafe)
+                .visitPurpose(visitPurpose)
+                .content(content)
+                .menu(menu)
+                .coffeeIndex(coffeeIndex)
+                .spaceIndex(spaceIndex)
+                .priceIndex(priceIndex)
+                .noiseIndex(noiseIndex)
+                .theme(theme)
+                .registeredAt(registeredAt)
+                .build();
+    }
+
+    private ReviewImage createReviewImage(String imageUrl, Review review) {
+        return ReviewImage.builder()
+                .imageUrl(imageUrl)
+                .review(review)
                 .build();
     }
 

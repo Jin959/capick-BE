@@ -1,5 +1,6 @@
 package com.capick.capick.dto.response;
 
+import com.capick.capick.domain.member.Member;
 import com.capick.capick.domain.review.Review;
 import com.capick.capick.domain.review.ReviewImage;
 import lombok.Builder;
@@ -38,11 +39,11 @@ public class ReviewResponse {
         this.imageUrls = imageUrls;
     }
 
-    public static ReviewResponse of(Review review, List<ReviewImage> reviewImages) {
+    public static ReviewResponse of(Review review, List<ReviewImage> reviewImages, Member writer) {
         return ReviewResponse.builder()
                 .id(review.getId())
                 .writer(
-                        MemberSimpleResponse.of(review.getWriter())
+                        MemberSimpleResponse.of(writer)
                 )
                 .visitPurpose(review.getVisitPurpose())
                 .content(review.getContent())

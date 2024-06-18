@@ -18,8 +18,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -601,6 +602,30 @@ class ReviewControllerTest {
                 .andExpect(jsonPath("$.code").value("400"))
                 .andExpect(jsonPath("$.message").value("리뷰 이미지 중 허용되지 않는 URL 이 존재합니다. URL 형식에 맞추고 프로토콜은 HTTP, HTTPS 를 사용해 주세요."))
                 .andExpect(jsonPath("$.data").doesNotExist())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("성공: 단 건 리뷰를 조회한다. HTTP 상태 코드 200 및 자체 응답 코드 200 을 반환한다.")
+    void getReview() throws Exception {
+        // given
+        ReviewResponse response = ReviewResponse.builder()
+                .writer(MemberSimpleResponse.builder().build())
+                .imageUrls(List.of())
+                .build();
+        when(reviewService.getReview(anyLong())).thenReturn(response);
+        int requestReviewId = 123;
+
+        // when // then
+        mockMvc.perform(
+                        get("/api/reviews/{reviewId}", requestReviewId)
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value("200"))
+                .andExpect(jsonPath("$.message").value("요청에 성공했습니다."))
+                .andExpect(jsonPath("$.data").exists())
+                .andExpect(jsonPath("$.data.writer").exists())
+                .andExpect(jsonPath("$.data.imageUrls").isArray())
                 .andDo(print());
     }
 
