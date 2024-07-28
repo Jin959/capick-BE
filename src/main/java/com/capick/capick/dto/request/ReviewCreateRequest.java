@@ -55,7 +55,7 @@ public class ReviewCreateRequest {
     private String theme;
 
     private List<@Pattern(
-            regexp = "((https?)://)?([\\w가-힇ぁ-ゔァ-ヴー々〆〤一-龥][%\\-_./&#?]?(\\?=)?)+",
+            regexp = "((https?)://)?([\\w가-힇ぁ-ゔァ-ヴー々〆〤一-龥][\\-_./%]?)+(\\?([^#\\s]+)?)?$",
             message = "리뷰 이미지 중 허용되지 않는 URL 이 존재합니다. URL 형식에 맞추고 프로토콜은 HTTP, HTTPS 를 사용해 주세요."
     ) String> imageUrls = new ArrayList<>();
 
