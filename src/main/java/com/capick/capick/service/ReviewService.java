@@ -6,6 +6,7 @@ import com.capick.capick.domain.review.Review;
 import com.capick.capick.domain.review.ReviewImage;
 import com.capick.capick.dto.request.CafeCreateRequest;
 import com.capick.capick.dto.request.ReviewCreateRequest;
+import com.capick.capick.dto.request.ReviewUpdateRequest;
 import com.capick.capick.dto.response.ReviewResponse;
 import com.capick.capick.exception.NotFoundResourceException;
 import com.capick.capick.repository.CafeRepository;
@@ -60,6 +61,11 @@ public class ReviewService {
     public ReviewResponse getReview(Long reviewId) {
         Review review = findReviewByIdOrElseThrow(reviewId);
         return ReviewResponse.of(review, review.getReviewImages(), review.getWriter());
+    }
+
+    @Transactional
+    public ReviewResponse updateReview(Long reviewId, ReviewUpdateRequest reviewUpdateRequest) {
+        return null;
     }
 
     private Review findReviewByIdOrElseThrow(Long reviewId) {
