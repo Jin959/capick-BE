@@ -8,6 +8,7 @@ import com.capick.capick.domain.review.ReviewImage;
 import com.capick.capick.dto.request.CafeCreateRequest;
 import com.capick.capick.dto.request.LocationCreateRequest;
 import com.capick.capick.dto.request.ReviewCreateRequest;
+import com.capick.capick.dto.request.ReviewUpdateRequest;
 import com.capick.capick.dto.response.ReviewResponse;
 import com.capick.capick.exception.DomainLogicalException;
 import com.capick.capick.exception.DomainPoliticalArgumentException;
@@ -30,6 +31,7 @@ import java.util.stream.Collectors;
 
 import static com.capick.capick.domain.cafe.CafeTheme.NORMAL;
 import static com.capick.capick.domain.cafe.CafeType.COST_EFFECTIVE;
+import static com.capick.capick.domain.cafe.CafeType.NOISY;
 import static org.assertj.core.api.Assertions.*;
 
 @ActiveProfiles("test")
@@ -388,6 +390,159 @@ class ReviewServiceTest {
                 .isInstanceOf(NotFoundResourceException.class)
                 .hasMessage("존재하지 않는 리뷰입니다.");
     }
+
+    @Test
+    @DisplayName("성공: 회원은 자기가 작성한 리뷰를 수정할 수 있다.")
+    void updateReview() {
+        // given
+        Member writer = createMember("email01@naver.com", "password01%^&", "nickname01");
+        Long writerId = memberRepository.save(writer).getId();
+
+        Location cafeLocation = createLocation(
+                37.57122962143047, 126.97629649901215, "서울 종로구 세종로 00-0", "서울 종로구 세종대로 000");
+        Cafe cafe = createCafe("스타벅스 광화문점", "1234567", "https://place.url", cafeLocation);
+        cafeRepository.save(cafe);
+
+        LocalDateTime registeredAt = LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS);
+
+        Review review = createReview(
+                writer, cafe, "넓어서 갔어요", "리뷰 내용", "아이스 아메리카노", 1, 4, 1, 1, "vibe", registeredAt);
+        List<String> imageUrls = List.of(
+                "https://storage.com/images/80459",
+                "https://storage.com/images%2Fpathname_encoded%EA%B2%BD%EB%A1%9C",
+                "https://storage.com/images%2Fpathname_encoded%EA%B2%BD%EB%A1%9C/80459?type=image&size=2"
+        );
+        List<ReviewImage> reviewImages = imageUrls.stream()
+                .map(imageUrl -> createReviewImage(imageUrl, review)).collect(Collectors.toList());
+
+        Long reviewId = reviewRepository.save(review).getId();
+        reviewImageRepository.saveAll(reviewImages);
+
+        ReviewUpdateRequest reviewUpdateRequest = createReviewUpdateRequest(
+                writerId, "일하거나 책읽고 공부하려고요", "리뷰 내용 수정", "아이스 라떼", 1, 4, 1, 1, "vibe");
+
+        // when
+        ReviewResponse response = reviewService.updateReview(reviewId, reviewUpdateRequest);
+
+        // then
+        assertThat(response)
+                .extracting("writer.id", "writer.nickname", "visitPurpose", "content", "menu")
+                .contains(writerId, "nickname01", "일하거나 책읽고 공부하려고요", "리뷰 내용 수정", "아이스 라떼");
+    }
+
+    @Test
+    @DisplayName("성공: 리뷰 수정 시 카페 타입 지수나 카페 테마를 수정하면 이전 기록은 없었던 것으로 하고 수정한 것을 적용해 카페 타입 및 테마를 갱신한다.")
+    void updateReviewWithUpdateCafeTypeAndCafeTheme() {
+        // given
+        Member writer = createMember("email01@naver.com", "password01%^&", "nickname01");
+        Long writerId = memberRepository.save(writer).getId();
+
+        Location cafeLocation = createLocation(
+                37.57122962143047, 126.97629649901215, "서울 종로구 세종로 00-0", "서울 종로구 세종대로 000");
+        Cafe cafe = createCafe("스타벅스 광화문점", "1234567", "https://place.url", cafeLocation);
+        cafeRepository.save(cafe);
+
+        LocalDateTime registeredAt = LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS);
+
+        Review review = createReview(
+                writer, cafe, "일하거나 책읽고 공부하려고요", "리뷰 내용", "아이스 아메리카노", 1, 4, 1, 1, "vibe", registeredAt);
+        Long reviewId = reviewRepository.save(review).getId();
+
+        ReviewUpdateRequest reviewUpdateRequest = createReviewUpdateRequest(
+                writerId, "일하거나 책읽고 공부하려고요", "리뷰 내용", "아이스 아메리카노", 1, 1, 1, 4, "normal");
+
+        // when
+        reviewService.updateReview(reviewId, reviewUpdateRequest);
+
+        // then
+        List<Cafe> cafes = cafeRepository.findAll();
+        assertThat(cafes).hasSize(1)
+                .extracting("cafeTypeInfo.cafeType", "cafeThemeInfo.cafeTheme")
+                .contains(
+                        tuple(NOISY, NORMAL)
+                );
+    }
+
+    @Test
+    @DisplayName("성공: 리뷰 수정 시 이미지를 수정하면 없어진 이미지는 삭제하고 새 이미지는 추가한다.")
+    void updateReviewWithReviewImage() {
+        Member writer = createMember("email01@naver.com", "password01%^&", "nickname01");
+        Long writerId = memberRepository.save(writer).getId();
+
+        Location cafeLocation = createLocation(
+                37.57122962143047, 126.97629649901215, "서울 종로구 세종로 00-0", "서울 종로구 세종대로 000");
+        Cafe cafe = createCafe("스타벅스 광화문점", "1234567", "https://place.url", cafeLocation);
+        cafeRepository.save(cafe);
+
+        LocalDateTime registeredAt = LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS);
+
+        Review review = createReview(
+                writer, cafe, "넓어서 갔어요", "리뷰 내용", "아이스 아메리카노", 1, 4, 1, 1, "normal", registeredAt);
+        List<String> imageUrls = List.of(
+                "https://storage.com/images/80459",
+                "https://storage.com/images%2Fpathname_encoded%EA%B2%BD%EB%A1%9C",
+                "https://storage.com/images%2Fpathname_encoded%EA%B2%BD%EB%A1%9C/80459?type=image&size=2"
+        );
+        List<ReviewImage> reviewImages = imageUrls.stream()
+                .map(imageUrl -> createReviewImage(imageUrl, review)).collect(Collectors.toList());
+
+        Long reviewId = reviewRepository.save(review).getId();
+        reviewImageRepository.saveAll(reviewImages);
+
+        List<String> newImageUrls = List.of(
+                "https://storage.com/images/new",
+                "https://storage.com/images%2Fpathname_encoded%EA%B2%BD%EB%A1%9C/80459?type=image&size=2"
+        );
+        ReviewUpdateRequest reviewUpdateRequest = createReviewUpdateRequest(
+                writerId, "일하거나 책읽고 공부하려고요", "리뷰 내용 수정", "아이스 라떼", 1, 4, 1, 1, "normal", newImageUrls);
+
+        // when
+        ReviewResponse response = reviewService.updateReview(reviewId, reviewUpdateRequest);
+
+        // then
+        assertThat(response.getImageUrls()).hasSize(2)
+                .containsExactlyInAnyOrder(
+                        "https://storage.com/images/new",
+                        "https://storage.com/images%2Fpathname_encoded%EA%B2%BD%EB%A1%9C/80459?type=image&size=2"
+                );
+    }
+
+    @Test
+    @DisplayName("성공: 리뷰 수정 시 중복 된 사진이 업로드 될 경우 중복은 제거하고 저장한다.")
+    void updateReviewWithDuplicateImages() {
+        // given
+        Member writer = createMember("email01@naver.com", "password01%^&", "nickname01");
+        Long writerId = memberRepository.save(writer).getId();
+
+        Location cafeLocation = createLocation(
+                37.57122962143047, 126.97629649901215, "서울 종로구 세종로 00-0", "서울 종로구 세종대로 000");
+        Cafe cafe = createCafe("스타벅스 광화문점", "1234567", "https://place.url", cafeLocation);
+        cafeRepository.save(cafe);
+
+        LocalDateTime registeredAt = LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS);
+
+        Review review = createReview(
+                writer, cafe, "일하거나 책읽고 공부하려고요", "리뷰 내용", "아이스 아메리카노", 1, 4, 1, 1, "vibe", registeredAt);
+        Long reviewId = reviewRepository.save(review).getId();
+
+        List<String> newImageUrls = List.of(
+                "https://storage.com/images/new/duplicate",
+                "https://storage.com/images/new/duplicate",
+                "https://storage.com/images%2Fpathname_encoded%EA%B2%BD%EB%A1%9C/80459?type=image&size=2"
+        );
+        ReviewUpdateRequest reviewUpdateRequest = createReviewUpdateRequest(
+                writerId, "일하거나 책읽고 공부하려고요", "리뷰 내용", "아이스 아메리카노", 1, 4, 1, 1, "vibe", newImageUrls);
+
+        // when
+        ReviewResponse response = reviewService.updateReview(reviewId, reviewUpdateRequest);
+
+        // then
+        assertThat(response.getImageUrls()).hasSize(2)
+                .containsExactlyInAnyOrder(
+                        "https://storage.com/images/new/duplicate",
+                        "https://storage.com/images%2Fpathname_encoded%EA%B2%BD%EB%A1%9C/80459?type=image&size=2"
+                );
+    }
     
     private Member createMember(String email, String password, String nickname) {
         return Member.builder()
@@ -491,6 +646,39 @@ class ReviewServiceTest {
         return ReviewCreateRequest.builder()
                 .writerId(writerId)
                 .cafe(cafe)
+                .visitPurpose(visitPurpose)
+                .content(content)
+                .menu(menu)
+                .coffeeIndex(coffeeIndex)
+                .spaceIndex(spaceIndex)
+                .priceIndex(priceIndex)
+                .noiseIndex(noiseIndex)
+                .theme(theme)
+                .imageUrls(imageUrls)
+                .build();
+    }
+
+    private ReviewUpdateRequest createReviewUpdateRequest(
+            Long writerId, String visitPurpose, String content, String menu,
+            int coffeeIndex, int spaceIndex, int priceIndex, int noiseIndex, String theme) {
+        return ReviewUpdateRequest.builder()
+                .writerId(writerId)
+                .visitPurpose(visitPurpose)
+                .content(content)
+                .menu(menu)
+                .coffeeIndex(coffeeIndex)
+                .spaceIndex(spaceIndex)
+                .priceIndex(priceIndex)
+                .noiseIndex(noiseIndex)
+                .theme(theme)
+                .build();
+    }
+
+    private ReviewUpdateRequest createReviewUpdateRequest(
+            Long writerId, String visitPurpose, String content, String menu,
+            int coffeeIndex, int spaceIndex, int priceIndex, int noiseIndex, String theme, List<String> imageUrls) {
+        return ReviewUpdateRequest.builder()
+                .writerId(writerId)
                 .visitPurpose(visitPurpose)
                 .content(content)
                 .menu(menu)

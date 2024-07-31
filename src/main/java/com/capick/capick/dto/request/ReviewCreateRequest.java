@@ -42,11 +42,11 @@ public class ReviewCreateRequest {
     @NotNull(message = "리뷰하기 위해 커피 맛에 대한 질문에 응답해 주세요.")
     private Integer coffeeIndex;
 
-    @NotNull(message = "리뷰하기 위해 가격에 대한 질문에 응답해 주세요.")
-    private Integer priceIndex;
-
     @NotNull(message = "리뷰하기 위해 공간에 대한 질문에 응답해 주세요.")
     private Integer spaceIndex;
+
+    @NotNull(message = "리뷰하기 위해 가격에 대한 질문에 응답해 주세요.")
+    private Integer priceIndex;
 
     @NotNull(message = "리뷰하기 위해 소음에 대한 질문에 응답해 주세요.")
     private Integer noiseIndex;
