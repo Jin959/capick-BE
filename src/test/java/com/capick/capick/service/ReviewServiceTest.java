@@ -13,6 +13,7 @@ import com.capick.capick.dto.response.ReviewResponse;
 import com.capick.capick.exception.DomainLogicalException;
 import com.capick.capick.exception.DomainPoliticalArgumentException;
 import com.capick.capick.exception.NotFoundResourceException;
+import com.capick.capick.exception.UnauthorizedException;
 import com.capick.capick.repository.CafeRepository;
 import com.capick.capick.repository.MemberRepository;
 import com.capick.capick.repository.ReviewImageRepository;
@@ -606,6 +607,35 @@ class ReviewServiceTest {
         assertThatThrownBy(() -> reviewService.updateReview(notExistReviewId, reviewUpdateRequest))
                 .isInstanceOf(NotFoundResourceException.class)
                 .hasMessage("존재하지 않는 리뷰입니다.");
+    }
+
+    @Test
+    @DisplayName("예외: 리뷰는 작성자만 수정할 수 있다. 그렇지 않은 경우 예외가 발생한다.")
+    void updateReviewByNotTheWriter() {
+        // given
+        Member writer = createMember("email01@naver.com", "password01%^&", "nickname01");
+        memberRepository.save(writer);
+        Member anotherMember = createMember("email02@naver.com", "password02%^&", "nickname02");
+        Long anotherMemberId = memberRepository.save(anotherMember).getId();
+
+        Location cafeLocation = createLocation(
+                37.57122962143047, 126.97629649901215, "서울 종로구 세종로 00-0", "서울 종로구 세종대로 000");
+        Cafe cafe = createCafe("스타벅스 광화문점", "1234567", "https://place.url", cafeLocation);
+        cafeRepository.save(cafe);
+
+        LocalDateTime registeredAt = LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS);
+
+        Review review = createReview(
+                writer, cafe, "일하거나 책읽고 공부하려고요", "리뷰 내용", "아이스 아메리카노", 1, 4, 1, 1, "vibe", registeredAt);
+        Long reviewId = reviewRepository.save(review).getId();
+
+        ReviewUpdateRequest reviewUpdateRequest = createReviewUpdateRequest(
+                anotherMemberId, "일하거나 책읽고 공부하려고요", "리뷰 내용 수정", "아이스 라떼", 1, 4, 1, 1, "vibe");
+
+        // when // then
+        assertThatThrownBy(() -> reviewService.updateReview(reviewId, reviewUpdateRequest))
+                .isInstanceOf(UnauthorizedException.class)
+                .hasMessage("작성자가 아닙니다.");
     }
 
     @Test
