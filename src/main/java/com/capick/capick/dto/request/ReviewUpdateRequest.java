@@ -52,9 +52,9 @@ public class ReviewUpdateRequest {
     ) String> imageUrls = new ArrayList<>();
 
     @Builder
-    public ReviewUpdateRequest(Long writerId, String visitPurpose, String content, String menu,
-                               Integer coffeeIndex, Integer spaceIndex, Integer priceIndex,
-                               Integer noiseIndex, String theme, List<String> imageUrls) {
+    public ReviewUpdateRequest(
+            Long writerId, String visitPurpose, String content, String menu, Integer coffeeIndex,
+            Integer spaceIndex, Integer priceIndex, Integer noiseIndex, String theme, List<String> imageUrls) {
         this.writerId = writerId;
         this.visitPurpose = visitPurpose;
         this.content = content;

@@ -28,8 +28,8 @@ public class CafeCreateRequest {
     private LocationCreateRequest location;
 
     @Builder
-    public CafeCreateRequest(String name, String kakaoPlaceId,
-                             String kakaoDetailPageUrl, LocationCreateRequest location) {
+    public CafeCreateRequest(
+            String name, String kakaoPlaceId, String kakaoDetailPageUrl, LocationCreateRequest location) {
         this.name = name;
         this.kakaoPlaceId = kakaoPlaceId;
         this.kakaoDetailPageUrl = kakaoDetailPageUrl;

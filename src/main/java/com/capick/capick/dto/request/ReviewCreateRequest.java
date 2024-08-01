@@ -60,9 +60,9 @@ public class ReviewCreateRequest {
     ) String> imageUrls = new ArrayList<>();
 
     @Builder
-    public ReviewCreateRequest(Long writerId, CafeCreateRequest cafe, String visitPurpose,
-                               String content, String menu, Integer coffeeIndex, Integer spaceIndex,
-                               Integer priceIndex, Integer noiseIndex, String theme, List<String> imageUrls) {
+    public ReviewCreateRequest(
+            Long writerId, CafeCreateRequest cafe, String visitPurpose, String content, String menu, Integer coffeeIndex,
+            Integer spaceIndex, Integer priceIndex, Integer noiseIndex, String theme, List<String> imageUrls) {
         this.writerId = writerId;
         this.cafe = cafe;
         this.visitPurpose = visitPurpose;

@@ -61,8 +61,9 @@ public class Review extends BaseEntity {
     List<ReviewImage> reviewImages = new ArrayList<>();
 
     @Builder
-    private Review(Member writer, Cafe cafe, String visitPurpose, String content, String menu,
-                   int coffeeIndex, int spaceIndex, int priceIndex, int noiseIndex, String theme, LocalDateTime registeredAt) {
+    private Review(
+            Member writer, Cafe cafe, String visitPurpose, String content, String menu, int coffeeIndex,
+            int spaceIndex, int priceIndex, int noiseIndex, String theme, LocalDateTime registeredAt) {
         this.writer = writer;
         this.cafe = cafe;
         this.visitPurpose = visitPurpose;
