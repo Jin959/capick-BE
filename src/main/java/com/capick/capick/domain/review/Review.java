@@ -77,6 +77,12 @@ public class Review extends BaseEntity {
         this.registeredAt = registeredAt;
     }
 
+    public void updateReviewText(String visitPurpose, String content, String menu) {
+        this.visitPurpose = visitPurpose;
+        this.content = content;
+        this.menu = menu;
+    }
+
     public void updateIndexes(int coffeeIndex, int spaceIndex, int priceIndex, int noiseIndex) {
         List<Integer> indexes = List.of(coffeeIndex, spaceIndex, priceIndex, noiseIndex);
         boolean isIndexOutOfRange = indexes.stream().anyMatch(index -> index < 1 || index > 5);
