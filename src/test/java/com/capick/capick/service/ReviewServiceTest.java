@@ -543,6 +543,187 @@ class ReviewServiceTest {
                         "https://storage.com/images%2Fpathname_encoded%EA%B2%BD%EB%A1%9C/80459?type=image&size=2"
                 );
     }
+
+    @Test
+    @DisplayName("예외: 리뷰를 수정하는 회원이 탈퇴 처리 되었거나 존재하지 않는 회원이면 예외가 발생한다.")
+    void updateReviewNotExistMember() {
+        // given
+        // TODO: 테스트 환경으로 삭제된 회원을 만들기 위해 Member.delete 라는 다른 객체의 행위를 끌어다 사용했다. 한편, Member의 빌더에 status 필드를 수정할 수 있게 하려 했으나 다른 곳에서 탈퇴 된 회원을 만들 가능성을 없애기 위해 빌더에 추가하는 것을 그만두었다. 좋은 방법이 없을까?
+        Member writer = createMember("email01@naver.com", "password01%^&", "nickname01");
+        writer.delete();
+        Long deletedWriterId = memberRepository.save(writer).getId();
+
+        Location cafeLocation = createLocation(
+                37.57122962143047, 126.97629649901215, "서울 종로구 세종로 00-0", "서울 종로구 세종대로 000");
+        Cafe cafe = createCafe("스타벅스 광화문점", "1234567", "https://place.url", cafeLocation);
+        cafeRepository.save(cafe);
+
+        LocalDateTime registeredAt = LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS);
+
+        Review review = createReview(
+                writer, cafe, "일하거나 책읽고 공부하려고요", "리뷰 내용", "아이스 아메리카노", 1, 4, 1, 1, "vibe", registeredAt);
+        Long reviewId = reviewRepository.save(review).getId();
+
+        ReviewUpdateRequest reviewUpdateRequest = createReviewUpdateRequest(
+                deletedWriterId, "일하거나 책읽고 공부하려고요", "리뷰 내용 수정", "아이스 라떼", 1, 4, 1, 1, "vibe");
+
+        // when // then
+        assertThatThrownBy(() -> reviewService.updateReview(reviewId, reviewUpdateRequest))
+                .isInstanceOf(NotFoundResourceException.class)
+                .hasMessage("존재하지 않는 회원입니다.");
+    }
+
+    @Test
+    @DisplayName("예외: 리뷰 수정 시 수정할 리뷰가 존재하지 않으면 예외가 발생한다.")
+    void updateNotExistReview() {
+        // given
+        Member writer = createMember("email01@naver.com", "password01%^&", "nickname01");
+        Long writerId = memberRepository.save(writer).getId();
+
+        Long notExistReviewId = 1L;
+
+        ReviewUpdateRequest reviewUpdateRequest = createReviewUpdateRequest(
+                writerId, "일하거나 책읽고 공부하려고요", "리뷰 내용 수정", "아이스 라떼", 1, 4, 1, 1, "vibe");
+
+        // when // then
+        assertThatThrownBy(() -> reviewService.updateReview(notExistReviewId, reviewUpdateRequest))
+                .isInstanceOf(NotFoundResourceException.class)
+                .hasMessage("존재하지 않는 리뷰입니다.");
+    }
+
+    @Test
+    @DisplayName("예외: 리뷰 수정 시 카페의 타입 지수를 1 에서 5 로 매길 수 있다. 1 부터 5 이외의 타입 지수를 입력받으면 예외가 발생한다.")
+    void updateReviewWithCafeTypeIndexOutOfRange() {
+        // given
+        Member writer = createMember("email01@naver.com", "password01%^&", "nickname01");
+        Long writerId = memberRepository.save(writer).getId();
+
+        Location cafeLocation = createLocation(
+                37.57122962143047, 126.97629649901215, "서울 종로구 세종로 00-0", "서울 종로구 세종대로 000");
+        Cafe cafe = createCafe("스타벅스 광화문점", "1234567", "https://place.url", cafeLocation);
+        cafeRepository.save(cafe);
+
+        LocalDateTime registeredAt = LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS);
+
+        Review review = createReview(
+                writer, cafe, "일하거나 책읽고 공부하려고요", "리뷰 내용", "아이스 아메리카노", 1, 4, 1, 1, "vibe", registeredAt);
+        Long reviewId = reviewRepository.save(review).getId();
+
+        ReviewUpdateRequest reviewUpdateRequestMinus = createReviewUpdateRequest(
+                writerId, "일하거나 책읽고 공부하려고요", "리뷰 내용 수정", "아이스 라떼", 1, 0, 1, 1, "vibe");
+        ReviewUpdateRequest reviewUpdateRequestOver = createReviewUpdateRequest(
+                writerId, "일하거나 책읽고 공부하려고요", "리뷰 내용 수정", "아이스 라떼", 1, 6, 1, 1, "vibe");
+
+        // when // then
+        assertThatThrownBy(() -> reviewService.updateReview(reviewId, reviewUpdateRequestMinus))
+                .isInstanceOf(DomainPoliticalArgumentException.class)
+                .hasMessage("리뷰 작성 시 까페 타입 지수는 1 부터 5 여야 합니다.");
+        assertThatThrownBy(() -> reviewService.updateReview(reviewId, reviewUpdateRequestOver))
+                .isInstanceOf(DomainPoliticalArgumentException.class)
+                .hasMessage("리뷰 작성 시 까페 타입 지수는 1 부터 5 여야 합니다.");
+    }
+
+    @Test
+    @DisplayName("예외: 리뷰 수정 시 사진을 3개 보다 많이 등록 할 경우 도메인 정책상 예외가 발생한다.")
+    void updateReviewWithImagesExceeded() {
+        // given
+        Member writer = createMember("email01@naver.com", "password01%^&", "nickname01");
+        Long writerId = memberRepository.save(writer).getId();
+
+        Location cafeLocation = createLocation(
+                37.57122962143047, 126.97629649901215, "서울 종로구 세종로 00-0", "서울 종로구 세종대로 000");
+        Cafe cafe = createCafe("스타벅스 광화문점", "1234567", "https://place.url", cafeLocation);
+        cafeRepository.save(cafe);
+
+        LocalDateTime registeredAt = LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS);
+
+        Review review = createReview(
+                writer, cafe, "일하거나 책읽고 공부하려고요", "리뷰 내용", "아이스 아메리카노", 1, 4, 1, 1, "vibe", registeredAt);
+        Long reviewId = reviewRepository.save(review).getId();
+
+        List<String> newImageUrls = List.of(
+                "https://storage.com/images/80459",
+                "https://storage.com/images%2Fpathname_encoded",
+                "https://storage.com/images%2Fpathname_encoded%EA%B2%BD%EB%A1%9C",
+                "https://storage.com/images%2Fpathname_encoded%EA%B2%BD%EB%A1%9C/80459?type=image&size=2"
+        );
+        ReviewUpdateRequest reviewUpdateRequest = createReviewUpdateRequest(
+                writerId, "일하거나 책읽고 공부하려고요", "리뷰 내용", "아이스 아메리카노", 1, 4, 1, 1, "vibe", newImageUrls);
+
+        // when // then
+        assertThatThrownBy(() -> reviewService.updateReview(reviewId, reviewUpdateRequest))
+                .isInstanceOf(DomainPoliticalArgumentException.class)
+                .hasMessage("이미지는 최대 3개 까지 등록할 수 있습니다.");
+    }
+
+    @Test
+    @DisplayName("경계: 리뷰 수정 시 간접적인 설문을 통해 까페의 타입 지수를 1 에서 5 로 매길 수 있다. 1 과 5 는 가능해야 한다.")
+    void updateReviewWithCafeTypeIndexOutOfRangeBoundary() {
+        // given
+        Member writer = createMember("email01@naver.com", "password01%^&", "nickname01");
+        Long writerId = memberRepository.save(writer).getId();
+
+        Location cafeLocation = createLocation(
+                37.57122962143047, 126.97629649901215, "서울 종로구 세종로 00-0", "서울 종로구 세종대로 000");
+        Cafe cafe = createCafe("스타벅스 광화문점", "1234567", "https://place.url", cafeLocation);
+        cafeRepository.save(cafe);
+
+        LocalDateTime registeredAt = LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS);
+
+        Review review = createReview(
+                writer, cafe, "일하거나 책읽고 공부하려고요", "리뷰 내용", "아이스 아메리카노", 1, 4, 1, 1, "vibe", registeredAt);
+        Long reviewId = reviewRepository.save(review).getId();
+
+        ReviewUpdateRequest reviewUpdateRequest = createReviewUpdateRequest(
+                writerId, "일하거나 책읽고 공부하려고요", "리뷰 내용 수정", "아이스 라떼", 1, 1, 1, 5, "vibe");
+
+        // when
+        reviewService.updateReview(reviewId, reviewUpdateRequest);
+
+        // then
+        List<Cafe> cafes = cafeRepository.findAll();
+        assertThat(cafes).hasSize(1)
+                .extracting("cafeTypeInfo.cafeType")
+                .contains(NOISY);
+    }
+
+    @Test
+    @DisplayName("경계: 리뷰 수정 시 사진을 3개까지는 등록 할 수 있다.")
+    void updateReviewWithMaxNumberOfImages() {
+        // given
+        Member writer = createMember("email01@naver.com", "password01%^&", "nickname01");
+        Long writerId = memberRepository.save(writer).getId();
+
+        Location cafeLocation = createLocation(
+                37.57122962143047, 126.97629649901215, "서울 종로구 세종로 00-0", "서울 종로구 세종대로 000");
+        Cafe cafe = createCafe("스타벅스 광화문점", "1234567", "https://place.url", cafeLocation);
+        cafeRepository.save(cafe);
+
+        LocalDateTime registeredAt = LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS);
+
+        Review review = createReview(
+                writer, cafe, "일하거나 책읽고 공부하려고요", "리뷰 내용", "아이스 아메리카노", 1, 4, 1, 1, "vibe", registeredAt);
+        Long reviewId = reviewRepository.save(review).getId();
+
+        List<String> newImageUrls = List.of(
+                "https://storage.com/images/80459",
+                "https://storage.com/images%2Fpathname_encoded%EA%B2%BD%EB%A1%9C",
+                "https://storage.com/images%2Fpathname_encoded%EA%B2%BD%EB%A1%9C/80459?type=image&size=2"
+        );
+        ReviewUpdateRequest reviewUpdateRequest = createReviewUpdateRequest(
+                writerId, "일하거나 책읽고 공부하려고요", "리뷰 내용", "아이스 아메리카노", 1, 4, 1, 1, "vibe", newImageUrls);
+
+        // when
+        ReviewResponse response = reviewService.updateReview(reviewId, reviewUpdateRequest);
+
+        // then
+        assertThat(response.getImageUrls()).hasSize(3)
+                .containsExactlyInAnyOrder(
+                        "https://storage.com/images/80459",
+                        "https://storage.com/images%2Fpathname_encoded%EA%B2%BD%EB%A1%9C",
+                        "https://storage.com/images%2Fpathname_encoded%EA%B2%BD%EB%A1%9C/80459?type=image&size=2"
+                );
+    }
     
     private Member createMember(String email, String password, String nickname) {
         return Member.builder()

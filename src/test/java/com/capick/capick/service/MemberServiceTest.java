@@ -125,6 +125,7 @@ class MemberServiceTest {
     void getNotExistMember() {
         // given
         Member member1 = createMember("email01@naver.com", "password01%^&", "nickname01");
+        // TODO: 테스트 환경으로 삭제된 회원을 만들기 위해 Member.delete 라는 다른 객체의 행위를 끌어다 사용했다. 한편, Member의 빌더에 status 필드를 수정할 수 있게 하려 했으나 다른 곳에서 탈퇴 된 회원을 만들 가능성을 없애기 위해 빌더에 추가하는 것을 그만두었다. 좋은 방법이 없을까?
         member1.delete();
         Member member2 = createMember("email02@naver.com", "password02%^&", "nickname02");
         Long deletedMemberId = memberRepository.save(member1).getId();
