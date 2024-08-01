@@ -69,14 +69,15 @@ class ReviewServiceTest {
         memberRepository.save(writer);
         Long writerId = writer.getId();
 
-        Location cafeLocation = createLocation(37.57122962143047, 126.97629649901215, "서울 종로구 세종로 00-0", "서울 종로구 세종대로 000");
+        Location cafeLocation = createLocation(
+                37.57122962143047, 126.97629649901215, "서울 종로구 세종로 00-0", "서울 종로구 세종대로 000");
         Cafe cafe = createCafe("스타벅스 광화문점", "1234567", "https://place.url", cafeLocation);
         cafeRepository.save(cafe);
 
-        CafeCreateRequest cafeCreateRequest
-                = createCafeCreateRequest("스타벅스 광화문점", "1234567", "https://place.url");
-        ReviewCreateRequest reviewCreateRequest
-                = createReviewCreateRequest(writerId, cafeCreateRequest, "일하거나 책읽기 좋아요", "리뷰 내용", "아메리카노", 3, 3, 3, 3, "normal");
+        CafeCreateRequest cafeCreateRequest = createCafeCreateRequest(
+                "스타벅스 광화문점", "1234567", "https://place.url");
+        ReviewCreateRequest reviewCreateRequest = createReviewCreateRequest(
+                writerId, cafeCreateRequest, "일하거나 책읽기 좋아요", "리뷰 내용", "아메리카노", 3, 3, 3, 3, "normal");
 
         LocalDateTime registeredAt = LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS);
 
@@ -98,12 +99,12 @@ class ReviewServiceTest {
         memberRepository.save(writer);
         Long writerId = writer.getId();
 
-        LocationCreateRequest locationCreateRequest
-                = createLocationCreateRequest(37.57122962143047, 126.97629649901215, "서울 종로구 세종로 00-0", "서울 종로구 세종대로 000");
-        CafeCreateRequest cafeCreateRequest
-                = createCafeCreateRequest("스타벅스 광화문점", "1234567", "https://place.url", locationCreateRequest);
-        ReviewCreateRequest reviewCreateRequestForCostEffectiveTypeCafe
-                = createReviewCreateRequest(writerId, cafeCreateRequest, "일하거나 책읽기 좋아요", "리뷰 내용", "아메리카노", 3, 3, 4, 3, "normal");
+        LocationCreateRequest locationCreateRequest = createLocationCreateRequest(
+                37.57122962143047, 126.97629649901215, "서울 종로구 세종로 00-0", "서울 종로구 세종대로 000");
+        CafeCreateRequest cafeCreateRequest = createCafeCreateRequest(
+                "스타벅스 광화문점", "1234567", "https://place.url", locationCreateRequest);
+        ReviewCreateRequest reviewCreateRequestForCostEffectiveTypeCafe = createReviewCreateRequest(
+                writerId, cafeCreateRequest, "일하거나 책읽기 좋아요", "리뷰 내용", "아메리카노", 3, 3, 4, 3, "normal");
 
         LocalDateTime registeredAt = LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS);
 
@@ -127,14 +128,15 @@ class ReviewServiceTest {
         memberRepository.save(writer);
         Long writerId = writer.getId();
 
-        Location cafeLocation = createLocation(37.57122962143047, 126.97629649901215, "서울 종로구 세종로 00-0", "서울 종로구 세종대로 000");
+        Location cafeLocation = createLocation(
+                37.57122962143047, 126.97629649901215, "서울 종로구 세종로 00-0", "서울 종로구 세종대로 000");
         Cafe cafe = createCafe("스타벅스 광화문점", "1234567", "https://place.url", cafeLocation);
         cafeRepository.save(cafe);
 
-        CafeCreateRequest cafeCreateRequest
-                = createCafeCreateRequest("스타벅스 광화문점", "1234567", "https://place.url");
-        ReviewCreateRequest reviewCreateRequestForCostEffectiveTypeCafe
-                = createReviewCreateRequest(writerId, cafeCreateRequest, "일하거나 책읽기 좋아요", "리뷰 내용", "아메리카노", 3, 3, 4, 3, "normal");
+        CafeCreateRequest cafeCreateRequest = createCafeCreateRequest(
+                "스타벅스 광화문점", "1234567", "https://place.url");
+        ReviewCreateRequest reviewCreateRequestForCostEffectiveTypeCafe = createReviewCreateRequest(
+                writerId, cafeCreateRequest, "일하거나 책읽기 좋아요", "리뷰 내용", "아메리카노", 3, 3, 4, 3, "normal");
 
         LocalDateTime registeredAt = LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS);
 
@@ -159,14 +161,16 @@ class ReviewServiceTest {
         memberRepository.save(writer);
         Long writerId = writer.getId();
 
-        Location cafeLocation = createLocation(37.57122962143047, 126.97629649901215, "서울 종로구 세종로 00-0", "서울 종로구 세종대로 000");
+        Location cafeLocation = createLocation(
+                37.57122962143047, 126.97629649901215, "서울 종로구 세종로 00-0", "서울 종로구 세종대로 000");
         Cafe cafe = createCafe("스타벅스 광화문점", "1234567", "https://place.url", cafeLocation);
         cafeRepository.save(cafe);
 
-        CafeCreateRequest cafeCreateRequest = createCafeCreateRequest("스타벅스 광화문점", "1234567", "https://place.url");
+        CafeCreateRequest cafeCreateRequest = createCafeCreateRequest(
+                "스타벅스 광화문점", "1234567", "https://place.url");
         List<String> imageUrls = List.of("https://image1.url", "https://image2.url", "https://image2.url");
         ReviewCreateRequest reviewCreateRequest = createReviewCreateRequest(
-                writerId, cafeCreateRequest, "일하거나 책읽기 좋아요", "리뷰 내용", "아메리카노",3, 3, 3, 3, "normal", imageUrls);
+                writerId, cafeCreateRequest, "일하거나 책읽기 좋아요", "리뷰 내용", "아메리카노", 3, 3, 3, 3, "normal", imageUrls);
 
         LocalDateTime registeredAt = LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS);
 
@@ -184,14 +188,15 @@ class ReviewServiceTest {
         // given
         Long notExistWriterId = 1L;
 
-        Location cafeLocation = createLocation(37.57122962143047, 126.97629649901215, "서울 종로구 세종로 00-0", "서울 종로구 세종대로 000");
+        Location cafeLocation = createLocation(
+                37.57122962143047, 126.97629649901215, "서울 종로구 세종로 00-0", "서울 종로구 세종대로 000");
         Cafe cafe = createCafe("스타벅스 광화문점", "1234567", "https://place.url", cafeLocation);
         cafeRepository.save(cafe);
 
-        CafeCreateRequest cafeCreateRequest
-                = createCafeCreateRequest("스타벅스 광화문점", "1234567", "https://place.url");
-        ReviewCreateRequest reviewCreateRequest
-                = createReviewCreateRequest(notExistWriterId, cafeCreateRequest, "일하거나 책읽기 좋아요", "리뷰 내용", "아메리카노", 3, 3, 3, 3, "normal");
+        CafeCreateRequest cafeCreateRequest = createCafeCreateRequest(
+                "스타벅스 광화문점", "1234567", "https://place.url");
+        ReviewCreateRequest reviewCreateRequest = createReviewCreateRequest(
+                notExistWriterId, cafeCreateRequest, "일하거나 책읽기 좋아요", "리뷰 내용", "아메리카노", 3, 3, 3, 3, "normal");
 
         LocalDateTime registeredAt = LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS);
         
@@ -210,10 +215,10 @@ class ReviewServiceTest {
         memberRepository.save(writer);
         Long writerId = writer.getId();
 
-        CafeCreateRequest cafeCreateRequest
-                = createCafeCreateRequest("스타벅스 광화문점", "1234567", "https://place.url");
-        ReviewCreateRequest reviewCreateRequest
-                = createReviewCreateRequest(writerId, cafeCreateRequest, "일하거나 책읽기 좋아요", "리뷰 내용", "아메리카노", 3, 3, 4, 3, "normal");
+        CafeCreateRequest cafeCreateRequest = createCafeCreateRequest(
+                "스타벅스 광화문점", "1234567", "https://place.url");
+        ReviewCreateRequest reviewCreateRequest = createReviewCreateRequest(
+                writerId, cafeCreateRequest, "일하거나 책읽기 좋아요", "리뷰 내용", "아메리카노", 3, 3, 4, 3, "normal");
 
         LocalDateTime registeredAt = LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS);
 
@@ -232,16 +237,17 @@ class ReviewServiceTest {
         memberRepository.save(writer);
         Long writerId = writer.getId();
 
-        Location cafeLocation = createLocation(37.57122962143047, 126.97629649901215, "서울 종로구 세종로 00-0", "서울 종로구 세종대로 000");
+        Location cafeLocation = createLocation(
+                37.57122962143047, 126.97629649901215, "서울 종로구 세종로 00-0", "서울 종로구 세종대로 000");
         Cafe cafe = createCafe("스타벅스 광화문점", "1234567", "https://place.url", cafeLocation);
         cafeRepository.save(cafe);
 
-        CafeCreateRequest cafeCreateRequest
-                = createCafeCreateRequest("스타벅스 광화문점", "1234567", "https://place.url");
-        ReviewCreateRequest reviewCreateRequestMinus
-                = createReviewCreateRequest(writerId, cafeCreateRequest, "일하거나 책읽기 좋아요", "리뷰 내용", "아메리카노", 0, 3, 3, 3, "normal");
-        ReviewCreateRequest reviewCreateRequestOver
-                = createReviewCreateRequest(writerId, cafeCreateRequest, "일하거나 책읽기 좋아요", "리뷰 내용", "아메리카노", 3, 6, 3, 3, "normal");
+        CafeCreateRequest cafeCreateRequest = createCafeCreateRequest(
+                "스타벅스 광화문점", "1234567", "https://place.url");
+        ReviewCreateRequest reviewCreateRequestMinus = createReviewCreateRequest(
+                writerId, cafeCreateRequest, "일하거나 책읽기 좋아요", "리뷰 내용", "아메리카노", 0, 3, 3, 3, "normal");
+        ReviewCreateRequest reviewCreateRequestOver = createReviewCreateRequest(
+                writerId, cafeCreateRequest, "일하거나 책읽기 좋아요", "리뷰 내용", "아메리카노", 3, 6, 3, 3, "normal");
 
         LocalDateTime registeredAt = LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS);
 
@@ -263,12 +269,15 @@ class ReviewServiceTest {
         memberRepository.save(writer);
         Long writerId = writer.getId();
 
-        Location cafeLocation = createLocation(37.57122962143047, 126.97629649901215, "서울 종로구 세종로 00-0", "서울 종로구 세종대로 000");
+        Location cafeLocation = createLocation(
+                37.57122962143047, 126.97629649901215, "서울 종로구 세종로 00-0", "서울 종로구 세종대로 000");
         Cafe cafe = createCafe("스타벅스 광화문점", "1234567", "https://place.url", cafeLocation);
         cafeRepository.save(cafe);
 
-        CafeCreateRequest cafeCreateRequest = createCafeCreateRequest("스타벅스 광화문점", "1234567", "https://place.url");
-        List<String> imageUrls = List.of("https://image1.url", "https://image2.url", "https://image3.url", "https://image4.url");
+        CafeCreateRequest cafeCreateRequest = createCafeCreateRequest(
+                "스타벅스 광화문점", "1234567", "https://place.url");
+        List<String> imageUrls = List.of(
+                "https://image1.url", "https://image2.url", "https://image3.url", "https://image4.url");
         ReviewCreateRequest reviewCreateRequest = createReviewCreateRequest(
                 writerId, cafeCreateRequest, "일하거나 책읽기 좋아요", "리뷰 내용", "아메리카노",3, 3, 3, 3, "normal", imageUrls);
 
@@ -288,14 +297,15 @@ class ReviewServiceTest {
         memberRepository.save(writer);
         Long writerId = writer.getId();
 
-        Location cafeLocation = createLocation(37.57122962143047, 126.97629649901215, "서울 종로구 세종로 00-0", "서울 종로구 세종대로 000");
+        Location cafeLocation = createLocation(
+                37.57122962143047, 126.97629649901215, "서울 종로구 세종로 00-0", "서울 종로구 세종대로 000");
         Cafe cafe = createCafe("스타벅스 광화문점", "1234567", "https://place.url", cafeLocation);
         cafeRepository.save(cafe);
 
-        CafeCreateRequest cafeCreateRequest
-                = createCafeCreateRequest("스타벅스 광화문점", "1234567", "https://place.url");
-        ReviewCreateRequest reviewCreateRequest
-                = createReviewCreateRequest(writerId, cafeCreateRequest, "일하거나 책읽기 좋아요", "리뷰 내용", "아메리카노", 1, 3, 5, 3, "normal");
+        CafeCreateRequest cafeCreateRequest = createCafeCreateRequest(
+                "스타벅스 광화문점", "1234567", "https://place.url");
+        ReviewCreateRequest reviewCreateRequest = createReviewCreateRequest(
+                writerId, cafeCreateRequest, "일하거나 책읽기 좋아요", "리뷰 내용", "아메리카노", 1, 3, 5, 3, "normal");
 
         LocalDateTime registeredAt = LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS);
 
@@ -318,11 +328,13 @@ class ReviewServiceTest {
         memberRepository.save(writer);
         Long writerId = writer.getId();
 
-        Location cafeLocation = createLocation(37.57122962143047, 126.97629649901215, "서울 종로구 세종로 00-0", "서울 종로구 세종대로 000");
+        Location cafeLocation = createLocation(
+                37.57122962143047, 126.97629649901215, "서울 종로구 세종로 00-0", "서울 종로구 세종대로 000");
         Cafe cafe = createCafe("스타벅스 광화문점", "1234567", "https://place.url", cafeLocation);
         cafeRepository.save(cafe);
 
-        CafeCreateRequest cafeCreateRequest = createCafeCreateRequest("스타벅스 광화문점", "1234567", "https://place.url");
+        CafeCreateRequest cafeCreateRequest = createCafeCreateRequest(
+                "스타벅스 광화문점", "1234567", "https://place.url");
         List<String> imageUrls = List.of("https://image1.url", "https://image2.url", "https://image3.url");
         ReviewCreateRequest reviewCreateRequest = createReviewCreateRequest(
                 writerId, cafeCreateRequest, "일하거나 책읽기 좋아요", "리뷰 내용", "아메리카노",3, 3, 3, 3, "normal", imageUrls);
@@ -344,15 +356,18 @@ class ReviewServiceTest {
         Member writer = createMember("email01@naver.com", "password01%^&", "nickname01");
         memberRepository.save(writer);
 
-        Location cafeLocation = createLocation(37.57122962143047, 126.97629649901215, "서울 종로구 세종로 00-0", "서울 종로구 세종대로 000");
+        Location cafeLocation = createLocation(
+                37.57122962143047, 126.97629649901215, "서울 종로구 세종로 00-0", "서울 종로구 세종대로 000");
         Cafe cafe = createCafe("스타벅스 광화문점", "1234567", "https://place.url", cafeLocation);
         cafeRepository.save(cafe);
 
         LocalDateTime registeredAt = LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS);
 
-        Review review = createReview(writer, cafe, "일하거나 책읽기 좋아요", "리뷰 내용", "아메리카노", 3, 3, 4, 3, "normal", registeredAt);
+        Review review = createReview(
+                writer, cafe, "일하거나 책읽기 좋아요", "리뷰 내용", "아메리카노", 3, 3, 4, 3, "normal", registeredAt);
 
-        Review reviewWithImages = createReview(writer, cafe, "일하거나 책읽기 좋아요", "리뷰 내용", "라떼", 3, 3, 4, 3, "vibe", registeredAt);
+        Review reviewWithImages = createReview(
+                writer, cafe, "일하거나 책읽기 좋아요", "리뷰 내용", "라떼", 3, 3, 4, 3, "vibe", registeredAt);
         List<String> imageUrls = List.of("https://image1.url", "https://image2.url", "https://image3.url");
         List<ReviewImage> reviewImages = imageUrls.stream()
                 .map(imageUrl -> createReviewImage(imageUrl, reviewWithImages)).collect(Collectors.toList());
@@ -367,11 +382,13 @@ class ReviewServiceTest {
 
         // then
         assertThat(responses.get(0))
-                .extracting("id", "writer.id", "writer.nickname", "visitPurpose", "content", "menu", "registeredAt")
+                .extracting("id", "writer.id", "writer.nickname",
+                        "visitPurpose", "content", "menu", "registeredAt")
                 .contains(review.getId(), writer.getId(), writer.getNickname(),
                         "일하거나 책읽기 좋아요", "리뷰 내용", "아메리카노", registeredAt);
         assertThat(responses.get(1))
-                .extracting("id", "writer.id", "writer.nickname", "visitPurpose", "content", "menu", "registeredAt", "imageUrls")
+                .extracting("id", "writer.id", "writer.nickname",
+                        "visitPurpose", "content", "menu", "registeredAt", "imageUrls")
                 .contains(reviewWithImages.getId(), writer.getId(), writer.getNickname(),
                         "일하거나 책읽기 좋아요", "리뷰 내용", "라떼", registeredAt, imageUrls);
     }
@@ -776,7 +793,8 @@ class ReviewServiceTest {
                 .build();
     }
 
-    private LocationCreateRequest createLocationCreateRequest(double latitude, double longitude, String address, String roadAddress) {
+    private LocationCreateRequest createLocationCreateRequest(
+            double latitude, double longitude, String address, String roadAddress) {
         return LocationCreateRequest.builder()
                 .latitude(latitude)
                 .longitude(longitude)
