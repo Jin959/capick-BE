@@ -192,6 +192,48 @@ class CafeTest {
 //                .containsExactly(Integer.MAX_VALUE / 2, 1, CafeTheme.VIBE);
 //    }
 
+    @Test
+    @DisplayName("성공: 카페 타입 지수를 감소시킨다.")
+    void minusCafeTypeIndex() {
+        // given
+        Review review = createReview("일하거나 책읽고 공부하려고요", "리뷰 내용", "아이스 아메리카노", 3, 4, 3, 3, "normal");
+        Cafe cafe = createCafe("스타벅스 광화문점", "1234567", "https://place.url");
+        // TODO: 같은 객체이나 다른 행위를 끌어다 사용했다. JPA 임베디드 타입의 공유 참조 문제를 방지 하기위해 Cafe의 빌더로 테스트 환경을 설정할 수 없다. 좋은 방법이 없는지 찾아보기
+        cafe.updateCafeType(review);
+
+        // when
+        cafe.minusCafeTypeIndex(review);
+
+        // then
+        assertThat(cafe.getCafeTypeInfo())
+                .extracting("coffeeIndex", "spaceIndex", "priceIndex", "noiseIndex")
+                .containsExactly(0, 0, 0, 0);
+    }
+
+    @Test
+    @DisplayName("성공: 카페 테마 누적 횟수를 감소시킨다.")
+    void minusCafeThemeCount() {
+        // given
+        Review review = createReview("일하거나 책읽고 공부하려고요", "리뷰 내용", "아이스 아메리카노", 3, 4, 3, 3, "normal");
+        Cafe cafe = createCafe("스타벅스 광화문점", "1234567", "https://place.url");
+        // TODO: 같은 객체이나 다른 행위를 끌어다 사용했다. JPA 임베디드 타입의 공유 참조 문제를 방지 하기위해 Cafe의 빌더로 테스트 환경을 설정할 수 없다. 좋은 방법이 없는지 찾아보기
+        cafe.updateCafeTheme(review);
+
+        // when
+        cafe.minusCafeThemeCount(review);
+
+        // then
+        assertThat(cafe.getCafeThemeInfo())
+                .extracting(
+                        "normalCount", "vibeCount", "viewCount", "petCount",
+                        "hobbyCount", "studyCount", "kidsCount", "etcCount"
+                )
+                .containsExactly(
+                        0, 0, 0, 0,
+                        0, 0, 0, 0
+                );
+    }
+
     private Review createReview(String visitPurpose, String content, String menu,
                                        int coffeeIndex, int spaceIndex, int priceIndex, int noiseIndex, String theme) {
         return Review.builder()
