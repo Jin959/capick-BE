@@ -45,6 +45,13 @@ public class CafeTypeInfo {
         }
     }
 
+    protected void minusCafeTypeIndex(Review review) {
+        coffeeIndex -= review.getCoffeeIndex();
+        spaceIndex -= review.getSpaceIndex();
+        priceIndex -= review.getPriceIndex();
+        noiseIndex -= review.getNoiseIndex();
+    }
+
     private void preventIndexOverflow(List<Integer> indexes) {
         int overflowBoundary = Integer.MAX_VALUE - 10000;
 

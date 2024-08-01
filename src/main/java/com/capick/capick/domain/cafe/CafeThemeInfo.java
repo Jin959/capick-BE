@@ -61,6 +61,34 @@ public class CafeThemeInfo {
         }
     }
 
+    protected void minusCafeThemeCount(Review review) {
+        switch (review.getTheme()) {
+            case "normal":
+                normalCount--;
+                break;
+            case "vibe":
+                vibeCount--;
+                break;
+            case "view":
+                viewCount--;
+                break;
+            case "pet":
+                petCount--;
+                break;
+            case "hobby":
+                hobbyCount--;
+                break;
+            case "study":
+                studyCount--;
+                break;
+            case "kids":
+                kidsCount--;
+                break;
+            default:
+                etcCount--;
+        }
+    }
+
     private void preventCountOverflow(List<Integer> themeCounts) {
         int overflowBoundary = Integer.MAX_VALUE - 10000;
 
