@@ -1,6 +1,7 @@
 package com.capick.capick.domain.review;
 
 import com.capick.capick.domain.common.BaseEntity;
+import com.capick.capick.domain.common.BaseStatus;
 import com.capick.capick.exception.DomainPoliticalArgumentException;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -49,6 +50,10 @@ public class ReviewImage extends BaseEntity {
                 .distinct()
                 .map(imageUrl -> ReviewImage.create(imageUrl, review))
                 .collect(Collectors.toList());
+    }
+
+    public void delete() {
+        this.status = BaseStatus.INACTIVE;
     }
 
 }
