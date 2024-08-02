@@ -25,6 +25,7 @@ public enum ApiResponseStatus {
     REVIEW_WITH_CAFE_TYPE_INDEX_OUT_OF_RANGE(HttpStatus.BAD_REQUEST, "리뷰 작성 시 까페 타입 지수는 1 부터 5 여야 합니다."),
     NUMBER_OF_REVIEW_IMAGE_EXCEEDED(HttpStatus.BAD_REQUEST, "이미지는 최대 3개 까지 등록할 수 있습니다."),
     NOT_FOUND_REVIEW(HttpStatus.NOT_FOUND, "존재하지 않는 리뷰입니다."),
+    NOT_THE_WRITER(HttpStatus.UNAUTHORIZED, "작성자가 아닙니다."),
 
     // 500
     DATABASE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "데이터베이스 연결 또는 접근에 실패하였습니다. 관리자에게 문의해 주세요."),

@@ -9,6 +9,7 @@ import com.capick.capick.dto.request.ReviewCreateRequest;
 import com.capick.capick.dto.request.ReviewUpdateRequest;
 import com.capick.capick.dto.response.ReviewResponse;
 import com.capick.capick.exception.NotFoundResourceException;
+import com.capick.capick.exception.UnauthorizedException;
 import com.capick.capick.repository.CafeRepository;
 import com.capick.capick.repository.ReviewImageRepository;
 import com.capick.capick.repository.ReviewRepository;
@@ -18,9 +19,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.capick.capick.domain.common.BaseStatus.ACTIVE;
 import static com.capick.capick.dto.ApiResponseStatus.NOT_FOUND_REVIEW;
+import static com.capick.capick.dto.ApiResponseStatus.NOT_THE_WRITER;
 
 @Service
 @Transactional(readOnly = true)
@@ -65,7 +68,54 @@ public class ReviewService {
 
     @Transactional
     public ReviewResponse updateReview(Long reviewId, ReviewUpdateRequest reviewUpdateRequest) {
-        return null;
+        // 작성자 검증
+        Review review = findReviewByIdOrElseThrow(reviewId);
+        Member writer = memberServiceHelper.findMemberByIdOrElseThrow(reviewUpdateRequest.getWriterId());
+        if (!review.getWriter().getId().equals(writer.getId())) {
+            throw UnauthorizedException.of(NOT_THE_WRITER);
+        }
+
+        // 카페 타입 지수, 테마 누적 횟수 마이너스
+        Cafe cafe = review.getCafe();
+        cafe.minusCafeTypeIndex(review);
+        cafe.minusCafeThemeCount(review);
+
+        // 리뷰 내용 업데이트
+        review.updateReviewText(
+                reviewUpdateRequest.getVisitPurpose(), reviewUpdateRequest.getContent(), reviewUpdateRequest.getMenu()
+        );
+        review.updateIndexes(
+                reviewUpdateRequest.getCoffeeIndex(), reviewUpdateRequest.getSpaceIndex(),
+                reviewUpdateRequest.getPriceIndex(), reviewUpdateRequest.getNoiseIndex()
+        );
+        Review updatedReview = reviewRepository.save(review);
+
+        // 리뷰 이미지 업데이트 도메인 로직
+        List<String> requestImageUrls = reviewUpdateRequest.getImageUrls();
+        List<ReviewImage> reviewImages = review.getReviewImages();
+
+        List<String> originalImageUrls = reviewImages.stream().map(ReviewImage::getImageUrl).collect(Collectors.toList());
+        // 이전에 없던 것들은 엔터티 생성
+        List<String> newImageUrls = requestImageUrls.stream().filter(url -> !originalImageUrls.contains(url)).collect(Collectors.toList());
+        List<ReviewImage> updatedReviewImages = ReviewImage.createReviewImages(newImageUrls, review);
+        reviewImageRepository.saveAll(updatedReviewImages);
+        // 원래 있던 이미지들 중 요청 된 이미지와 겹치지 않는 것은 엔터티 제거
+        List<String> deprecatedImageUrls = originalImageUrls.stream().filter(url -> !requestImageUrls.contains(url)).collect(Collectors.toList());
+        reviewImages.stream().forEach(image -> {
+            if (deprecatedImageUrls.contains(image.getImageUrl())) {
+                image.delete();
+            } else {
+                updatedReviewImages.add(image);
+            }
+        });
+        reviewImageRepository.saveAll(reviewImages);
+
+        // 카페 타입, 테마 업데이트
+        cafe.updateCafeType(updatedReview);
+        cafe.updateCafeTheme(updatedReview);
+        cafeRepository.save(cafe);
+
+        return ReviewResponse.of(updatedReview, updatedReviewImages, writer);
     }
 
     private Review findReviewByIdOrElseThrow(Long reviewId) {
