@@ -10,6 +10,21 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class ReviewTest {
 
     @Test
+    @DisplayName("성공: 리뷰의 텍스트 정보인 방문 목적, 리뷰 내용, 메뉴를 수정 할 수 있다.")
+    void updateReviewText() {
+        // given
+        Review review = createReview("일하거나 책읽고 공부하려고요", "리뷰 내용", "아이스 아메리카노", 2, 4, 2, 2, "normal");
+
+        // when
+        review.updateReviewText("넓어서 갔어요", "리뷰 내용 수정", "핫 라떼");
+
+        // then
+        assertThat(review)
+                .extracting("visitPurpose", "content", "menu")
+                .contains("넓어서 갔어요", "리뷰 내용 수정", "핫 라떼");
+    }
+
+    @Test
     @DisplayName("성공: 리뷰의 타입 지수를 수정할 수 있다.")
     void updateIndexes() {
         // given
@@ -59,6 +74,20 @@ class ReviewTest {
                 .visitPurpose(visitPurpose)
                 .content(content)
                 .menu(menu)
+                .theme(theme)
+                .build();
+    }
+
+    private Review createReview(String visitPurpose, String content, String menu,
+                                int coffeeIndex, int spaceIndex, int priceIndex, int noiseIndex, String theme) {
+        return Review.builder()
+                .visitPurpose(visitPurpose)
+                .content(content)
+                .menu(menu)
+                .coffeeIndex(coffeeIndex)
+                .spaceIndex(spaceIndex)
+                .priceIndex(priceIndex)
+                .noiseIndex(noiseIndex)
                 .theme(theme)
                 .build();
     }
