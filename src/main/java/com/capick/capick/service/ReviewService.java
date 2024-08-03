@@ -77,8 +77,8 @@ public class ReviewService {
 
         // 카페 타입 지수, 테마 누적 횟수 마이너스
         Cafe cafe = review.getCafe();
-        cafe.minusCafeTypeIndex(review);
-        cafe.minusCafeThemeCount(review);
+        cafe.deductCafeTypeIndex(review);
+        cafe.deductCafeThemeCount(review);
 
         // 리뷰 내용 업데이트
         review.updateReviewText(

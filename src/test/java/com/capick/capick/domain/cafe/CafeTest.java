@@ -194,7 +194,7 @@ class CafeTest {
 
     @Test
     @DisplayName("성공: 카페 타입 지수를 감소시킨다.")
-    void minusCafeTypeIndex() {
+    void deductCafeTypeIndex() {
         // given
         Review review = createReview("일하거나 책읽고 공부하려고요", "리뷰 내용", "아이스 아메리카노", 3, 4, 3, 3, "normal");
         Cafe cafe = createCafe("스타벅스 광화문점", "1234567", "https://place.url");
@@ -202,7 +202,7 @@ class CafeTest {
         cafe.updateCafeType(review);
 
         // when
-        cafe.minusCafeTypeIndex(review);
+        cafe.deductCafeTypeIndex(review);
 
         // then
         assertThat(cafe.getCafeTypeInfo())
@@ -212,7 +212,7 @@ class CafeTest {
 
     @Test
     @DisplayName("성공: 카페 테마 누적 횟수를 감소시킨다.")
-    void minusCafeThemeCount() {
+    void deductCafeThemeCount() {
         // given
         Review review = createReview("일하거나 책읽고 공부하려고요", "리뷰 내용", "아이스 아메리카노", 3, 4, 3, 3, "normal");
         Cafe cafe = createCafe("스타벅스 광화문점", "1234567", "https://place.url");
@@ -220,7 +220,7 @@ class CafeTest {
         cafe.updateCafeTheme(review);
 
         // when
-        cafe.minusCafeThemeCount(review);
+        cafe.deductCafeThemeCount(review);
 
         // then
         assertThat(cafe.getCafeThemeInfo())

@@ -1,6 +1,7 @@
 package com.capick.capick.domain.cafe;
 
 import com.capick.capick.domain.review.Review;
+import com.capick.capick.exception.DomainPoliticalArgumentException;
 import lombok.*;
 
 import javax.persistence.Column;
@@ -8,6 +9,8 @@ import javax.persistence.Embeddable;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import java.util.*;
+
+import static com.capick.capick.dto.ApiResponseStatus.LACK_OF_ACCUMULATED_CAFE_TYPE_INDEX;
 
 @Getter
 @Embeddable
@@ -45,7 +48,10 @@ public class CafeTypeInfo {
         }
     }
 
-    protected void minusCafeTypeIndex(Review review) {
+    protected void deductCafeTypeIndex(Review review) {
+        if (isAccumulatedTypeIndexLessThanTypeIndexOf(review)) {
+            throw DomainPoliticalArgumentException.of(LACK_OF_ACCUMULATED_CAFE_TYPE_INDEX);
+        }
         coffeeIndex -= review.getCoffeeIndex();
         spaceIndex -= review.getSpaceIndex();
         priceIndex -= review.getPriceIndex();
@@ -93,6 +99,11 @@ public class CafeTypeInfo {
         return indexMap.keySet().stream()
                 .max(Comparator.comparing(indexMap::get))
                 .orElseGet(() -> "none");
+    }
+
+    private boolean isAccumulatedTypeIndexLessThanTypeIndexOf(Review review) {
+        return coffeeIndex < review.getCoffeeIndex() | spaceIndex < review.getSpaceIndex()
+                | priceIndex < review.getPriceIndex() | noiseIndex < review.getNoiseIndex();
     }
 
 }

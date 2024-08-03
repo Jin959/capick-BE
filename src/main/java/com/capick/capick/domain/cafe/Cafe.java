@@ -75,16 +75,16 @@ public class Cafe extends BaseEntity {
         cafeTypeInfo.updateCafeType(review);
     }
 
-    public void minusCafeTypeIndex(Review review) {
-        cafeTypeInfo.minusCafeTypeIndex(review);
+    public void deductCafeTypeIndex(Review review) {
+        cafeTypeInfo.deductCafeTypeIndex(review);
     }
 
     public void updateCafeTheme(Review review) {
         cafeThemeInfo.updateCafeTheme(review);
     }
 
-    public void minusCafeThemeCount(Review review) {
-        cafeThemeInfo.minusCafeThemeCount(review);
+    public void deductCafeThemeCount(Review review) {
+        cafeThemeInfo.deductCafeThemeCount(review);
     }
 
 }

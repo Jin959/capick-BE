@@ -1,6 +1,7 @@
 package com.capick.capick.domain.cafe;
 
 import com.capick.capick.domain.review.Review;
+import com.capick.capick.exception.DomainPoliticalArgumentException;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,6 +12,8 @@ import javax.persistence.Embeddable;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import java.util.*;
+
+import static com.capick.capick.dto.ApiResponseStatus.LACK_OF_ACCUMULATED_CAFE_THEME_COUNT;
 
 @Getter
 @Embeddable
@@ -61,7 +64,10 @@ public class CafeThemeInfo {
         }
     }
 
-    protected void minusCafeThemeCount(Review review) {
+    protected void deductCafeThemeCount(Review review) {
+        if (isAccumulatedThemeCountLessThan(review.getTheme())) {
+            throw DomainPoliticalArgumentException.of(LACK_OF_ACCUMULATED_CAFE_THEME_COUNT);
+        }
         switch (review.getTheme()) {
             case "normal":
                 normalCount--;
@@ -159,6 +165,27 @@ public class CafeThemeInfo {
         return themeCountMap.keySet().stream()
                 .max(Comparator.comparing(themeCountMap::get))
                 .orElseGet(() -> "etc");
+    }
+
+    private boolean isAccumulatedThemeCountLessThan(String theme) {
+        switch (theme) {
+            case "normal":
+                return normalCount < 1;
+            case "vibe":
+                return vibeCount < 1;
+            case "view":
+                return viewCount < 1;
+            case "pet":
+                return petCount < 1;
+            case "hobby":
+                return hobbyCount < 1;
+            case "study":
+                return studyCount < 1;
+            case "kids":
+                return kidsCount < 1;
+            default:
+                return etcCount < 1;
+        }
     }
 
 }

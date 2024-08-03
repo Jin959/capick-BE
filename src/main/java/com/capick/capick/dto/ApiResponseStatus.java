@@ -26,6 +26,8 @@ public enum ApiResponseStatus {
     NUMBER_OF_REVIEW_IMAGE_EXCEEDED(HttpStatus.BAD_REQUEST, "이미지는 최대 3개 까지 등록할 수 있습니다."),
     NOT_FOUND_REVIEW(HttpStatus.NOT_FOUND, "존재하지 않는 리뷰입니다."),
     NOT_THE_WRITER(HttpStatus.UNAUTHORIZED, "작성자가 아닙니다."),
+    LACK_OF_ACCUMULATED_CAFE_TYPE_INDEX(HttpStatus.CONFLICT, "차감할 누적 카페 타입 지수가 없습니다. 이전에 등록한 만큼 차감해주세요."),
+    LACK_OF_ACCUMULATED_CAFE_THEME_COUNT(HttpStatus.CONFLICT, "차감할 카페 테마 횟수가 없습니다. 이전에 등록한 테마를 입력해주세요."),
 
     // 500
     DATABASE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "데이터베이스 연결 또는 접근에 실패하였습니다. 관리자에게 문의해 주세요."),
