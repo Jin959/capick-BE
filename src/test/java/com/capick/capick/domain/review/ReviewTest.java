@@ -69,6 +69,19 @@ class ReviewTest {
                 .containsExactly(1, 5, 3, 3);
     }
 
+    @Test
+    @DisplayName("성공: 리뷰의 카페 테마 정보를 수정할 수 있다.")
+    void updateTheme() {
+        // given
+        Review review = createReview("일하거나 책읽고 공부하려고요", "리뷰 내용", "아이스 아메리카노", 2, 4, 2, 2, "normal");
+
+        // when
+        review.updateTheme("study");
+
+        // then
+        assertThat(review.getTheme()).isEqualTo("study");
+    }
+
     private static Review createReview(String visitPurpose, String content, String menu, String theme) {
         return Review.builder()
                 .visitPurpose(visitPurpose)
