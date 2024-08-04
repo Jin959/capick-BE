@@ -1,7 +1,7 @@
 package com.capick.capick.domain.cafe;
 
 import com.capick.capick.domain.review.Review;
-import com.capick.capick.exception.DomainPoliticalArgumentException;
+import com.capick.capick.exception.DomainLogicalException;
 import lombok.*;
 
 import javax.persistence.Column;
@@ -50,7 +50,7 @@ public class CafeTypeInfo {
 
     protected void deductCafeTypeIndex(Review review) {
         if (isAccumulatedTypeIndexLessThanTypeIndexOf(review)) {
-            throw DomainPoliticalArgumentException.of(LACK_OF_ACCUMULATED_CAFE_TYPE_INDEX);
+            throw DomainLogicalException.of(LACK_OF_ACCUMULATED_CAFE_TYPE_INDEX);
         }
         coffeeIndex -= review.getCoffeeIndex();
         spaceIndex -= review.getSpaceIndex();

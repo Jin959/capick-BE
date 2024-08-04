@@ -1,7 +1,7 @@
 package com.capick.capick.domain.cafe;
 
 import com.capick.capick.domain.review.Review;
-import com.capick.capick.exception.DomainPoliticalArgumentException;
+import com.capick.capick.exception.DomainLogicalException;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -66,7 +66,7 @@ public class CafeThemeInfo {
 
     protected void deductCafeThemeCount(Review review) {
         if (isAccumulatedThemeCountLessThan(review.getTheme())) {
-            throw DomainPoliticalArgumentException.of(LACK_OF_ACCUMULATED_CAFE_THEME_COUNT);
+            throw DomainLogicalException.of(LACK_OF_ACCUMULATED_CAFE_THEME_COUNT);
         }
         switch (review.getTheme()) {
             case "normal":

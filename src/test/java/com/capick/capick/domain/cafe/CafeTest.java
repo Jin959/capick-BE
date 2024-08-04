@@ -3,7 +3,6 @@ package com.capick.capick.domain.cafe;
 import com.capick.capick.domain.review.Review;
 import com.capick.capick.dto.request.LocationCreateRequest;
 import com.capick.capick.exception.DomainLogicalException;
-import com.capick.capick.exception.DomainPoliticalArgumentException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -225,7 +224,7 @@ class CafeTest {
 
         // when // then
         assertThatThrownBy(() -> cafe.deductCafeTypeIndex(reviewWithCafeTypeIndexMoreThanAccumulated))
-                .isInstanceOf(DomainPoliticalArgumentException.class)
+                .isInstanceOf(DomainLogicalException.class)
                 .hasMessage("차감할 누적 카페 타입 지수가 없습니다. 이전에 등록한 만큼 차감해주세요.");
     }
 
@@ -267,7 +266,7 @@ class CafeTest {
 
         // when // then
         assertThatThrownBy(() -> cafe.deductCafeThemeCount(reviewWithCafeThemeCountMoreThanAccumulated))
-                .isInstanceOf(DomainPoliticalArgumentException.class)
+                .isInstanceOf(DomainLogicalException.class)
                 .hasMessage("차감할 카페 테마 횟수가 없습니다. 이전에 등록한 테마를 입력해주세요.");
     }
 
