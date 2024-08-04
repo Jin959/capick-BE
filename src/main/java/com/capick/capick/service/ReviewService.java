@@ -88,6 +88,7 @@ public class ReviewService {
                 reviewUpdateRequest.getCoffeeIndex(), reviewUpdateRequest.getSpaceIndex(),
                 reviewUpdateRequest.getPriceIndex(), reviewUpdateRequest.getNoiseIndex()
         );
+        review.updateTheme(reviewUpdateRequest.getTheme());
         Review updatedReview = reviewRepository.save(review);
 
         // 리뷰 이미지 업데이트 도메인 로직

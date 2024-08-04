@@ -96,4 +96,8 @@ public class Review extends BaseEntity {
         this.noiseIndex = noiseIndex;
     }
 
+    public void updateTheme(String theme) {
+        this.theme = theme;
+    }
+
 }
