@@ -3,6 +3,7 @@ package com.capick.capick.domain.cafe;
 import com.capick.capick.domain.review.Review;
 import com.capick.capick.dto.request.LocationCreateRequest;
 import com.capick.capick.exception.DomainLogicalException;
+import com.capick.capick.exception.DomainPoliticalArgumentException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -211,6 +212,24 @@ class CafeTest {
     }
 
     @Test
+    @DisplayName("예외: 카페 타입 지수를 차감할 때 누적 타입 지수보다 많이 차감시킬 수 없다. 그렇지 않으면 예외를 발생시킨다. 누적된 카페 타입 지수는 양수이다.")
+    void deductCafeTypeIndexMoreThanAccumulated() {
+        // given
+        Review review = createReview("일하거나 책읽고 공부하려고요", "리뷰 내용", "아이스 아메리카노", 1, 1, 1, 1, "normal");
+        Cafe cafe = createCafe("스타벅스 광화문점", "1234567", "https://place.url");
+        // TODO: 다른 행위를 끌어다 테스트 환경을 조성함
+        cafe.updateCafeType(review);
+
+        Review reviewWithCafeTypeIndexMoreThanAccumulated = createReview(
+                "일하거나 책읽고 공부하려고요", "리뷰 내용", "아이스 아메리카노", 5, 5, 5, 5, "normal");
+
+        // when // then
+        assertThatThrownBy(() -> cafe.deductCafeTypeIndex(reviewWithCafeTypeIndexMoreThanAccumulated))
+                .isInstanceOf(DomainPoliticalArgumentException.class)
+                .hasMessage("차감할 누적 카페 타입 지수가 없습니다. 이전에 등록한 만큼 차감해주세요.");
+    }
+
+    @Test
     @DisplayName("성공: 카페 테마 누적 횟수를 감소시킨다.")
     void deductCafeThemeCount() {
         // given
@@ -232,6 +251,24 @@ class CafeTest {
                         0, 0, 0, 0,
                         0, 0, 0, 0
                 );
+    }
+
+    @Test
+    @DisplayName("예외: 카페 테마 횟수를 차감할 때 누적 테마 횟수보다 많이 차감시킬 수 없다. 그렇지 않으면 예외를 발생시킨다. 누적된 카페 테마 횟수는 양수이다.")
+    void deductCafeThemeCountMoreThanAccumulated() {
+        // given
+        Review review = createReview("일하거나 책읽고 공부하려고요", "리뷰 내용", "아이스 아메리카노", 1, 1, 1, 1, "normal");
+        Cafe cafe = createCafe("스타벅스 광화문점", "1234567", "https://place.url");
+        // TODO: 다른 행위를 끌어다 테스트 환경을 조성함
+        cafe.updateCafeType(review);
+
+        Review reviewWithCafeThemeCountMoreThanAccumulated = createReview(
+                "일하거나 책읽고 공부하려고요", "리뷰 내용", "아이스 아메리카노", 5, 5, 5, 5, "normal");
+
+        // when // then
+        assertThatThrownBy(() -> cafe.deductCafeThemeCount(reviewWithCafeThemeCountMoreThanAccumulated))
+                .isInstanceOf(DomainPoliticalArgumentException.class)
+                .hasMessage("차감할 카페 테마 횟수가 없습니다. 이전에 등록한 테마를 입력해주세요.");
     }
 
     private Review createReview(String visitPurpose, String content, String menu,
