@@ -11,7 +11,6 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 import static com.capick.capick.dto.ApiResponseStatus.REVIEW_WITH_CAFE_TYPE_INDEX_OUT_OF_RANGE;
@@ -56,9 +55,6 @@ public class Review extends BaseEntity {
     private String theme;
 
     private LocalDateTime registeredAt;
-
-    @OneToMany(mappedBy = "review", cascade = CascadeType.ALL)
-    List<ReviewImage> reviewImages = new ArrayList<>();
 
     @Builder
     private Review(

@@ -63,7 +63,8 @@ public class ReviewService {
 
     public ReviewResponse getReview(Long reviewId) {
         Review review = findReviewByIdOrElseThrow(reviewId);
-        return ReviewResponse.of(review, review.getReviewImages(), review.getWriter());
+        List<ReviewImage> reviewImages = reviewImageRepository.findAllByReviewAndStatus(review, ACTIVE);
+        return ReviewResponse.of(review, reviewImages, review.getWriter());
     }
 
     @Transactional
@@ -93,7 +94,7 @@ public class ReviewService {
 
         // 리뷰 이미지 업데이트 도메인 로직
         List<String> requestImageUrls = reviewUpdateRequest.getImageUrls();
-        List<ReviewImage> reviewImages = review.getReviewImages();
+        List<ReviewImage> reviewImages = reviewImageRepository.findAllByReviewAndStatus(review, ACTIVE);
 
         List<String> originalImageUrls = reviewImages.stream().map(ReviewImage::getImageUrl).collect(Collectors.toList());
         // 이전에 없던 것들은 엔터티 생성
