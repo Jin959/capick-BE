@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.capick.capick.domain.common.BaseStatus.ACTIVE;
 import static com.capick.capick.dto.ApiResponseStatus.NOT_FOUND_REVIEW;
@@ -69,19 +70,13 @@ public class ReviewService {
 
     @Transactional
     public ReviewResponse updateReview(Long reviewId, ReviewUpdateRequest reviewUpdateRequest) {
-        // 작성자 검증
         Review review = findReviewByIdOrElseThrow(reviewId);
-        Member writer = memberServiceHelper.findMemberByIdOrElseThrow(reviewUpdateRequest.getWriterId());
-        if (!review.getWriter().getId().equals(writer.getId())) {
-            throw UnauthorizedException.of(NOT_THE_WRITER);
-        }
+        Member writer = findEditorWhoWroteOrElseThrow(reviewUpdateRequest.getWriterId(), review.getWriter().getId());
 
-        // 카페 타입 지수, 테마 누적 횟수 마이너스
         Cafe cafe = review.getCafe();
         cafe.deductCafeTypeIndex(review);
         cafe.deductCafeThemeCount(review);
 
-        // 리뷰 내용 업데이트
         review.updateReviewText(
                 reviewUpdateRequest.getVisitPurpose(), reviewUpdateRequest.getContent(), reviewUpdateRequest.getMenu()
         );
@@ -92,27 +87,21 @@ public class ReviewService {
         review.updateTheme(reviewUpdateRequest.getTheme());
         Review updatedReview = reviewRepository.save(review);
 
-        // 리뷰 이미지 업데이트 도메인 로직
         List<String> requestImageUrls = reviewUpdateRequest.getImageUrls();
         List<ReviewImage> reviewImages = reviewImageRepository.findAllByReviewAndStatus(review, ACTIVE);
+        List<String> originalImageUrls = reviewImages.stream()
+                .map(ReviewImage::getImageUrl).collect(Collectors.toList());
 
-        List<String> originalImageUrls = reviewImages.stream().map(ReviewImage::getImageUrl).collect(Collectors.toList());
-        // 이전에 없던 것들은 엔터티 생성
-        List<String> newImageUrls = requestImageUrls.stream().filter(url -> !originalImageUrls.contains(url)).collect(Collectors.toList());
-        List<ReviewImage> updatedReviewImages = ReviewImage.createReviewImages(newImageUrls, review);
-        reviewImageRepository.saveAll(updatedReviewImages);
-        // 원래 있던 이미지들 중 요청 된 이미지와 겹치지 않는 것은 엔터티 제거
-        List<String> deprecatedImageUrls = originalImageUrls.stream().filter(url -> !requestImageUrls.contains(url)).collect(Collectors.toList());
-        reviewImages.stream().forEach(image -> {
-            if (deprecatedImageUrls.contains(image.getImageUrl())) {
-                image.delete();
-            } else {
-                updatedReviewImages.add(image);
-            }
-        });
+        List<ReviewImage> newReviewImages = createReviewImagesExcludingIntersection(
+                requestImageUrls, originalImageUrls, review);
+        List<ReviewImage> preservedReviewImages = extractIntersectionalReviewImagesDeletingDeprecated(
+                originalImageUrls, requestImageUrls, reviewImages);
+        reviewImageRepository.saveAll(newReviewImages);
         reviewImageRepository.saveAll(reviewImages);
 
-        // 카페 타입, 테마 업데이트
+        List<ReviewImage> updatedReviewImages = Stream
+                .concat(newReviewImages.stream(), preservedReviewImages.stream()).collect(Collectors.toList());
+
         cafe.updateCafeType(updatedReview);
         cafe.updateCafeTheme(updatedReview);
         cafeRepository.save(cafe);
@@ -131,5 +120,40 @@ public class ReviewService {
                         cafeCreateRequest.getName(), cafeCreateRequest.getKakaoPlaceId(),
                         cafeCreateRequest.getKakaoDetailPageUrl(), cafeCreateRequest.getLocation()
                 ));
+    }
+
+    private Member findEditorWhoWroteOrElseThrow(Long editorId, Long writerId) {
+        Member editor = memberServiceHelper.findMemberByIdOrElseThrow(editorId);
+        if (!writerId.equals(editor.getId())) {
+            throw UnauthorizedException.of(NOT_THE_WRITER);
+        }
+        return editor;
+    }
+
+    private List<ReviewImage> createReviewImagesExcludingIntersection(
+            List<String> requestImageUrls, List<String> originalImageUrls, Review review) {
+        List<String> newImageUrls = extractDifferenceSetOfImageUrls(requestImageUrls, originalImageUrls);
+        return ReviewImage.createReviewImages(newImageUrls, review);
+    }
+
+    private List<ReviewImage> extractIntersectionalReviewImagesDeletingDeprecated(
+            List<String> originalImageUrls, List<String> requestImageUrls, List<ReviewImage> reviewImages) {
+        List<String> deprecatedImageUrls = extractDifferenceSetOfImageUrls(originalImageUrls, requestImageUrls);
+        deleteDeprecatedReviewImages(deprecatedImageUrls, reviewImages);
+        return reviewImages.stream()
+                .filter(image -> image.getStatus().equals(ACTIVE)).collect(Collectors.toList());
+    }
+
+    private List<String> extractDifferenceSetOfImageUrls(List<String> ImageUrlsFrom, List<String> imageUrlsBy) {
+        return ImageUrlsFrom.stream()
+                .filter(url -> !imageUrlsBy.contains(url)).collect(Collectors.toList());
+    }
+
+    private void deleteDeprecatedReviewImages(List<String> deprecatedImageUrls, List<ReviewImage> reviewImages) {
+        reviewImages.forEach(image -> {
+            if (deprecatedImageUrls.contains(image.getImageUrl())) {
+                image.delete();
+            }
+        });
     }
 }
