@@ -38,7 +38,7 @@ class ReviewControllerTest {
     private ReviewService reviewService;
 
     @Test
-    @DisplayName("성공: 회원은 등록된 카페에 대해 리뷰를 생성할 수 있다. HTTP 상태 코드 200 및 자체 응답 코드 201을 반환한다.")
+    @DisplayName("성공: 리뷰를 생성한다. HTTP 상태 코드 200 및 자체 응답 코드 201을 반환한다.")
     void createReview() throws Exception {
         // given
         ReviewResponse response = ReviewResponse.builder()
@@ -65,7 +65,11 @@ class ReviewControllerTest {
                 .priceIndex(3)
                 .noiseIndex(3)
                 .theme("normal")
-                .imageUrls(List.of("image1.url", "http://image2.url", "https://이미지3.url/이미지?=mage%201.jpeg"))
+                .imageUrls(List.of(
+                        "https://storage.com/images/80459",
+                        "https://storage.com/images%2Fpathname_encoded%EA%B2%BD%EB%A1%9C",
+                        "https://storage.com/images%2Fpathname_encoded%EA%B2%BD%EB%A1%9C/80459?type=image&size=2"
+                ))
                 .build();
 
         // when // then
@@ -103,7 +107,11 @@ class ReviewControllerTest {
                 .priceIndex(3)
                 .noiseIndex(3)
                 .theme("normal")
-                .imageUrls(List.of("https://image1.url", "https://image2.url", "https://image3.url"))
+                .imageUrls(List.of(
+                        "https://storage.com/images/80459",
+                        "https://storage.com/images%2Fpathname_encoded%EA%B2%BD%EB%A1%9C",
+                        "https://storage.com/images%2Fpathname_encoded%EA%B2%BD%EB%A1%9C/80459?type=image&size=2"
+                ))
                 .build();
 
         // when // then
@@ -364,7 +372,7 @@ class ReviewControllerTest {
 
     @Test
     @DisplayName("예외: 리뷰 생성 시 리뷰 내용은 필수값이다. 입력하지 않으면 HTTP 상태 코드 400 및 자체 응답 코드 400을 반환한다.")
-    void createReviewWithEmptyContent() throws Exception {
+    void createReviewWithoutContent() throws Exception {
         // given
         ReviewCreateRequest request = ReviewCreateRequest.builder()
                 .writerId(1L)
@@ -434,7 +442,7 @@ class ReviewControllerTest {
     }
 
     @Test
-    @DisplayName("예외: 리뷰 생성 시 메뉴는 필수값이다. 입력하지 않으면 HTTP 상태 코드 400 및 자체 응답 코드 400을 반환한다.")
+    @DisplayName("예외: 리뷰 생성 시 메뉴는 필수값이며 공백을 허용하지 않는다. 입력하지 않으면 HTTP 상태 코드 400 및 자체 응답 코드 400을 반환한다.")
     void createReviewWithoutMenu() throws Exception {
         // given
         ReviewCreateRequest request = ReviewCreateRequest.builder()
@@ -448,6 +456,7 @@ class ReviewControllerTest {
                 )
                 .visitPurpose("일하거나 책읽기 좋아요")
                 .content("리뷰 내용")
+                .menu(" ")
                 .coffeeIndex(3)
                 .spaceIndex(3)
                 .priceIndex(3)
