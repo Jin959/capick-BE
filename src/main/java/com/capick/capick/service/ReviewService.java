@@ -109,6 +109,10 @@ public class ReviewService {
         return ReviewResponse.of(updatedReview, updatedReviewImages, writer);
     }
 
+    public void deleteReview(Long reviewId) {
+
+    }
+
     private Review findReviewByIdOrElseThrow(Long reviewId) {
         return reviewRepository.findByIdAndStatus(reviewId, ACTIVE)
                 .orElseThrow(() -> NotFoundResourceException.of(NOT_FOUND_REVIEW));
