@@ -2,6 +2,7 @@ package com.capick.capick.controller;
 
 import com.capick.capick.dto.request.CafeCreateRequest;
 import com.capick.capick.dto.request.ReviewCreateRequest;
+import com.capick.capick.dto.request.ReviewUpdateRequest;
 import com.capick.capick.dto.response.MemberSimpleResponse;
 import com.capick.capick.dto.response.ReviewResponse;
 import com.capick.capick.service.ReviewService;
@@ -635,6 +636,343 @@ class ReviewControllerTest {
                 .andExpect(jsonPath("$.data").exists())
                 .andExpect(jsonPath("$.data.writer").exists())
                 .andExpect(jsonPath("$.data.imageUrls").isArray())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("성공: 리뷰를 수정한다. HTTP 상태 코드 200 및 자체 응답 코드 200 을 반환한다.")
+    void updateReview() throws Exception {
+        // given
+        ReviewResponse response = ReviewResponse.builder()
+                .writer(MemberSimpleResponse.builder().build())
+                .imageUrls(List.of())
+                .build();
+
+        when(reviewService.updateReview(anyLong(), any(ReviewUpdateRequest.class))).thenReturn(response);
+
+        int requestReviewId = 123;
+        ReviewCreateRequest request = ReviewCreateRequest.builder()
+                .writerId(1L)
+                .visitPurpose("일하거나 책읽고 공부하려고요")
+                .content("리뷰 내용")
+                .menu("아이스 아메리카노")
+                .coffeeIndex(3)
+                .spaceIndex(3)
+                .priceIndex(3)
+                .noiseIndex(3)
+                .theme("normal")
+                .imageUrls(List.of(
+                        "https://storage.com/images/80459",
+                        "https://storage.com/images%2Fpathname_encoded%EA%B2%BD%EB%A1%9C",
+                        "https://storage.com/images%2Fpathname_encoded%EA%B2%BD%EB%A1%9C/80459?type=image&size=2"
+                ))
+                .build();
+
+        // when // then
+        mockMvc.perform(
+                        patch("/api/reviews/{reviewId}", requestReviewId)
+                                .content(objectMapper.writeValueAsString(request))
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value("200"))
+                .andExpect(jsonPath("$.message").value("요청에 성공했습니다."))
+                .andExpect(jsonPath("$.data").exists())
+                .andExpect(jsonPath("$.data.writer").exists())
+                .andExpect(jsonPath("$.data.imageUrls").isArray())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("예외: 리뷰 수정 시 작성자 회원 리소스 아이디는 필수값이다. 입력하지 않으면 HTTP 상태 코드 400 및 자체 응답 코드 400을 반환한다.")
+    void reviewUpdateWithoutWriterId() throws Exception {
+        // given
+        int requestReviewId = 123;
+        ReviewCreateRequest request = ReviewCreateRequest.builder()
+                .visitPurpose("일하거나 책읽고 공부하려고요")
+                .content("리뷰 내용")
+                .menu("아이스 아메리카노")
+                .coffeeIndex(3)
+                .spaceIndex(3)
+                .priceIndex(3)
+                .noiseIndex(3)
+                .theme("normal")
+                .build();
+
+        // when // then
+        mockMvc.perform(
+                        patch("/api/reviews/{reviewId}", requestReviewId)
+                                .content(objectMapper.writeValueAsString(request))
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("400"))
+                .andExpect(jsonPath("$.message").value("리뷰 작성자의 회원 리소스 아이디를 입력해 주세요."))
+                .andExpect(jsonPath("$.data").doesNotExist())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("예외: 리뷰 수정 시 카페 방문 목적은 필수값이다. 입력하지 않으면 HTTP 상태 코드 400 및 자체 응답 코드 400을 반환한다.")
+    void reviewUpdateWithoutVisitPurpose() throws Exception {
+        // given
+        int requestReviewId = 123;
+        ReviewCreateRequest request = ReviewCreateRequest.builder()
+                .writerId(1L)
+                .content("리뷰 내용")
+                .menu("아이스 아메리카노")
+                .coffeeIndex(3)
+                .spaceIndex(3)
+                .priceIndex(3)
+                .noiseIndex(3)
+                .theme("normal")
+                .build();
+
+        // when // then
+        mockMvc.perform(
+                        patch("/api/reviews/{reviewId}", requestReviewId)
+                                .content(objectMapper.writeValueAsString(request))
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("400"))
+                .andExpect(jsonPath("$.message").value("리뷰 수정을 위해 카페를 방문한 목적을 입력해 주세요."))
+                .andExpect(jsonPath("$.data").doesNotExist())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("경계: 리뷰 수정 시 방문 목적은 최대 20자이다. 그렇지 않으면 HTTP 상태 코드 400 및 자체 응답 코드 400을 반환한다.")
+    void updateReviewWithVisitPurposeLengthOutOfRange() throws Exception {
+        // given
+        int requestReviewId = 123;
+        ReviewCreateRequest request = ReviewCreateRequest.builder()
+                .writerId(1L)
+                .visitPurpose("일하거나 책읽고 공부하려고요".repeat(20))
+                .content("리뷰 내용")
+                .menu("아이스 아메리카노")
+                .coffeeIndex(3)
+                .spaceIndex(3)
+                .priceIndex(3)
+                .noiseIndex(3)
+                .theme("normal")
+                .build();
+
+        // when // then
+        mockMvc.perform(
+                        patch("/api/reviews/{reviewId}", requestReviewId)
+                                .content(objectMapper.writeValueAsString(request))
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("400"))
+                .andExpect(jsonPath("$.message").value("카페 방문 목적은 최대 20자입니다."))
+                .andExpect(jsonPath("$.data").doesNotExist())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("예외: 리뷰 수정 시 리뷰 내용은 필수값이다. 입력하지 않으면 HTTP 상태 코드 400 및 자체 응답 코드 400을 반환한다.")
+    void updateReviewWithoutContent() throws Exception {
+        // given
+        int requestReviewId = 123;
+        ReviewCreateRequest request = ReviewCreateRequest.builder()
+                .writerId(1L)
+                .visitPurpose("일하거나 책읽고 공부하려고요")
+                .menu("아이스 아메리카노")
+                .coffeeIndex(3)
+                .spaceIndex(3)
+                .priceIndex(3)
+                .noiseIndex(3)
+                .theme("normal")
+                .build();
+
+        // when // then
+        mockMvc.perform(
+                        patch("/api/reviews/{reviewId}", requestReviewId)
+                                .content(objectMapper.writeValueAsString(request))
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("400"))
+                .andExpect(jsonPath("$.message").value("리뷰 수정을 위해 리뷰 내용을 입력해 주세요."))
+                .andExpect(jsonPath("$.data").doesNotExist())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("경계: 리뷰 수정 시 리뷰 내용은 최대 300자이다. 그렇지 않으면 HTTP 상태 코드 400 및 자체 응답 코드 400을 반환한다.")
+    void updateReviewWithContentLengthOutOfRange() throws Exception {
+        // given
+        int requestReviewId = 123;
+        ReviewCreateRequest request = ReviewCreateRequest.builder()
+                .writerId(1L)
+                .visitPurpose("일하거나 책읽고 공부하려고요")
+                .content("리뷰 내용".repeat(300))
+                .menu("아이스 아메리카노")
+                .coffeeIndex(3)
+                .spaceIndex(3)
+                .priceIndex(3)
+                .noiseIndex(3)
+                .theme("normal")
+                .build();
+
+        // when // then
+        mockMvc.perform(
+                        patch("/api/reviews/{reviewId}", requestReviewId)
+                                .content(objectMapper.writeValueAsString(request))
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("400"))
+                .andExpect(jsonPath("$.message").value("리뷰 내용은 최대 300자입니다."))
+                .andExpect(jsonPath("$.data").doesNotExist())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("예외: 리뷰 수정 시 메뉴는 필수값이며 공백을 허용하지 않는다. 입력하지 않으면 HTTP 상태 코드 400 및 자체 응답 코드 400을 반환한다.")
+    void updateReviewWithoutMenu() throws Exception {
+        // given
+        int requestReviewId = 123;
+        ReviewCreateRequest request = ReviewCreateRequest.builder()
+                .writerId(1L)
+                .visitPurpose("일하거나 책읽고 공부하려고요")
+                .content("리뷰 내용")
+                .menu("    ")
+                .coffeeIndex(3)
+                .spaceIndex(3)
+                .priceIndex(3)
+                .noiseIndex(3)
+                .theme("normal")
+                .build();
+
+        // when // then
+        mockMvc.perform(
+                        patch("/api/reviews/{reviewId}", requestReviewId)
+                                .content(objectMapper.writeValueAsString(request))
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("400"))
+                .andExpect(jsonPath("$.message").value("리뷰 수정을 위해 리뷰할 메뉴를 입력해 주세요."))
+                .andExpect(jsonPath("$.data").doesNotExist())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("예외: 리뷰 수정 시 설문을 통한 카페 타입 지수는 필수값이다. 하나라도 입력하지 않으면 HTTP 상태 코드 400 및 자체 응답 코드 400을 반환한다.")
+    void updateReviewWithoutCafeTypeIndex() throws Exception {
+        // given
+        int requestReviewId = 123;
+        ReviewCreateRequest request = ReviewCreateRequest.builder()
+                .writerId(1L)
+                .visitPurpose("일하거나 책읽고 공부하려고요")
+                .content("리뷰 내용")
+                .menu("아이스 아메리카노")
+                .spaceIndex(3)
+                .priceIndex(3)
+                .noiseIndex(3)
+                .theme("normal")
+                .build();
+
+        // when // then
+        mockMvc.perform(
+                        patch("/api/reviews/{reviewId}", requestReviewId)
+                                .content(objectMapper.writeValueAsString(request))
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("400"))
+                .andExpect(jsonPath("$.message").value("리뷰 수정을 위해 커피 맛에 대한 질문에 응답해 주세요."))
+                .andExpect(jsonPath("$.data").doesNotExist())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("예외: 리뷰 수정 시 카페 테마는 필수값이다. 입력하지 않으면 HTTP 상태 코드 400 및 자체 응답 코드 400을 반환한다.")
+    void updateReviewWithoutCafeTheme() throws Exception {
+        // given
+        int requestReviewId = 123;
+        ReviewCreateRequest request = ReviewCreateRequest.builder()
+                .writerId(1L)
+                .visitPurpose("일하거나 책읽고 공부하려고요")
+                .content("리뷰 내용")
+                .menu("아이스 아메리카노")
+                .coffeeIndex(3)
+                .spaceIndex(3)
+                .priceIndex(3)
+                .noiseIndex(3)
+                .build();
+
+        // when // then
+        mockMvc.perform(
+                        patch("/api/reviews/{reviewId}", requestReviewId)
+                                .content(objectMapper.writeValueAsString(request))
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("400"))
+                .andExpect(jsonPath("$.message").value("리뷰 수정을 위해 컨셉이나 테마에 대한 질문에 응답해 주세요."))
+                .andExpect(jsonPath("$.data").doesNotExist())
+                .andDo(print());
+    }
+
+    // TODO: Parameterized 가능한지 생각하고 적용해보기
+    @Test
+    @DisplayName("예외: 리뷰 수정 시 리뷰 이미지는 URL 형태이고 프로토콜은 HTTP, HTTPS 를 사용해야 한다. 그렇지 않으면 HTTP 상태 코드 400 및 자체 응답 코드 400을 반환한다.")
+    void updateReviewWithInvalidImageUrls() throws Exception {
+        // given
+        int requestReviewId = 123;
+        ReviewCreateRequest request1 = ReviewCreateRequest.builder()
+                .writerId(1L)
+                .visitPurpose("일하거나 책읽고 공부하려고요")
+                .content("리뷰 내용")
+                .menu("아이스 아메리카노")
+                .coffeeIndex(3)
+                .spaceIndex(3)
+                .priceIndex(3)
+                .noiseIndex(3)
+                .theme("normal")
+                .imageUrls(List.of(
+                        "ftp://storage.com/images%2Fpathname_encoded%EA%B2%BD%EB%A1%9C/80459?type=image&size=2"
+                ))
+                .build();
+        ReviewCreateRequest request2 = ReviewCreateRequest.builder()
+                .writerId(1L)
+                .visitPurpose("일하거나 책읽고 공부하려고요")
+                .content("리뷰 내용")
+                .menu("아이스 아메리카노")
+                .coffeeIndex(3)
+                .spaceIndex(3)
+                .priceIndex(3)
+                .noiseIndex(3)
+                .theme("normal")
+                .imageUrls(List.of(
+                        "https://storage.com/images%2F     공백불가pathname_encoded%EA%B2%BD%EB%A1%9C/80459?type=image&size=2"
+                ))
+                .build();
+
+        // when // then
+        mockMvc.perform(
+                        patch("/api/reviews/{reviewId}", requestReviewId)
+                                .content(objectMapper.writeValueAsString(request1))
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("400"))
+                .andExpect(jsonPath("$.message").value("리뷰 이미지 중 허용되지 않는 URL 이 존재합니다. URL 형식에 맞추고 프로토콜은 HTTP, HTTPS 를 사용해 주세요."))
+                .andExpect(jsonPath("$.data").doesNotExist())
+                .andDo(print());
+        mockMvc.perform(
+                        patch("/api/reviews/{reviewId}", requestReviewId)
+                                .content(objectMapper.writeValueAsString(request2))
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("400"))
+                .andExpect(jsonPath("$.message").value("리뷰 이미지 중 허용되지 않는 URL 이 존재합니다. URL 형식에 맞추고 프로토콜은 HTTP, HTTPS 를 사용해 주세요."))
+                .andExpect(jsonPath("$.data").doesNotExist())
                 .andDo(print());
     }
 
