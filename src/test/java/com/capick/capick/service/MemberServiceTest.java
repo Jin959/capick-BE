@@ -23,8 +23,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.capick.capick.domain.common.BaseStatus.INACTIVE;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 
 @ActiveProfiles("test")
 @SpringBootTest
@@ -221,10 +220,12 @@ class MemberServiceTest {
         memberService.updateMemberPassword(request);
 
         // then
-        Member updatedMember = memberRepository.findById(memberId).orElse(member);
-        assertThat(updatedMember)
+        List<Member> members = memberRepository.findAll();
+        assertThat(members).hasSize(1)
                 .extracting("id", "password")
-                .contains(updatedMember.getId(), "new13password%^&");
+                .contains(
+                        tuple(memberId, "new13password%^&")
+                );
     }
 
     @Test
@@ -293,10 +294,12 @@ class MemberServiceTest {
         memberService.deleteMember(memberId);
 
         // then
-        Member updatedMember = memberRepository.findById(memberId).orElse(member);
-        assertThat(updatedMember)
+        List<Member> members = memberRepository.findAll();
+        assertThat(members).hasSize(1)
                 .extracting("id", "status")
-                .contains(updatedMember.getId(), INACTIVE);
+                .contains(
+                        tuple(memberId, INACTIVE)
+                );
     }
 
     @Test
