@@ -30,9 +30,9 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.capick.capick.domain.cafe.CafeTheme.NORMAL;
-import static com.capick.capick.domain.cafe.CafeType.COST_EFFECTIVE;
-import static com.capick.capick.domain.cafe.CafeType.NOISY;
+import static com.capick.capick.domain.cafe.CafeTheme.*;
+import static com.capick.capick.domain.cafe.CafeType.*;
+import static com.capick.capick.domain.common.BaseStatus.*;
 import static org.assertj.core.api.Assertions.*;
 
 @ActiveProfiles("test")
@@ -493,7 +493,7 @@ class ReviewServiceTest {
 
     @Test
     @DisplayName("성공: 리뷰 수정 시 이미지를 수정하면 없어진 이미지는 삭제하고 새 이미지는 추가한다.")
-    void updateReviewWithReviewImage() {
+    void updateReviewWithReviewImages() {
         Member writer = createMember("email01@naver.com", "password01%^&", "nickname01");
         Long writerId = memberRepository.save(writer).getId();
 
@@ -583,8 +583,26 @@ class ReviewServiceTest {
     }
 
     @Test
+    @DisplayName("예외: 리뷰 수정 시 수정할 리뷰가 존재하지 않으면 예외가 발생한다.")
+    void updateNotExistReview() {
+        // given
+        Member writer = createMember("email01@naver.com", "password01%^&", "nickname01");
+        Long writerId = memberRepository.save(writer).getId();
+
+        Long notExistReviewId = 1L;
+
+        ReviewUpdateRequest reviewUpdateRequest = createReviewUpdateRequest(
+                writerId, "일하거나 책읽고 공부하려고요", "리뷰 내용 수정", "아이스 라떼", 1, 4, 1, 1, "vibe");
+
+        // when // then
+        assertThatThrownBy(() -> reviewService.updateReview(notExistReviewId, reviewUpdateRequest))
+                .isInstanceOf(NotFoundResourceException.class)
+                .hasMessage("존재하지 않는 리뷰입니다.");
+    }
+
+    @Test
     @DisplayName("예외: 리뷰를 수정하는 회원이 탈퇴 처리 되었거나 존재하지 않는 회원이면 예외가 발생한다.")
-    void updateReviewNotExistMember() {
+    void updateReviewByNotExistMember() {
         // given
         // TODO: 테스트 환경으로 삭제된 회원을 만들기 위해 Member.delete 라는 다른 객체의 행위를 끌어다 사용했다. 한편, Member의 빌더에 status 필드를 수정할 수 있게 하려 했으나 다른 곳에서 탈퇴 된 회원을 만들 가능성을 없애기 위해 빌더에 추가하는 것을 그만두었다. 좋은 방법이 없을까?
         Member writer = createMember("email01@naver.com", "password01%^&", "nickname01");
@@ -614,24 +632,6 @@ class ReviewServiceTest {
         assertThatThrownBy(() -> reviewService.updateReview(reviewId, reviewUpdateRequest))
                 .isInstanceOf(NotFoundResourceException.class)
                 .hasMessage("존재하지 않는 회원입니다.");
-    }
-
-    @Test
-    @DisplayName("예외: 리뷰 수정 시 수정할 리뷰가 존재하지 않으면 예외가 발생한다.")
-    void updateNotExistReview() {
-        // given
-        Member writer = createMember("email01@naver.com", "password01%^&", "nickname01");
-        Long writerId = memberRepository.save(writer).getId();
-
-        Long notExistReviewId = 1L;
-
-        ReviewUpdateRequest reviewUpdateRequest = createReviewUpdateRequest(
-                writerId, "일하거나 책읽고 공부하려고요", "리뷰 내용 수정", "아이스 라떼", 1, 4, 1, 1, "vibe");
-
-        // when // then
-        assertThatThrownBy(() -> reviewService.updateReview(notExistReviewId, reviewUpdateRequest))
-                .isInstanceOf(NotFoundResourceException.class)
-                .hasMessage("존재하지 않는 리뷰입니다.");
     }
 
     @Test
@@ -820,6 +820,141 @@ class ReviewServiceTest {
                         "https://storage.com/images%2Fpathname_encoded%EA%B2%BD%EB%A1%9C",
                         "https://storage.com/images%2Fpathname_encoded%EA%B2%BD%EB%A1%9C/80459?type=image&size=2"
                 );
+    }
+
+    @Test
+    @DisplayName("성공: 회원은 자기가 작성한 리뷰를 삭제할 수 있다.")
+    void deleteReview() {
+        // given
+        Member writer = createMember("email01@naver.com", "password01%^&", "nickname01");
+        memberRepository.save(writer).getId();
+
+        Location cafeLocation = createLocation(
+                37.57122962143047, 126.97629649901215, "서울 종로구 세종로 00-0", "서울 종로구 세종대로 000");
+        Cafe cafe = createCafe("스타벅스 광화문점", "1234567", "https://place.url", cafeLocation);
+        cafeRepository.save(cafe);
+
+        LocalDateTime registeredAt = LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS);
+
+        Review review = createReview(
+                writer, cafe, "넓어서 갔어요", "리뷰 내용", "아이스 아메리카노", 1, 4, 1, 1, "vibe", registeredAt);
+        List<String> imageUrls = List.of(
+                "https://storage.com/images/80459",
+                "https://storage.com/images%2Fpathname_encoded%EA%B2%BD%EB%A1%9C",
+                "https://storage.com/images%2Fpathname_encoded%EA%B2%BD%EB%A1%9C/80459?type=image&size=2"
+        );
+        List<ReviewImage> reviewImages = imageUrls.stream()
+                .map(imageUrl -> createReviewImage(imageUrl, review)).collect(Collectors.toList());
+
+        Long reviewId = reviewRepository.save(review).getId();
+        reviewImageRepository.saveAll(reviewImages);
+
+        // TODO: 다른 행위를 끌어다 테스트 환경을 조성함
+        cafe.updateCafeType(review);
+        cafe.updateCafeTheme(review);
+        cafeRepository.save(cafe);
+
+        // when
+        reviewService.deleteReview(reviewId);
+
+        // then
+        List<Review> reviews = reviewRepository.findAll();
+        assertThat(reviews).hasSize(1)
+                .extracting("id", "status")
+                .contains(
+                        tuple(reviewId, INACTIVE)
+                );
+    }
+
+    @Test
+    @DisplayName("성공: 리뷰 삭제 시 삭제할 리뷰로 인한 기록은 없었던 것으로 하고 카페 타입 및 테마를 갱신한다.")
+    void deleteReviewWithUpdateCafeTypeAndCafeTheme() {
+        // given
+        Member writer = createMember("email01@naver.com", "password01%^&", "nickname01");
+        memberRepository.save(writer).getId();
+
+        Location cafeLocation = createLocation(
+                37.57122962143047, 126.97629649901215, "서울 종로구 세종로 00-0", "서울 종로구 세종대로 000");
+        Cafe cafe = createCafe("스타벅스 광화문점", "1234567", "https://place.url", cafeLocation);
+        cafeRepository.save(cafe);
+
+        LocalDateTime registeredAt = LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS);
+
+        Review review = createReview(
+                writer, cafe, "넓어서 갔어요", "리뷰 내용", "아이스 아메리카노", 1, 4, 1, 1, "vibe", registeredAt);
+        Long reviewId = reviewRepository.save(review).getId();
+
+        // TODO: 다른 행위를 끌어다 테스트 환경을 조성함
+        cafe.updateCafeType(review);
+        cafe.updateCafeTheme(review);
+        cafeRepository.save(cafe);
+
+        // when
+        reviewService.deleteReview(reviewId);
+
+        // then
+        List<Cafe> cafes = cafeRepository.findAll();
+        assertThat(cafes).hasSize(1)
+                .extracting("cafeTypeInfo.cafeType", "cafeThemeInfo.cafeTheme")
+                .contains(
+                        tuple(NONE, ETC)
+                )
+                .doesNotContain(
+                        tuple(SPACIOUS, VIBE)
+                );
+    }
+
+    @Test
+    @DisplayName("성공: 리뷰 삭제 시 리뷰 이미지도 함께 삭제한다.")
+    void deleteReviewWithReviewImages() {
+        // given
+        Member writer = createMember("email01@naver.com", "password01%^&", "nickname01");
+        memberRepository.save(writer).getId();
+
+        Location cafeLocation = createLocation(
+                37.57122962143047, 126.97629649901215, "서울 종로구 세종로 00-0", "서울 종로구 세종대로 000");
+        Cafe cafe = createCafe("스타벅스 광화문점", "1234567", "https://place.url", cafeLocation);
+        cafeRepository.save(cafe);
+
+        LocalDateTime registeredAt = LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS);
+
+        Review review = createReview(
+                writer, cafe, "넓어서 갔어요", "리뷰 내용", "아이스 아메리카노", 1, 4, 1, 1, "vibe", registeredAt);
+        List<String> imageUrls = List.of(
+                "https://storage.com/images/80459",
+                "https://storage.com/images%2Fpathname_encoded%EA%B2%BD%EB%A1%9C",
+                "https://storage.com/images%2Fpathname_encoded%EA%B2%BD%EB%A1%9C/80459?type=image&size=2"
+        );
+        List<ReviewImage> reviewImages = imageUrls.stream()
+                .map(imageUrl -> createReviewImage(imageUrl, review)).collect(Collectors.toList());
+
+        Long reviewId = reviewRepository.save(review).getId();
+        reviewImageRepository.saveAll(reviewImages);
+
+        // when
+        reviewService.deleteReview(reviewId);
+
+        // then
+        List<ReviewImage> reviewImagesAll = reviewImageRepository.findAll();
+        assertThat(reviewImagesAll).hasSize(3)
+                .extracting("status")
+                .contains(INACTIVE)
+                .doesNotContain(ACTIVE);
+    }
+
+    @Test
+    @DisplayName("예외: 리뷰 삭제 시 수정할 리뷰가 존재하지 않으면 예외가 발생한다.")
+    void deleteNotExistReview() {
+        // given
+        Member writer = createMember("email01@naver.com", "password01%^&", "nickname01");
+        memberRepository.save(writer).getId();
+
+        Long notExistReviewId = 1L;
+
+        // when // then
+        assertThatThrownBy(() -> reviewService.deleteReview(notExistReviewId))
+                .isInstanceOf(NotFoundResourceException.class)
+                .hasMessage("존재하지 않는 리뷰입니다.");
     }
     
     private Member createMember(String email, String password, String nickname) {
