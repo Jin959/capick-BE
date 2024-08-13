@@ -58,7 +58,7 @@ class CafeTest {
 
     @Test
     @DisplayName("성공: 까페 타입 갱신 시 리뷰에서 매겨진 지수들이 누적되어 더해진다.")
-    void updateIndexes() {
+    void addCafeTypeIndexes() {
         // given
         Review review = createReview("일하거나 책읽기 좋아요", "리뷰 내용", "아메리카노", 3, 3, 4, 3, "normal");
         Cafe cafe = createCafe("스타벅스 광화문점", "1234567", "https://place.url");
@@ -192,9 +192,13 @@ class CafeTest {
 //                .containsExactly(Integer.MAX_VALUE / 2, 1, CafeTheme.VIBE);
 //    }
 
+    /**
+     * @Deprecated
+     * Cafe.deductCafeTypeIndex 을 리뷰 수정에서 사용하지 않게 되면 지우기
+     */
     @Test
     @DisplayName("성공: 카페 타입 지수를 감소시킨다.")
-    void deductCafeTypeIndex() {
+    void Deprecated_deductCafeTypeIndex() {
         // given
         Review review = createReview("일하거나 책읽고 공부하려고요", "리뷰 내용", "아이스 아메리카노", 3, 4, 3, 3, "normal");
         Cafe cafe = createCafe("스타벅스 광화문점", "1234567", "https://place.url");
@@ -210,9 +214,13 @@ class CafeTest {
                 .containsExactly(0, 0, 0, 0);
     }
 
+    /**
+     * @Deprecated
+     * Cafe.deductCafeTypeIndex 을 리뷰 수정에서 사용하지 않게 되면 지우기
+     */
     @Test
     @DisplayName("예외: 카페 타입 지수를 차감할 때 누적 타입 지수보다 많이 차감시킬 수 없다. 그렇지 않으면 예외를 발생시킨다. 누적된 카페 타입 지수는 양수이다.")
-    void deductCafeTypeIndexMoreThanAccumulated() {
+    void Deprecated_deductCafeTypeIndexMoreThanAccumulated() {
         // given
         Review review = createReview("일하거나 책읽고 공부하려고요", "리뷰 내용", "아이스 아메리카노", 1, 1, 1, 1, "normal");
         Cafe cafe = createCafe("스타벅스 광화문점", "1234567", "https://place.url");
@@ -226,6 +234,86 @@ class CafeTest {
         assertThatThrownBy(() -> cafe.deductCafeTypeIndex(reviewWithCafeTypeIndexMoreThanAccumulated))
                 .isInstanceOf(DomainLogicalException.class)
                 .hasMessage("차감할 누적 카페 타입 지수가 없습니다. 이전에 등록한 만큼 차감해주세요.");
+    }
+
+    @Test
+    @DisplayName("성공: 카페 타입 감소 갱신 시 리뷰에서 매겨진 카페 타입 지수만큼 누적된 지수를 감소시킨다.")
+    void deductCafeTypeIndexes() {
+        // given
+        Review review = createReview("일하거나 책읽고 공부하려고요", "리뷰 내용", "아이스 아메리카노", 3, 4, 3, 3, "normal");
+        Cafe cafe = createCafe("스타벅스 광화문점", "1234567", "https://place.url");
+        // TODO: 같은 객체이나 다른 행위를 끌어다 사용했다. JPA 임베디드 타입의 공유 참조 문제를 방지 하기위해 Cafe의 빌더로 테스트 환경을 설정할 수 없다. 좋은 방법이 없는지 찾아보기
+        cafe.updateCafeType(review);
+
+        // when
+        cafe.updateCafeTypeByDeducting(review);
+
+        // then
+        assertThat(cafe.getCafeTypeInfo())
+                .extracting("coffeeIndex", "spaceIndex", "priceIndex", "noiseIndex")
+                .containsExactly(0, 0, 0, 0);
+    }
+
+    @Test
+    @DisplayName("성공: 카페 타입 지수를 감소시켜 카페 타입을 갱신할 때 누적된 지수들 중 가장 큰 값으로 까페의 타입이 정해진다.")
+    void updateCafeTypeByDeducting() {
+        // given
+        Review reviewTypeSpacious = createReview(
+                "일하거나 책읽고 공부하려고요", "리뷰 내용", "아이스 아메리카노", 3, 4, 3, 3, "normal");
+        Review reviewTypeCoffee = createReview(
+                "일하거나 책읽고 공부하려고요", "리뷰 내용", "아이스 아메리카노", 5, 3, 3, 3, "normal");
+        Cafe cafe = createCafe("스타벅스 광화문점", "1234567", "https://place.url");
+        // TODO: 같은 객체이나 다른 행위를 끌어다 사용했다.
+        cafe.updateCafeType(reviewTypeSpacious);
+        cafe.updateCafeType(reviewTypeCoffee);
+
+        // when
+        cafe.updateCafeTypeByDeducting(reviewTypeCoffee);
+
+        // then
+        assertThat(cafe.getCafeTypeInfo().getCafeType())
+                .isEqualByComparingTo(CafeType.SPACIOUS)
+                .isNotEqualByComparingTo(CafeType.COFFEE);
+    }
+
+    @Test
+    @DisplayName("예외: 카페 타입 지수를 차감할 때 누적 타입 지수보다 많이 차감시킬 수 없다. 그렇지 않으면 예외를 발생시킨다. 누적된 카페 타입 지수는 양수이다.")
+    void updateCafeTypeByDeductingMoreThanAccumulated() {
+        // given
+        Review review = createReview("일하거나 책읽고 공부하려고요", "리뷰 내용", "아이스 아메리카노", 1, 1, 1, 1, "normal");
+        Cafe cafe = createCafe("스타벅스 광화문점", "1234567", "https://place.url");
+        // TODO: 다른 행위를 끌어다 테스트 환경을 조성함
+        cafe.updateCafeType(review);
+
+        Review reviewWithCafeTypeIndexesMoreThanAccumulated = createReview(
+                "일하거나 책읽고 공부하려고요", "리뷰 내용", "아이스 아메리카노", 5, 5, 5, 5, "normal");
+
+        // when // then
+        assertThatThrownBy(() -> cafe.updateCafeTypeByDeducting(reviewWithCafeTypeIndexesMoreThanAccumulated))
+                .isInstanceOf(DomainLogicalException.class)
+                .hasMessage("차감할 누적 카페 타입 지수가 없습니다. 이전에 등록한 만큼 차감해주세요.");
+    }
+
+    @Test
+    @DisplayName("경계: 까페 타입 감소 갱신 후 누적된 지수 중 최대값이 없으면 감소 갱신 이전 까페 타입을 유지한다.")
+    void updateCafeTypeByDeductingWithoutMaxIndex() {
+        // given
+        Review reviewTypeNone = createReview(
+                "일하거나 책읽고 공부하려고요", "리뷰 내용", "아이스 아메리카노", 2, 2, 2, 2, "normal");
+        Review reviewTypeSpacious = createReview(
+                "일하거나 책읽고 공부하려고요", "리뷰 내용", "아이스 아메리카노", 2, 4, 2, 2, "normal");
+        Cafe cafe = createCafe("스타벅스 광화문점", "1234567", "https://place.url");
+        // TODO: 같은 객체이나 다른 행위를 끌어다 사용했다.
+        cafe.updateCafeType(reviewTypeNone);
+        cafe.updateCafeType(reviewTypeSpacious);
+
+        // when
+        cafe.updateCafeTypeByDeducting(reviewTypeSpacious);
+
+        // then
+        assertThat(cafe.getCafeTypeInfo().getCafeType())
+                .isEqualByComparingTo(CafeType.SPACIOUS)
+                .isNotEqualByComparingTo(CafeType.NONE);
     }
 
     @Test
