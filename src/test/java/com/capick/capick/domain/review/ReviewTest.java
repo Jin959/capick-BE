@@ -1,5 +1,6 @@
 package com.capick.capick.domain.review;
 
+import com.capick.capick.domain.common.BaseStatus;
 import com.capick.capick.exception.DomainPoliticalArgumentException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -80,6 +81,19 @@ class ReviewTest {
 
         // then
         assertThat(review.getTheme()).isEqualTo("study");
+    }
+
+    @Test
+    @DisplayName("성공: 리뷰 삭제 시 소프트 딜리트 한다.")
+    void delete() {
+        // given
+        Review review = createReview("넓어서 갔어요", "리뷰 내용", "아이스 아메리카노", 2, 4, 2, 2, "normal");
+
+        // when
+        review.delete();
+
+        // then
+        assertThat(review.getStatus()).isEqualByComparingTo(BaseStatus.INACTIVE);
     }
 
     private static Review createReview(String visitPurpose, String content, String menu, String theme) {
