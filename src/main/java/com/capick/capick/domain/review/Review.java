@@ -2,6 +2,7 @@ package com.capick.capick.domain.review;
 
 import com.capick.capick.domain.cafe.Cafe;
 import com.capick.capick.domain.common.BaseEntity;
+import com.capick.capick.domain.common.BaseStatus;
 import com.capick.capick.domain.member.Member;
 import com.capick.capick.exception.DomainPoliticalArgumentException;
 import lombok.AccessLevel;
@@ -95,6 +96,10 @@ public class Review extends BaseEntity {
 
     public void updateTheme(String theme) {
         this.theme = theme;
+    }
+
+    public void delete() {
+        this.status = BaseStatus.INACTIVE;
     }
 
 }
