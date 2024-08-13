@@ -33,7 +33,7 @@ public class Review extends BaseEntity {
     @Column(nullable = false, length = 20)
     private String visitPurpose;
 
-    @Column(length = 300)
+    @Column(nullable = false, length = 300)
     private String content;
 
     @Column(nullable = false)
@@ -54,6 +54,7 @@ public class Review extends BaseEntity {
     @Column(nullable = false)
     private String theme;
 
+    @Column(nullable = false)
     private LocalDateTime registeredAt;
 
     @Builder
