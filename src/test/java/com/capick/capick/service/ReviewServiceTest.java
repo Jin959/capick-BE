@@ -871,7 +871,7 @@ class ReviewServiceTest {
     void deleteReviewWithUpdateCafeTypeAndCafeTheme() {
         // given
         Member writer = createMember("email01@naver.com", "password01%^&", "nickname01");
-        memberRepository.save(writer).getId();
+        memberRepository.save(writer);
 
         Location cafeLocation = createLocation(
                 37.57122962143047, 126.97629649901215, "서울 종로구 세종로 00-0", "서울 종로구 세종대로 000");
@@ -880,27 +880,34 @@ class ReviewServiceTest {
 
         LocalDateTime registeredAt = LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS);
 
-        Review review = createReview(
-                writer, cafe, "넓어서 갔어요", "리뷰 내용", "아이스 아메리카노", 1, 4, 1, 1, "vibe", registeredAt);
-        Long reviewId = reviewRepository.save(review).getId();
+        Review reviewWithSpaciousAndStudy = createReview(
+                writer, cafe, "넓어서 갔어요", "리뷰 내용", "아이스 아메리카노", 1, 4, 1, 1, "study", registeredAt);
+        List<Review> reviewsWithCoffeeAndVibe = List.of(
+                createReview(writer, cafe, "넓어서 갔어요", "리뷰 내용", "아이스 아메리카노", 1, 1, 1, 1, "vibe", registeredAt),
+                createReview(writer, cafe, "넓어서 갔어요", "리뷰 내용", "아이스 아메리카노", 5, 1, 1, 1, "vibe", registeredAt)
+        );
+        reviewRepository.save(reviewWithSpaciousAndStudy);
+        reviewRepository.saveAll(reviewsWithCoffeeAndVibe);
 
         // TODO: 다른 행위를 끌어다 테스트 환경을 조성함
-        cafe.updateCafeType(review);
-        cafe.updateCafeTheme(review);
+        cafe.updateCafeType(reviewWithSpaciousAndStudy);
+        cafe.updateCafeTheme(reviewWithSpaciousAndStudy);
+        reviewsWithCoffeeAndVibe.forEach(cafe::updateCafeType);
+        reviewsWithCoffeeAndVibe.forEach(cafe::updateCafeTheme);
         cafeRepository.save(cafe);
 
         // when
-        reviewService.deleteReview(reviewId);
+        reviewsWithCoffeeAndVibe.forEach(review -> reviewService.deleteReview(review.getId()));
 
         // then
         List<Cafe> cafes = cafeRepository.findAll();
         assertThat(cafes).hasSize(1)
                 .extracting("cafeTypeInfo.cafeType", "cafeThemeInfo.cafeTheme")
                 .contains(
-                        tuple(NONE, ETC)
+                        tuple(SPACIOUS, STUDY)
                 )
                 .doesNotContain(
-                        tuple(SPACIOUS, VIBE)
+                        tuple(COFFEE, VIBE)
                 );
     }
 
@@ -930,6 +937,11 @@ class ReviewServiceTest {
 
         Long reviewId = reviewRepository.save(review).getId();
         reviewImageRepository.saveAll(reviewImages);
+
+        // TODO: 다른 행위를 끌어다 테스트 환경을 조성함
+        cafe.updateCafeType(review);
+        cafe.updateCafeTheme(review);
+        cafeRepository.save(cafe);
 
         // when
         reviewService.deleteReview(reviewId);
