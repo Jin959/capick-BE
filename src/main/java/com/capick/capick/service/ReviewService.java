@@ -109,8 +109,23 @@ public class ReviewService {
         return ReviewResponse.of(updatedReview, updatedReviewImages, writer);
     }
 
+    // TODO: 토큰 개발 후 삭제 요청 회원의 존재 여부와 작성자가 삭제 요청자인지 검증하는 로직 개발하기
+    // TODO: 댓글도 함께 삭제하는 것에 대해 고려해보기
+    @Transactional
     public void deleteReview(Long reviewId) {
+        Review review = findReviewByIdOrElseThrow(reviewId);
 
+        Cafe cafe = review.getCafe();
+        cafe.updateCafeTypeByDeducting(review);
+        cafe.updateCafeThemeByDeducting(review);
+        cafeRepository.save(cafe);
+
+        List<ReviewImage> reviewImages = reviewImageRepository.findAllByReviewAndStatus(review, ACTIVE);
+        reviewImages.forEach(ReviewImage::delete);
+        reviewImageRepository.saveAll(reviewImages);
+
+        review.delete();
+        reviewRepository.save(review);
     }
 
     private Review findReviewByIdOrElseThrow(Long reviewId) {
