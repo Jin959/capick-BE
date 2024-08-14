@@ -14,7 +14,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class CafeTest {
 
     @Test
-    @DisplayName("성공: 까페 생성 시 타입 초기 값은 NONE 이다.")
+    @DisplayName("성공: 카페 생성 시 타입 초기 값은 NONE 이다.")
     void createCafeInitType() {
         // given
         LocationCreateRequest locationCreateRequest
@@ -29,7 +29,7 @@ class CafeTest {
     }
 
     @Test
-    @DisplayName("성공: 까페 생성 시 테마 초기 값은 NORMAL 이다.")
+    @DisplayName("성공: 카페 생성 시 테마 초기 값은 NORMAL 이다.")
     void createCafeInitTheme() {
         // given
         LocationCreateRequest locationCreateRequest
@@ -44,7 +44,7 @@ class CafeTest {
     }
 
     @Test
-    @DisplayName("예외: 까페 생성 시 위치 정보가 없으면 예외가 발생한다.")
+    @DisplayName("예외: 카페 생성 시 위치 정보가 없으면 예외가 발생한다.")
     void createCafeWithoutLocation() {
         // given
         LocationCreateRequest locationCreateRequest = null;
@@ -57,7 +57,7 @@ class CafeTest {
     }
 
     @Test
-    @DisplayName("성공: 까페 타입 갱신 시 리뷰에서 매겨진 지수들이 누적되어 더해진다.")
+    @DisplayName("성공: 카페 타입 갱신 시 리뷰에서 매겨진 지수들이 누적되어 더해진다.")
     void addCafeTypeIndexes() {
         // given
         Review review = createReview("일하거나 책읽기 좋아요", "리뷰 내용", "아메리카노", 3, 3, 4, 3, "normal");
@@ -74,7 +74,7 @@ class CafeTest {
     }
 
     @Test
-    @DisplayName("성공: 까페 타입 갱신 시 누적된 지수들 중 가장 큰 값으로 까페의 타입이 정해진다.")
+    @DisplayName("성공: 카페 타입 갱신 시 누적된 지수들 중 가장 큰 값으로 카페의 타입이 정해진다.")
     void updateCafeType() {
         // given
         Review review = createReview("일하거나 책읽기 좋아요", "리뷰 내용", "아메리카노", 3, 3, 4, 3, "normal");
@@ -89,7 +89,7 @@ class CafeTest {
     }
 
     @Test
-    @DisplayName("경계: 까페 타입 갱신 시 누적된 지수 중 최대값이 없으면 갱신 이전 까페 타입을 유지한다.")
+    @DisplayName("경계: 카페 타입 갱신 시 누적된 지수 중 최대값이 없으면 갱신 이전 카페 타입을 유지한다.")
     void updateCafeTypeWithoutMaxIndex() {
         // given
         Review review = createReview("일하거나 책읽기 좋아요", "리뷰 내용", "아메리카노", 3, 3, 3, 3, "normal");
@@ -105,7 +105,7 @@ class CafeTest {
 
 
     @Test
-    @DisplayName("경계: 까페 타입 갱신 시 누적된 타입 지수가 자료형 크기를 초과할 경우에도 까페 타입 지정에는 영향이 없어야 한다.")
+    @DisplayName("경계: 카페 타입 갱신 시 누적된 타입 지수가 자료형 크기를 초과할 경우에도 카페 타입 지정에는 영향이 없어야 한다.")
     void updateCafeTypeOverflow() {
         // given
         Review reviewWithMaxIntegerIndex = createReview("일하거나 책읽기 좋아요", "리뷰 내용", "아메리카노",
@@ -114,7 +114,7 @@ class CafeTest {
         Review review = createReview("일하거나 책읽기 좋아요", "리뷰 내용", "아메리카노", 3, 3, 3 + 2, 3, "normal");
 
         // when
-        // TODO: 두 행위 각각에 대해 까페 타입이 변했는지 시나리오 테스트 DynamicTest 를 사용해야 할 것 같다. 확실하지는 않음.
+        // TODO: 두 행위 각각에 대해 카페 타입이 변했는지 시나리오 테스트 DynamicTest 를 사용해야 할 것 같다. 확실하지는 않음.
         cafe.updateCafeType(reviewWithMaxIntegerIndex);
         cafe.updateCafeType(review);
 
@@ -123,8 +123,8 @@ class CafeTest {
     }
 
     @Test
-    @DisplayName("성공: 까페 테마 갱신 시 리뷰에서 전달 받은 까페 테마 횟수를 세어서 테마 누적 횟수로 기록한다.")
-    void updateThemeCount() {
+    @DisplayName("성공: 카페 테마 갱신 시 리뷰에서 선택된 카페 테마는 테마 누적 횟수에 하나씩 누적되어 더해진다.")
+    void addCafeThemeCount() {
         // given
         Review review = createReview("일하거나 책읽기 좋아요", "리뷰 내용", "아메리카노", 3, 3, 4, 3, "vibe");
         Cafe cafe = createCafe("스타벅스 광화문점", "1234567", "https://place.url");
@@ -140,7 +140,7 @@ class CafeTest {
     }
 
     @Test
-    @DisplayName("성공: 까페 테마 갱신 시 테마 누적 횟수가 가장 큰 테마로 정해진다.")
+    @DisplayName("성공: 카페 테마 갱신 시 테마 누적 횟수가 가장 큰 테마로 정해진다.")
     void updateCafeTheme() {
         // given
         Review review = createReview("일하거나 책읽기 좋아요", "리뷰 내용", "아메리카노", 3, 3, 4, 3, "vibe");
@@ -154,7 +154,7 @@ class CafeTest {
     }
 
     @Test
-    @DisplayName("경계: 까페 테마 갱신 시 테마 누적 횟수 중 최대값이 없으면 갱신 이전 테마를 유지한다.")
+    @DisplayName("경계: 카페 테마 갱신 시 테마 누적 횟수 중 최대값이 없으면 갱신 이전 테마를 유지한다.")
     void updateCafeThemeWithoutMaxThemeCount() {
         // given
         Review review1 = createReview("일하거나 책읽기 좋아요", "리뷰 내용", "아메리카노", 3, 3, 4, 3, "vibe");
@@ -171,9 +171,9 @@ class CafeTest {
         assertThat(cafe.getCafeThemeInfo().getCafeTheme()).isEqualByComparingTo(CafeTheme.VIBE);
     }
 
-    // TODO: 테마 Overflow 테스트 방법 고민해보기, 테스트 수행도 비용이다. 21억번 까페 테마 누적을 시키는 것은 너무 고비용이다. 테스트 돌리는데 오래 걸림.
+    // TODO: 테마 Overflow 테스트 방법 고민해보기, 테스트 수행도 비용이다. 21억번 카페 테마 누적을 시키는 것은 너무 고비용이다. 테스트 돌리는데 오래 걸림.
 //    @Test
-//    @DisplayName("경계: 까페 테마 갱신 시 테마 누적 횟수가 자료형 크기를 초과할 경우에도 까페 테마 지정에는 영향이 없어야 한다.")
+//    @DisplayName("경계: 카페 테마 갱신 시 테마 누적 횟수가 자료형 크기를 초과할 경우에도 카페 테마 지정에는 영향이 없어야 한다.")
 //    void updateCafeThemeOverflow() {
 //        // given
 //        Review review = createReview("일하거나 책읽기 좋아요", "리뷰 내용", "아메리카노", 3, 3, 4, 3, "vibe");
@@ -182,9 +182,9 @@ class CafeTest {
 //
 //        // when
 //        for (int i = 0; i < Integer.MAX_VALUE; i++) {
-//            cafe.updateCafeType(review);
+//            cafe.updateCafeTheme(review);
 //        }
-//        cafe.updateCafeType(newReview);
+//        cafe.updateCafeTheme(newReview);
 //
 //        // then
 //        assertThat(cafe.getCafeThemeInfo())
@@ -237,7 +237,7 @@ class CafeTest {
     }
 
     @Test
-    @DisplayName("성공: 카페 타입 감소 갱신 시 리뷰에서 매겨진 카페 타입 지수만큼 누적된 지수를 감소시킨다.")
+    @DisplayName("성공: 카페 타입 감소 갱신 시 리뷰에서 매겼던 카페 타입 지수만큼 누적된 지수를 감소시켜 되돌린다.")
     void deductCafeTypeIndexes() {
         // given
         Review review = createReview("일하거나 책읽고 공부하려고요", "리뷰 내용", "아이스 아메리카노", 3, 4, 3, 3, "normal");
@@ -255,7 +255,7 @@ class CafeTest {
     }
 
     @Test
-    @DisplayName("성공: 카페 타입 지수를 감소시켜 카페 타입을 갱신할 때 누적된 지수들 중 가장 큰 값으로 까페의 타입이 정해진다.")
+    @DisplayName("성공: 카페 타입 지수를 감소시켜 카페 타입을 갱신할 때 누적된 지수들 중 가장 큰 값으로 카페의 타입이 정해진다.")
     void updateCafeTypeByDeducting() {
         // given
         Review reviewTypeSpacious = createReview(
@@ -295,7 +295,7 @@ class CafeTest {
     }
 
     @Test
-    @DisplayName("경계: 까페 타입 감소 갱신 후 누적된 지수 중 최대값이 없으면 감소 갱신 이전 까페 타입을 유지한다.")
+    @DisplayName("경계: 카페 타입 감소 갱신 후 누적된 지수 중 최대값이 없으면 감소 갱신 이전의 카페 타입을 유지한다.")
     void updateCafeTypeByDeductingWithoutMaxIndex() {
         // given
         Review reviewTypeNone = createReview(
@@ -316,9 +316,13 @@ class CafeTest {
                 .isNotEqualByComparingTo(CafeType.NONE);
     }
 
+    /**
+     * @Deprecated
+     * Cafe.deductCafeThemeCount 을 리뷰 수정에서 사용하지 않게 되면 지우기
+     */
     @Test
     @DisplayName("성공: 카페 테마 누적 횟수를 감소시킨다.")
-    void deductCafeThemeCount() {
+    void Deprecated_deductCafeThemeCount() {
         // given
         Review review = createReview("일하거나 책읽고 공부하려고요", "리뷰 내용", "아이스 아메리카노", 3, 4, 3, 3, "normal");
         Cafe cafe = createCafe("스타벅스 광화문점", "1234567", "https://place.url");
@@ -340,22 +344,112 @@ class CafeTest {
                 );
     }
 
+    /**
+     * @Deprecated
+     * Cafe.deductCafeThemeCount 을 리뷰 수정에서 사용하지 않게 되면 지우기
+     */
     @Test
     @DisplayName("예외: 카페 테마 횟수를 차감할 때 누적 테마 횟수보다 많이 차감시킬 수 없다. 그렇지 않으면 예외를 발생시킨다. 누적된 카페 테마 횟수는 양수이다.")
-    void deductCafeThemeCountMoreThanAccumulated() {
+    void Deprecated_deductCafeThemeCountMoreThanAccumulated() {
         // given
         Review review = createReview("일하거나 책읽고 공부하려고요", "리뷰 내용", "아이스 아메리카노", 1, 1, 1, 1, "normal");
         Cafe cafe = createCafe("스타벅스 광화문점", "1234567", "https://place.url");
         // TODO: 다른 행위를 끌어다 테스트 환경을 조성함
-        cafe.updateCafeType(review);
+        cafe.updateCafeTheme(review);
 
-        Review reviewWithCafeThemeCountMoreThanAccumulated = createReview(
-                "일하거나 책읽고 공부하려고요", "리뷰 내용", "아이스 아메리카노", 5, 5, 5, 5, "normal");
+        Review reviewWithCafeThemeUnselected = createReview(
+                "일하거나 책읽고 공부하려고요", "리뷰 내용", "아이스 아메리카노", 1, 1, 1, 1, "study");
 
         // when // then
-        assertThatThrownBy(() -> cafe.deductCafeThemeCount(reviewWithCafeThemeCountMoreThanAccumulated))
+        assertThatThrownBy(() -> cafe.deductCafeThemeCount(reviewWithCafeThemeUnselected))
                 .isInstanceOf(DomainLogicalException.class)
                 .hasMessage("차감할 카페 테마 횟수가 없습니다. 이전에 등록한 테마를 입력해주세요.");
+    }
+
+    @Test
+    @DisplayName("성공: 카페 테마 감소 갱신 시 리뷰에서 선택했던 테마의 누적 횟수를 감소시켜 되돌린다.")
+    void deductCafeThemeCount() {
+        // given
+        Review review = createReview("일하거나 책읽고 공부하려고요", "리뷰 내용", "아이스 아메리카노", 3, 4, 3, 3, "study");
+        Cafe cafe = createCafe("스타벅스 광화문점", "1234567", "https://place.url");
+        // TODO: 같은 객체이나 다른 행위를 끌어다 사용했다. JPA 임베디드 타입의 공유 참조 문제를 방지 하기위해 Cafe의 빌더로 테스트 환경을 설정할 수 없다. 좋은 방법이 없는지 찾아보기
+        cafe.updateCafeTheme(review);
+
+        // when
+        cafe.updateCafeThemeByDeducting(review);
+
+        // then
+        assertThat(cafe.getCafeThemeInfo())
+                .extracting(
+                        "normalCount", "vibeCount", "viewCount", "petCount",
+                        "hobbyCount", "studyCount", "kidsCount", "etcCount"
+                )
+                .containsExactly(
+                        0, 0, 0, 0,
+                        0, 0, 0, 0
+                );
+    }
+
+    @Test
+    @DisplayName("성공: 카페 테마 누적 횟수를 감소시켜 카페 테마를 갱신할 때 누적된 테마 횟수들 중 가장 큰 값으로 카페의 테마가 정해진다.")
+    void updateCafeThemeByDeducting() {
+        // given
+        Review reviewThemeStudy = createReview(
+                "일하거나 책읽고 공부하려고요", "리뷰 내용", "아이스 아메리카노", 5, 3, 3, 3, "study");
+        List<Review> reviewsThemeNormal = List.of(
+                createReview("일하거나 책읽고 공부하려고요", "리뷰 내용", "아이스 아메리카노", 3, 4, 3, 3, "normal"),
+                createReview("일하거나 책읽고 공부하려고요", "리뷰 내용", "아이스 아메리카노", 5, 3, 3, 3, "normal")
+        );
+        Cafe cafe = createCafe("스타벅스 광화문점", "1234567", "https://place.url");
+
+        // TODO: 같은 객체이나 다른 행위를 끌어다 사용했다.
+        cafe.updateCafeTheme(reviewThemeStudy);
+        reviewsThemeNormal.forEach(cafe::updateCafeTheme);
+
+        // when
+        reviewsThemeNormal.forEach(cafe::updateCafeThemeByDeducting);
+
+        // then
+        assertThat(cafe.getCafeThemeInfo().getCafeTheme())
+                .isEqualByComparingTo(CafeTheme.STUDY)
+                .isNotEqualByComparingTo(CafeTheme.NORMAL);
+    }
+
+    @Test
+    @DisplayName("예외: 카페 테마 횟수를 차감할 때 누적 테마 횟수보다 많이 차감시킬 수 없다. 그렇지 않으면 예외를 발생시킨다. 누적된 카페 테마 횟수는 양수이다.")
+    void updateCafeThemeByDeductingMoreThanAccumulated() {
+        // given
+        Review review = createReview("일하거나 책읽고 공부하려고요", "리뷰 내용", "아이스 아메리카노", 1, 1, 1, 1, "normal");
+        Cafe cafe = createCafe("스타벅스 광화문점", "1234567", "https://place.url");
+        // TODO: 다른 행위를 끌어다 테스트 환경을 조성함
+        cafe.updateCafeTheme(review);
+
+        Review reviewWithCafeThemeUnselected = createReview(
+                "일하거나 책읽고 공부하려고요", "리뷰 내용", "아이스 아메리카노", 1, 1, 1, 1, "study");
+
+        // when // then
+        assertThatThrownBy(() -> cafe.deductCafeThemeCount(reviewWithCafeThemeUnselected))
+                .isInstanceOf(DomainLogicalException.class)
+                .hasMessage("차감할 카페 테마 횟수가 없습니다. 이전에 등록한 테마를 입력해주세요.");
+    }
+
+    @Test
+    @DisplayName("경계: 카페 테마 감소 갱신 후 테마 누적 횟수 중 최대값이 없으면 감소 갱신 이전의 카페 테마를 유지한다.")
+    void updateCafeThemeByDeductingWithoutMaxThemeCount() {
+        // given
+        Review reviewThemeStudy = createReview(
+                "일하거나 책읽고 공부하려고요", "리뷰 내용", "아이스 아메리카노", 5, 3, 3, 3, "study");
+        Cafe cafe = createCafe("스타벅스 광화문점", "1234567", "https://place.url");
+        // TODO: 같은 객체이나 다른 행위를 끌어다 사용했다.
+        cafe.updateCafeTheme(reviewThemeStudy);
+
+        // when
+        cafe.updateCafeThemeByDeducting(reviewThemeStudy);
+
+        // then
+        assertThat(cafe.getCafeThemeInfo().getCafeTheme())
+                .isEqualByComparingTo(CafeTheme.STUDY)
+                .isNotEqualByComparingTo(CafeTheme.ETC);
     }
 
     private Review createReview(String visitPurpose, String content, String menu,
