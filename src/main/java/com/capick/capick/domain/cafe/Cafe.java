@@ -86,11 +86,17 @@ public class Cafe extends BaseEntity {
     }
 
     public void updateCafeTheme(Review review) {
-        cafeThemeInfo.updateCafeTheme(review);
+        cafeThemeInfo.addCafeThemeCount(review);
+        cafeThemeInfo.ifHasMaxThemeCountUpdateCafeTheme();
     }
 
     public void deductCafeThemeCount(Review review) {
         cafeThemeInfo.deductCafeThemeCount(review);
+    }
+
+    public void updateCafeThemeByDeducting(Review review) {
+        cafeThemeInfo.deductCafeThemeCount(review);
+        cafeThemeInfo.ifHasMaxThemeCountUpdateCafeTheme();
     }
 
 }
