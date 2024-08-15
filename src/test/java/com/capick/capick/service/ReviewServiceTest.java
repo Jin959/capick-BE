@@ -437,8 +437,8 @@ class ReviewServiceTest {
         reviewImageRepository.saveAll(reviewImages);
 
         // TODO: 다른 행위를 끌어다 테스트 환경을 조성함
-        cafe.updateCafeType(review);
-        cafe.updateCafeTheme(review);
+        cafe.updateCafeTypeByAdding(review);
+        cafe.updateCafeThemeByAdding(review);
         cafeRepository.save(cafe);
 
         ReviewUpdateRequest reviewUpdateRequest = createReviewUpdateRequest(
@@ -472,8 +472,8 @@ class ReviewServiceTest {
         Long reviewId = reviewRepository.save(review).getId();
 
         // TODO: 다른 행위를 끌어다 테스트 환경을 조성함
-        cafe.updateCafeType(review);
-        cafe.updateCafeTheme(review);
+        cafe.updateCafeTypeByAdding(review);
+        cafe.updateCafeThemeByAdding(review);
         cafeRepository.save(cafe);
 
         ReviewUpdateRequest reviewUpdateRequest = createReviewUpdateRequest(
@@ -518,8 +518,8 @@ class ReviewServiceTest {
         reviewImageRepository.saveAll(reviewImages);
 
         // TODO: 다른 행위를 끌어다 테스트 환경을 조성함
-        cafe.updateCafeType(review);
-        cafe.updateCafeTheme(review);
+        cafe.updateCafeTypeByAdding(review);
+        cafe.updateCafeThemeByAdding(review);
         cafeRepository.save(cafe);
 
         List<String> newImageUrls = List.of(
@@ -559,8 +559,8 @@ class ReviewServiceTest {
         Long reviewId = reviewRepository.save(review).getId();
 
         // TODO: 다른 행위를 끌어다 테스트 환경을 조성함
-        cafe.updateCafeType(review);
-        cafe.updateCafeTheme(review);
+        cafe.updateCafeTypeByAdding(review);
+        cafe.updateCafeThemeByAdding(review);
         cafeRepository.save(cafe);
 
         List<String> newImageUrls = List.of(
@@ -621,8 +621,8 @@ class ReviewServiceTest {
         Long reviewId = reviewRepository.save(review).getId();
 
         // TODO: 다른 행위를 끌어다 테스트 환경을 조성함
-        cafe.updateCafeType(review);
-        cafe.updateCafeTheme(review);
+        cafe.updateCafeTypeByAdding(review);
+        cafe.updateCafeThemeByAdding(review);
         cafeRepository.save(cafe);
 
         ReviewUpdateRequest reviewUpdateRequest = createReviewUpdateRequest(
@@ -655,8 +655,8 @@ class ReviewServiceTest {
         Long reviewId = reviewRepository.save(review).getId();
 
         // TODO: 다른 행위를 끌어다 테스트 환경을 조성함
-        cafe.updateCafeType(review);
-        cafe.updateCafeTheme(review);
+        cafe.updateCafeTypeByAdding(review);
+        cafe.updateCafeThemeByAdding(review);
         cafeRepository.save(cafe);
 
         ReviewUpdateRequest reviewUpdateRequest = createReviewUpdateRequest(
@@ -687,8 +687,8 @@ class ReviewServiceTest {
         Long reviewId = reviewRepository.save(review).getId();
 
         // TODO: 다른 행위를 끌어다 테스트 환경을 조성함
-        cafe.updateCafeType(review);
-        cafe.updateCafeTheme(review);
+        cafe.updateCafeTypeByAdding(review);
+        cafe.updateCafeThemeByAdding(review);
         cafeRepository.save(cafe);
 
         ReviewUpdateRequest reviewUpdateRequestMinus = createReviewUpdateRequest(
@@ -724,8 +724,8 @@ class ReviewServiceTest {
         Long reviewId = reviewRepository.save(review).getId();
 
         // TODO: 다른 행위를 끌어다 테스트 환경을 조성함
-        cafe.updateCafeType(review);
-        cafe.updateCafeTheme(review);
+        cafe.updateCafeTypeByAdding(review);
+        cafe.updateCafeThemeByAdding(review);
         cafeRepository.save(cafe);
 
         List<String> newImageUrls = List.of(
@@ -762,8 +762,8 @@ class ReviewServiceTest {
         Long reviewId = reviewRepository.save(review).getId();
 
         // TODO: 다른 행위를 끌어다 테스트 환경을 조성함
-        cafe.updateCafeType(review);
-        cafe.updateCafeTheme(review);
+        cafe.updateCafeTypeByAdding(review);
+        cafe.updateCafeThemeByAdding(review);
         cafeRepository.save(cafe);
 
         ReviewUpdateRequest reviewUpdateRequest = createReviewUpdateRequest(
@@ -798,8 +798,8 @@ class ReviewServiceTest {
         Long reviewId = reviewRepository.save(review).getId();
 
         // TODO: 다른 행위를 끌어다 테스트 환경을 조성함
-        cafe.updateCafeType(review);
-        cafe.updateCafeTheme(review);
+        cafe.updateCafeTypeByAdding(review);
+        cafe.updateCafeThemeByAdding(review);
         cafeRepository.save(cafe);
 
         List<String> newImageUrls = List.of(
@@ -850,8 +850,8 @@ class ReviewServiceTest {
         reviewImageRepository.saveAll(reviewImages);
 
         // TODO: 다른 행위를 끌어다 테스트 환경을 조성함
-        cafe.updateCafeType(review);
-        cafe.updateCafeTheme(review);
+        cafe.updateCafeTypeByAdding(review);
+        cafe.updateCafeThemeByAdding(review);
         cafeRepository.save(cafe);
 
         // when
@@ -890,10 +890,10 @@ class ReviewServiceTest {
         reviewRepository.saveAll(reviewsWithCoffeeAndVibe);
 
         // TODO: 다른 행위를 끌어다 테스트 환경을 조성함
-        cafe.updateCafeType(reviewWithSpaciousAndStudy);
-        cafe.updateCafeTheme(reviewWithSpaciousAndStudy);
-        reviewsWithCoffeeAndVibe.forEach(cafe::updateCafeType);
-        reviewsWithCoffeeAndVibe.forEach(cafe::updateCafeTheme);
+        cafe.updateCafeTypeByAdding(reviewWithSpaciousAndStudy);
+        cafe.updateCafeThemeByAdding(reviewWithSpaciousAndStudy);
+        reviewsWithCoffeeAndVibe.forEach(cafe::updateCafeTypeByAdding);
+        reviewsWithCoffeeAndVibe.forEach(cafe::updateCafeThemeByAdding);
         cafeRepository.save(cafe);
 
         // when
@@ -939,8 +939,8 @@ class ReviewServiceTest {
         reviewImageRepository.saveAll(reviewImages);
 
         // TODO: 다른 행위를 끌어다 테스트 환경을 조성함
-        cafe.updateCafeType(review);
-        cafe.updateCafeTheme(review);
+        cafe.updateCafeTypeByAdding(review);
+        cafe.updateCafeThemeByAdding(review);
         cafeRepository.save(cafe);
 
         // when

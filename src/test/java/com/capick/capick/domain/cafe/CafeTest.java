@@ -57,14 +57,14 @@ class CafeTest {
     }
 
     @Test
-    @DisplayName("성공: 카페 타입 갱신 시 리뷰에서 매겨진 지수들이 누적되어 더해진다.")
+    @DisplayName("성공: 카페 타입 증가 갱신 시 리뷰에서 매겨진 지수들이 누적되어 더해진다.")
     void addCafeTypeIndexes() {
         // given
         Review review = createReview("일하거나 책읽기 좋아요", "리뷰 내용", "아메리카노", 3, 3, 4, 3, "normal");
         Cafe cafe = createCafe("스타벅스 광화문점", "1234567", "https://place.url");
 
         // when
-        cafe.updateCafeType(review);
+        cafe.updateCafeTypeByAdding(review);
 
         // then
         assertThat(cafe.getCafeTypeInfo())
@@ -74,14 +74,14 @@ class CafeTest {
     }
 
     @Test
-    @DisplayName("성공: 카페 타입 갱신 시 누적된 지수들 중 가장 큰 값으로 카페의 타입이 정해진다.")
-    void updateCafeType() {
+    @DisplayName("성공: 카페 타입 증가 갱신 시 누적된 지수들 중 가장 큰 값으로 카페의 타입이 정해진다.")
+    void updateCafeTypeByAdding() {
         // given
         Review review = createReview("일하거나 책읽기 좋아요", "리뷰 내용", "아메리카노", 3, 3, 4, 3, "normal");
         Cafe cafe = createCafe("스타벅스 광화문점", "1234567", "https://place.url");
 
         // when
-        cafe.updateCafeType(review);
+        cafe.updateCafeTypeByAdding(review);
 
         // then
         assertThat(cafe.getCafeTypeInfo().getCafeType()).isEqualByComparingTo(CafeType.COST_EFFECTIVE);
@@ -89,14 +89,14 @@ class CafeTest {
     }
 
     @Test
-    @DisplayName("경계: 카페 타입 갱신 시 누적된 지수 중 최대값이 없으면 갱신 이전 카페 타입을 유지한다.")
-    void updateCafeTypeWithoutMaxIndex() {
+    @DisplayName("경계: 카페 타입 증가 갱신 시 누적된 지수 중 최대값이 없으면 갱신 이전 카페 타입을 유지한다.")
+    void updateCafeTypeByAddingWithoutMaxIndex() {
         // given
         Review review = createReview("일하거나 책읽기 좋아요", "리뷰 내용", "아메리카노", 3, 3, 3, 3, "normal");
         Cafe cafe = createCafe("스타벅스 광화문점", "1234567", "https://place.url");
 
         // when
-        cafe.updateCafeType(review);
+        cafe.updateCafeTypeByAdding(review);
 
         // then
         assertThat(cafe.getCafeTypeInfo().getCafeType()).isEqualByComparingTo(CafeType.NONE);
@@ -105,8 +105,8 @@ class CafeTest {
 
 
     @Test
-    @DisplayName("경계: 카페 타입 갱신 시 누적된 타입 지수가 자료형 크기를 초과할 경우에도 카페 타입 지정에는 영향이 없어야 한다.")
-    void updateCafeTypeOverflow() {
+    @DisplayName("경계: 카페 타입 증가 갱신 시 누적된 타입 지수가 자료형 크기를 초과할 경우에도 카페 타입 지정에는 영향이 없어야 한다.")
+    void updateCafeTypeByAddingWithOverflow() {
         // given
         Review reviewWithMaxIntegerIndex = createReview("일하거나 책읽기 좋아요", "리뷰 내용", "아메리카노",
                 Integer.MAX_VALUE, Integer.MAX_VALUE - 1, Integer.MAX_VALUE - 1, Integer.MAX_VALUE - 1, "normal");
@@ -115,22 +115,22 @@ class CafeTest {
 
         // when
         // TODO: 두 행위 각각에 대해 카페 타입이 변했는지 시나리오 테스트 DynamicTest 를 사용해야 할 것 같다. 확실하지는 않음.
-        cafe.updateCafeType(reviewWithMaxIntegerIndex);
-        cafe.updateCafeType(review);
+        cafe.updateCafeTypeByAdding(reviewWithMaxIntegerIndex);
+        cafe.updateCafeTypeByAdding(review);
 
         // then
         assertThat(cafe.getCafeTypeInfo().getCafeType()).isEqualByComparingTo(CafeType.COST_EFFECTIVE);
     }
 
     @Test
-    @DisplayName("성공: 카페 테마 갱신 시 리뷰에서 선택된 카페 테마는 테마 누적 횟수에 하나씩 누적되어 더해진다.")
+    @DisplayName("성공: 카페 테마 증가 갱신 시 리뷰에서 선택된 카페 테마가 테마 누적 횟수에 하나씩 누적되어 더해진다.")
     void addCafeThemeCount() {
         // given
         Review review = createReview("일하거나 책읽기 좋아요", "리뷰 내용", "아메리카노", 3, 3, 4, 3, "vibe");
         Cafe cafe = createCafe("스타벅스 광화문점", "1234567", "https://place.url");
 
         // when
-        cafe.updateCafeTheme(review);
+        cafe.updateCafeThemeByAdding(review);
 
         // then
         assertThat(cafe.getCafeThemeInfo())
@@ -140,22 +140,22 @@ class CafeTest {
     }
 
     @Test
-    @DisplayName("성공: 카페 테마 갱신 시 테마 누적 횟수가 가장 큰 테마로 정해진다.")
-    void updateCafeTheme() {
+    @DisplayName("성공: 카페 테마 증가 갱신 시 테마 누적 횟수가 가장 큰 테마로 정해진다.")
+    void updateCafeThemeByAdding() {
         // given
         Review review = createReview("일하거나 책읽기 좋아요", "리뷰 내용", "아메리카노", 3, 3, 4, 3, "vibe");
         Cafe cafe = createCafe("스타벅스 광화문점", "1234567", "https://place.url");
 
         // when
-        cafe.updateCafeTheme(review);
+        cafe.updateCafeThemeByAdding(review);
 
         // then
         assertThat(cafe.getCafeThemeInfo().getCafeTheme()).isEqualByComparingTo(CafeTheme.VIBE);
     }
 
     @Test
-    @DisplayName("경계: 카페 테마 갱신 시 테마 누적 횟수 중 최대값이 없으면 갱신 이전 테마를 유지한다.")
-    void updateCafeThemeWithoutMaxThemeCount() {
+    @DisplayName("경계: 카페 테마 증가 갱신 시 테마 누적 횟수 중 최대값이 없으면 갱신 이전 테마를 유지한다.")
+    void updateCafeThemeByAddingWithoutMaxThemeCount() {
         // given
         Review review1 = createReview("일하거나 책읽기 좋아요", "리뷰 내용", "아메리카노", 3, 3, 4, 3, "vibe");
         Review review2 = createReview("일하거나 책읽기 좋아요", "리뷰 내용", "아메리카노", 3, 3, 4, 3, "normal");
@@ -165,7 +165,7 @@ class CafeTest {
         Cafe cafe = createCafe("스타벅스 광화문점", "1234567", "https://place.url");
 
         // when
-        reviews.forEach(cafe::updateCafeTheme);
+        reviews.forEach(cafe::updateCafeThemeByAdding);
 
         // then
         assertThat(cafe.getCafeThemeInfo().getCafeTheme()).isEqualByComparingTo(CafeTheme.VIBE);
@@ -173,8 +173,8 @@ class CafeTest {
 
     // TODO: 테마 Overflow 테스트 방법 고민해보기, 테스트 수행도 비용이다. 21억번 카페 테마 누적을 시키는 것은 너무 고비용이다. 테스트 돌리는데 오래 걸림.
 //    @Test
-//    @DisplayName("경계: 카페 테마 갱신 시 테마 누적 횟수가 자료형 크기를 초과할 경우에도 카페 테마 지정에는 영향이 없어야 한다.")
-//    void updateCafeThemeOverflow() {
+//    @DisplayName("경계: 카페 테마 증가 갱신 시 테마 누적 횟수가 자료형 크기를 초과할 경우에도 카페 테마 지정에는 영향이 없어야 한다.")
+//    void updateCafeThemeByAddingWithOverflow() {
 //        // given
 //        Review review = createReview("일하거나 책읽기 좋아요", "리뷰 내용", "아메리카노", 3, 3, 4, 3, "vibe");
 //        Cafe cafe = createCafe("스타벅스 광화문점", "1234567", "https://place.url");
@@ -182,9 +182,9 @@ class CafeTest {
 //
 //        // when
 //        for (int i = 0; i < Integer.MAX_VALUE; i++) {
-//            cafe.updateCafeTheme(review);
+//            cafe.updateCafeThemeByAdding(review);
 //        }
-//        cafe.updateCafeTheme(newReview);
+//        cafe.updateCafeThemeByAdding(newReview);
 //
 //        // then
 //        assertThat(cafe.getCafeThemeInfo())
@@ -199,7 +199,7 @@ class CafeTest {
         Review review = createReview("일하거나 책읽고 공부하려고요", "리뷰 내용", "아이스 아메리카노", 3, 4, 3, 3, "normal");
         Cafe cafe = createCafe("스타벅스 광화문점", "1234567", "https://place.url");
         // TODO: 같은 객체이나 다른 행위를 끌어다 사용했다. JPA 임베디드 타입의 공유 참조 문제를 방지 하기위해 Cafe의 빌더로 테스트 환경을 설정할 수 없다. 좋은 방법이 없는지 찾아보기
-        cafe.updateCafeType(review);
+        cafe.updateCafeTypeByAdding(review);
 
         // when
         cafe.updateCafeTypeByDeducting(review);
@@ -220,8 +220,8 @@ class CafeTest {
                 "일하거나 책읽고 공부하려고요", "리뷰 내용", "아이스 아메리카노", 5, 3, 3, 3, "normal");
         Cafe cafe = createCafe("스타벅스 광화문점", "1234567", "https://place.url");
         // TODO: 같은 객체이나 다른 행위를 끌어다 사용했다.
-        cafe.updateCafeType(reviewTypeSpacious);
-        cafe.updateCafeType(reviewTypeCoffee);
+        cafe.updateCafeTypeByAdding(reviewTypeSpacious);
+        cafe.updateCafeTypeByAdding(reviewTypeCoffee);
 
         // when
         cafe.updateCafeTypeByDeducting(reviewTypeCoffee);
@@ -239,7 +239,7 @@ class CafeTest {
         Review review = createReview("일하거나 책읽고 공부하려고요", "리뷰 내용", "아이스 아메리카노", 1, 1, 1, 1, "normal");
         Cafe cafe = createCafe("스타벅스 광화문점", "1234567", "https://place.url");
         // TODO: 다른 행위를 끌어다 테스트 환경을 조성함
-        cafe.updateCafeType(review);
+        cafe.updateCafeTypeByAdding(review);
 
         Review reviewWithCafeTypeIndexesMoreThanAccumulated = createReview(
                 "일하거나 책읽고 공부하려고요", "리뷰 내용", "아이스 아메리카노", 5, 5, 5, 5, "normal");
@@ -260,8 +260,8 @@ class CafeTest {
                 "일하거나 책읽고 공부하려고요", "리뷰 내용", "아이스 아메리카노", 2, 4, 2, 2, "normal");
         Cafe cafe = createCafe("스타벅스 광화문점", "1234567", "https://place.url");
         // TODO: 같은 객체이나 다른 행위를 끌어다 사용했다.
-        cafe.updateCafeType(reviewTypeNone);
-        cafe.updateCafeType(reviewTypeSpacious);
+        cafe.updateCafeTypeByAdding(reviewTypeNone);
+        cafe.updateCafeTypeByAdding(reviewTypeSpacious);
 
         // when
         cafe.updateCafeTypeByDeducting(reviewTypeSpacious);
@@ -279,7 +279,7 @@ class CafeTest {
         Review review = createReview("일하거나 책읽고 공부하려고요", "리뷰 내용", "아이스 아메리카노", 3, 4, 3, 3, "study");
         Cafe cafe = createCafe("스타벅스 광화문점", "1234567", "https://place.url");
         // TODO: 같은 객체이나 다른 행위를 끌어다 사용했다. JPA 임베디드 타입의 공유 참조 문제를 방지 하기위해 Cafe의 빌더로 테스트 환경을 설정할 수 없다. 좋은 방법이 없는지 찾아보기
-        cafe.updateCafeTheme(review);
+        cafe.updateCafeThemeByAdding(review);
 
         // when
         cafe.updateCafeThemeByDeducting(review);
@@ -309,8 +309,8 @@ class CafeTest {
         Cafe cafe = createCafe("스타벅스 광화문점", "1234567", "https://place.url");
 
         // TODO: 같은 객체이나 다른 행위를 끌어다 사용했다.
-        cafe.updateCafeTheme(reviewThemeStudy);
-        reviewsThemeNormal.forEach(cafe::updateCafeTheme);
+        cafe.updateCafeThemeByAdding(reviewThemeStudy);
+        reviewsThemeNormal.forEach(cafe::updateCafeThemeByAdding);
 
         // when
         reviewsThemeNormal.forEach(cafe::updateCafeThemeByDeducting);
@@ -328,7 +328,7 @@ class CafeTest {
         Review review = createReview("일하거나 책읽고 공부하려고요", "리뷰 내용", "아이스 아메리카노", 1, 1, 1, 1, "normal");
         Cafe cafe = createCafe("스타벅스 광화문점", "1234567", "https://place.url");
         // TODO: 다른 행위를 끌어다 테스트 환경을 조성함
-        cafe.updateCafeTheme(review);
+        cafe.updateCafeThemeByAdding(review);
 
         Review reviewWithCafeThemeUnselected = createReview(
                 "일하거나 책읽고 공부하려고요", "리뷰 내용", "아이스 아메리카노", 1, 1, 1, 1, "study");
@@ -347,7 +347,7 @@ class CafeTest {
                 "일하거나 책읽고 공부하려고요", "리뷰 내용", "아이스 아메리카노", 5, 3, 3, 3, "study");
         Cafe cafe = createCafe("스타벅스 광화문점", "1234567", "https://place.url");
         // TODO: 같은 객체이나 다른 행위를 끌어다 사용했다.
-        cafe.updateCafeTheme(reviewThemeStudy);
+        cafe.updateCafeThemeByAdding(reviewThemeStudy);
 
         // when
         cafe.updateCafeThemeByDeducting(reviewThemeStudy);
