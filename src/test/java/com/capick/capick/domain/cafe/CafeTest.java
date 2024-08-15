@@ -192,50 +192,6 @@ class CafeTest {
 //                .containsExactly(Integer.MAX_VALUE / 2, 1, CafeTheme.VIBE);
 //    }
 
-    /**
-     * @Deprecated
-     * Cafe.deductCafeTypeIndex 을 리뷰 수정에서 사용하지 않게 되면 지우기
-     */
-    @Test
-    @DisplayName("성공: 카페 타입 지수를 감소시킨다.")
-    void Deprecated_deductCafeTypeIndex() {
-        // given
-        Review review = createReview("일하거나 책읽고 공부하려고요", "리뷰 내용", "아이스 아메리카노", 3, 4, 3, 3, "normal");
-        Cafe cafe = createCafe("스타벅스 광화문점", "1234567", "https://place.url");
-        // TODO: 같은 객체이나 다른 행위를 끌어다 사용했다. JPA 임베디드 타입의 공유 참조 문제를 방지 하기위해 Cafe의 빌더로 테스트 환경을 설정할 수 없다. 좋은 방법이 없는지 찾아보기
-        cafe.updateCafeType(review);
-
-        // when
-        cafe.deductCafeTypeIndex(review);
-
-        // then
-        assertThat(cafe.getCafeTypeInfo())
-                .extracting("coffeeIndex", "spaceIndex", "priceIndex", "noiseIndex")
-                .containsExactly(0, 0, 0, 0);
-    }
-
-    /**
-     * @Deprecated
-     * Cafe.deductCafeTypeIndex 을 리뷰 수정에서 사용하지 않게 되면 지우기
-     */
-    @Test
-    @DisplayName("예외: 카페 타입 지수를 차감할 때 누적 타입 지수보다 많이 차감시킬 수 없다. 그렇지 않으면 예외를 발생시킨다. 누적된 카페 타입 지수는 양수이다.")
-    void Deprecated_deductCafeTypeIndexMoreThanAccumulated() {
-        // given
-        Review review = createReview("일하거나 책읽고 공부하려고요", "리뷰 내용", "아이스 아메리카노", 1, 1, 1, 1, "normal");
-        Cafe cafe = createCafe("스타벅스 광화문점", "1234567", "https://place.url");
-        // TODO: 다른 행위를 끌어다 테스트 환경을 조성함
-        cafe.updateCafeType(review);
-
-        Review reviewWithCafeTypeIndexMoreThanAccumulated = createReview(
-                "일하거나 책읽고 공부하려고요", "리뷰 내용", "아이스 아메리카노", 5, 5, 5, 5, "normal");
-
-        // when // then
-        assertThatThrownBy(() -> cafe.deductCafeTypeIndex(reviewWithCafeTypeIndexMoreThanAccumulated))
-                .isInstanceOf(DomainLogicalException.class)
-                .hasMessage("차감할 누적 카페 타입 지수가 없습니다. 이전에 등록한 만큼 차감해주세요.");
-    }
-
     @Test
     @DisplayName("성공: 카페 타입 감소 갱신 시 리뷰에서 매겼던 카페 타입 지수만큼 누적된 지수를 감소시켜 되돌린다.")
     void deductCafeTypeIndexes() {
@@ -316,56 +272,6 @@ class CafeTest {
                 .isNotEqualByComparingTo(CafeType.NONE);
     }
 
-    /**
-     * @Deprecated
-     * Cafe.deductCafeThemeCount 을 리뷰 수정에서 사용하지 않게 되면 지우기
-     */
-    @Test
-    @DisplayName("성공: 카페 테마 누적 횟수를 감소시킨다.")
-    void Deprecated_deductCafeThemeCount() {
-        // given
-        Review review = createReview("일하거나 책읽고 공부하려고요", "리뷰 내용", "아이스 아메리카노", 3, 4, 3, 3, "normal");
-        Cafe cafe = createCafe("스타벅스 광화문점", "1234567", "https://place.url");
-        // TODO: 같은 객체이나 다른 행위를 끌어다 사용했다. JPA 임베디드 타입의 공유 참조 문제를 방지 하기위해 Cafe의 빌더로 테스트 환경을 설정할 수 없다. 좋은 방법이 없는지 찾아보기
-        cafe.updateCafeTheme(review);
-
-        // when
-        cafe.deductCafeThemeCount(review);
-
-        // then
-        assertThat(cafe.getCafeThemeInfo())
-                .extracting(
-                        "normalCount", "vibeCount", "viewCount", "petCount",
-                        "hobbyCount", "studyCount", "kidsCount", "etcCount"
-                )
-                .containsExactly(
-                        0, 0, 0, 0,
-                        0, 0, 0, 0
-                );
-    }
-
-    /**
-     * @Deprecated
-     * Cafe.deductCafeThemeCount 을 리뷰 수정에서 사용하지 않게 되면 지우기
-     */
-    @Test
-    @DisplayName("예외: 카페 테마 횟수를 차감할 때 누적 테마 횟수보다 많이 차감시킬 수 없다. 그렇지 않으면 예외를 발생시킨다. 누적된 카페 테마 횟수는 양수이다.")
-    void Deprecated_deductCafeThemeCountMoreThanAccumulated() {
-        // given
-        Review review = createReview("일하거나 책읽고 공부하려고요", "리뷰 내용", "아이스 아메리카노", 1, 1, 1, 1, "normal");
-        Cafe cafe = createCafe("스타벅스 광화문점", "1234567", "https://place.url");
-        // TODO: 다른 행위를 끌어다 테스트 환경을 조성함
-        cafe.updateCafeTheme(review);
-
-        Review reviewWithCafeThemeUnselected = createReview(
-                "일하거나 책읽고 공부하려고요", "리뷰 내용", "아이스 아메리카노", 1, 1, 1, 1, "study");
-
-        // when // then
-        assertThatThrownBy(() -> cafe.deductCafeThemeCount(reviewWithCafeThemeUnselected))
-                .isInstanceOf(DomainLogicalException.class)
-                .hasMessage("차감할 카페 테마 횟수가 없습니다. 이전에 등록한 테마를 입력해주세요.");
-    }
-
     @Test
     @DisplayName("성공: 카페 테마 감소 갱신 시 리뷰에서 선택했던 테마의 누적 횟수를 감소시켜 되돌린다.")
     void deductCafeThemeCount() {
@@ -428,7 +334,7 @@ class CafeTest {
                 "일하거나 책읽고 공부하려고요", "리뷰 내용", "아이스 아메리카노", 1, 1, 1, 1, "study");
 
         // when // then
-        assertThatThrownBy(() -> cafe.deductCafeThemeCount(reviewWithCafeThemeUnselected))
+        assertThatThrownBy(() -> cafe.updateCafeThemeByDeducting(reviewWithCafeThemeUnselected))
                 .isInstanceOf(DomainLogicalException.class)
                 .hasMessage("차감할 카페 테마 횟수가 없습니다. 이전에 등록한 테마를 입력해주세요.");
     }
