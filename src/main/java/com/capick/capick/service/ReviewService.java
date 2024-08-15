@@ -55,8 +55,8 @@ public class ReviewService {
         List<ReviewImage> reviewImages = ReviewImage.createReviewImages(reviewCreateRequest.getImageUrls(), savedReview);
         reviewImageRepository.saveAll(reviewImages);
 
-        cafe.updateCafeType(savedReview);
-        cafe.updateCafeTheme(savedReview);
+        cafe.updateCafeTypeByAdding(savedReview);
+        cafe.updateCafeThemeByAdding(savedReview);
         cafeRepository.save(cafe);
 
         return ReviewResponse.of(savedReview, reviewImages, writer);
@@ -102,8 +102,8 @@ public class ReviewService {
         List<ReviewImage> updatedReviewImages = Stream
                 .concat(newReviewImages.stream(), preservedReviewImages.stream()).collect(Collectors.toList());
 
-        cafe.updateCafeType(updatedReview);
-        cafe.updateCafeTheme(updatedReview);
+        cafe.updateCafeTypeByAdding(updatedReview);
+        cafe.updateCafeThemeByAdding(updatedReview);
         cafeRepository.save(cafe);
 
         return ReviewResponse.of(updatedReview, updatedReviewImages, writer);

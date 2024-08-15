@@ -71,7 +71,7 @@ public class Cafe extends BaseEntity {
                 .build();
     }
 
-    public void updateCafeType(Review review) {
+    public void updateCafeTypeByAdding(Review review) {
         cafeTypeInfo.addCafeTypeIndexes(review);
         cafeTypeInfo.ifHasMaxIndexUpdateCafeType();
     }
@@ -81,7 +81,7 @@ public class Cafe extends BaseEntity {
         cafeTypeInfo.ifHasMaxIndexUpdateCafeType();
     }
 
-    public void updateCafeTheme(Review review) {
+    public void updateCafeThemeByAdding(Review review) {
         cafeThemeInfo.addCafeThemeCount(review);
         cafeThemeInfo.ifHasMaxThemeCountUpdateCafeTheme();
     }
