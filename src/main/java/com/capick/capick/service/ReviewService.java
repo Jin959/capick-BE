@@ -74,8 +74,8 @@ public class ReviewService {
         Member writer = findEditorWhoWroteOrElseThrow(reviewUpdateRequest.getWriterId(), review.getWriter().getId());
 
         Cafe cafe = review.getCafe();
-        cafe.deductCafeTypeIndex(review);
-        cafe.deductCafeThemeCount(review);
+        cafe.updateCafeTypeByDeducting(review);
+        cafe.updateCafeThemeByDeducting(review);
 
         review.updateReviewText(
                 reviewUpdateRequest.getVisitPurpose(), reviewUpdateRequest.getContent(), reviewUpdateRequest.getMenu()
