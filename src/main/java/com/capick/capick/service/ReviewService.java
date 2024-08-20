@@ -63,7 +63,7 @@ public class ReviewService {
     }
 
     public ReviewResponse getReview(Long reviewId) {
-        Review review = findReviewByIdOrElseThrow(reviewId);
+        Review review = findReviewWithMemberByIdOrElseThrow(reviewId);
         List<ReviewImage> reviewImages = reviewImageRepository.findAllByReviewAndStatus(review, ACTIVE);
         return ReviewResponse.of(review, reviewImages, review.getWriter());
     }
@@ -130,6 +130,11 @@ public class ReviewService {
 
     private Review findReviewByIdOrElseThrow(Long reviewId) {
         return reviewRepository.findByIdAndStatus(reviewId, ACTIVE)
+                .orElseThrow(() -> NotFoundResourceException.of(NOT_FOUND_REVIEW));
+    }
+
+    private Review findReviewWithMemberByIdOrElseThrow(Long reviewId) {
+        return reviewRepository.findWithMemberByIdAndStatus(reviewId, ACTIVE)
                 .orElseThrow(() -> NotFoundResourceException.of(NOT_FOUND_REVIEW));
     }
 
