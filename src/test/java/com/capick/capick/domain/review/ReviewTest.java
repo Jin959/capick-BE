@@ -105,8 +105,9 @@ class ReviewTest {
                 .build();
     }
 
-    private Review createReview(String visitPurpose, String content, String menu,
-                                int coffeeIndex, int spaceIndex, int priceIndex, int noiseIndex, String theme) {
+    private Review createReview(
+            String visitPurpose, String content, String menu,
+            int coffeeIndex, int spaceIndex, int priceIndex, int noiseIndex, String theme) {
         return Review.builder()
                 .visitPurpose(visitPurpose)
                 .content(content)

@@ -358,8 +358,9 @@ class CafeTest {
                 .isNotEqualByComparingTo(CafeTheme.ETC);
     }
 
-    private Review createReview(String visitPurpose, String content, String menu,
-                                       int coffeeIndex, int spaceIndex, int priceIndex, int noiseIndex, String theme) {
+    private Review createReview(
+            String visitPurpose, String content, String menu,
+            int coffeeIndex, int spaceIndex, int priceIndex, int noiseIndex, String theme) {
         return Review.builder()
                 .visitPurpose(visitPurpose)
                 .content(content)
@@ -380,7 +381,8 @@ class CafeTest {
                 .build();
     }
 
-    private LocationCreateRequest createLocationCreateRequest(double latitude, double longitude, String address, String roadAddress) {
+    private LocationCreateRequest createLocationCreateRequest(
+            double latitude, double longitude, String address, String roadAddress) {
         return LocationCreateRequest.builder()
                 .latitude(latitude)
                 .longitude(longitude)

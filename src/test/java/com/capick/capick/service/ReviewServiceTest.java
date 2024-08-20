@@ -995,9 +995,9 @@ class ReviewServiceTest {
                 .build();
     }
 
-    private Review createReview(Member writer, Cafe cafe, String visitPurpose,
-                                String content, String menu, int coffeeIndex, int spaceIndex,
-                                int priceIndex, int noiseIndex, String theme, LocalDateTime registeredAt) {
+    private Review createReview(
+            Member writer, Cafe cafe, String visitPurpose, String content, String menu,
+            int coffeeIndex, int spaceIndex, int priceIndex, int noiseIndex, String theme, LocalDateTime registeredAt) {
         return Review.builder()
                 .writer(writer)
                 .cafe(cafe)

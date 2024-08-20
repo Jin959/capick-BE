@@ -57,8 +57,9 @@ class ReviewImageRepositoryTest {
                 );
     }
 
-    private Review createReview(String visitPurpose, String content, String menu, int coffeeIndex, int spaceIndex,
-                                int priceIndex, int noiseIndex, String theme, LocalDateTime registeredAt) {
+    private Review createReview(
+            String visitPurpose, String content, String menu,
+            int coffeeIndex, int spaceIndex, int priceIndex, int noiseIndex, String theme, LocalDateTime registeredAt) {
         return Review.builder()
                 .visitPurpose(visitPurpose)
                 .content(content)
