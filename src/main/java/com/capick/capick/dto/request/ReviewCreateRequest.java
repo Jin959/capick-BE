@@ -42,11 +42,11 @@ public class ReviewCreateRequest {
     @NotNull(message = "리뷰하기 위해 커피 맛에 대한 질문에 응답해 주세요.")
     private Integer coffeeIndex;
 
-    @NotNull(message = "리뷰하기 위해 가격에 대한 질문에 응답해 주세요.")
-    private Integer priceIndex;
-
     @NotNull(message = "리뷰하기 위해 공간에 대한 질문에 응답해 주세요.")
     private Integer spaceIndex;
+
+    @NotNull(message = "리뷰하기 위해 가격에 대한 질문에 응답해 주세요.")
+    private Integer priceIndex;
 
     @NotNull(message = "리뷰하기 위해 소음에 대한 질문에 응답해 주세요.")
     private Integer noiseIndex;
@@ -55,14 +55,14 @@ public class ReviewCreateRequest {
     private String theme;
 
     private List<@Pattern(
-            regexp = "((https?)://)?([\\w가-힇ぁ-ゔァ-ヴー々〆〤一-龥][%\\-_./&#?]?(\\?=)?)+",
+            regexp = "((https?)://)?([\\w가-힇ぁ-ゔァ-ヴー々〆〤一-龥][\\-_./%]?)+(\\?([^#\\s]+)?)?$",
             message = "리뷰 이미지 중 허용되지 않는 URL 이 존재합니다. URL 형식에 맞추고 프로토콜은 HTTP, HTTPS 를 사용해 주세요."
     ) String> imageUrls = new ArrayList<>();
 
     @Builder
-    public ReviewCreateRequest(Long writerId, CafeCreateRequest cafe, String visitPurpose,
-                               String content, String menu, Integer coffeeIndex, Integer spaceIndex,
-                               Integer priceIndex, Integer noiseIndex, String theme, List<String> imageUrls) {
+    public ReviewCreateRequest(
+            Long writerId, CafeCreateRequest cafe, String visitPurpose, String content, String menu, Integer coffeeIndex,
+            Integer spaceIndex, Integer priceIndex, Integer noiseIndex, String theme, List<String> imageUrls) {
         this.writerId = writerId;
         this.cafe = cafe;
         this.visitPurpose = visitPurpose;

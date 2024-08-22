@@ -1,6 +1,7 @@
 package com.capick.capick.domain.cafe;
 
 import com.capick.capick.domain.review.Review;
+import com.capick.capick.exception.DomainLogicalException;
 import lombok.*;
 
 import javax.persistence.Column;
@@ -8,6 +9,8 @@ import javax.persistence.Embeddable;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import java.util.*;
+
+import static com.capick.capick.dto.ApiResponseStatus.LACK_OF_ACCUMULATED_CAFE_TYPE_INDEX;
 
 @Getter
 @Embeddable
@@ -30,12 +33,20 @@ public class CafeTypeInfo {
     @Enumerated(EnumType.STRING)
     private CafeType cafeType;
 
-    protected void updateCafeType(Review review) {
+    protected void addCafeTypeIndexes(Review review) {
         List<Integer> indexes = List.of(coffeeIndex, spaceIndex, priceIndex, noiseIndex);
-
         preventIndexOverflow(indexes);
-        updateIndexes(review);
+        addIndexes(review);
+    }
 
+    protected void deductCafeTypeIndexes(Review review) {
+        if (isAccumulatedTypeIndexLessThanTypeIndexOf(review)) {
+            throw DomainLogicalException.of(LACK_OF_ACCUMULATED_CAFE_TYPE_INDEX);
+        }
+        deductIndexes(review);
+    }
+
+    protected void ifHasMaxIndexUpdateCafeType() {
         Map<String, Integer> indexMap = createIndexMap();
         Integer maxIndexValue = Collections.max(indexMap.values());
 
@@ -56,11 +67,23 @@ public class CafeTypeInfo {
         }
     }
 
-    private void updateIndexes(Review review) {
+    private void addIndexes(Review review) {
         coffeeIndex += review.getCoffeeIndex();
         spaceIndex += review.getSpaceIndex();
         priceIndex += review.getPriceIndex();
         noiseIndex += review.getNoiseIndex();
+    }
+
+    private boolean isAccumulatedTypeIndexLessThanTypeIndexOf(Review review) {
+        return coffeeIndex < review.getCoffeeIndex() | spaceIndex < review.getSpaceIndex()
+                | priceIndex < review.getPriceIndex() | noiseIndex < review.getNoiseIndex();
+    }
+
+    private void deductIndexes(Review review) {
+        coffeeIndex -= review.getCoffeeIndex();
+        spaceIndex -= review.getSpaceIndex();
+        priceIndex -= review.getPriceIndex();
+        noiseIndex -= review.getNoiseIndex();
     }
 
     private Map<String, Integer> createIndexMap() {
@@ -87,5 +110,4 @@ public class CafeTypeInfo {
                 .max(Comparator.comparing(indexMap::get))
                 .orElseGet(() -> "none");
     }
-
 }

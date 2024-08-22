@@ -23,8 +23,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.capick.capick.domain.common.BaseStatus.INACTIVE;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 
 @ActiveProfiles("test")
 @SpringBootTest
@@ -61,8 +60,10 @@ class MemberServiceTest {
         // given
         Member member = createMember("email01@naver.com", "password01%^&", "nickname01");
         memberRepository.save(member);
-        MemberCreateRequest duplicateEmailRequest = createMemberCreateRequest("email01@naver.com", "password02", "nickname02");
-        MemberCreateRequest duplicateNicknameRequest = createMemberCreateRequest("email02@naver.com", "password02", "nickname01");
+        MemberCreateRequest duplicateEmailRequest = createMemberCreateRequest(
+                "email01@naver.com", "password02", "nickname02");
+        MemberCreateRequest duplicateNicknameRequest = createMemberCreateRequest(
+                "email02@naver.com", "password02", "nickname01");
 
         // when // then
         assertThatThrownBy(() -> memberService.createMember(duplicateEmailRequest))
@@ -93,10 +94,12 @@ class MemberServiceTest {
 
         Member memberRequiredOnly = createMember("email@naver.com", "password12^&*", "닉네임");
         Member memberWithProfile = createMember("email@naver.com", "password12^&*", "닉네임", profile);
-        Member memberWithProfileAndPreferTown = createMember("email@naver.com", "password12^&*", "닉네임", profile, preferTown);
+        Member memberWithProfileAndPreferTown = createMember(
+                "email@naver.com", "password12^&*", "닉네임", profile, preferTown);
         Member memberWithIntro = createMember("email@naver.com", "password12^&*", "닉네임", profileOnlyIntro);
-        List<Long> memberIds = memberRepository.saveAll(List.of(memberRequiredOnly, memberWithProfile, memberWithProfileAndPreferTown, memberWithIntro))
-                .stream().map(Member::getId).collect(Collectors.toList());
+        List<Long> memberIds = memberRepository.saveAll(
+                        List.of(memberRequiredOnly, memberWithProfile, memberWithProfileAndPreferTown, memberWithIntro)
+                ).stream().map(Member::getId).collect(Collectors.toList());
 
         // when
         List<MemberResponse> responses = memberIds.stream()
@@ -114,7 +117,9 @@ class MemberServiceTest {
                 .extracting("id", "email", "nickname",
                         "profile.imageUrl", "profile.introduction",
                         "preferTown.latitude", "preferTown.longitude", "preferTown.address", "preferTown.roadAddress")
-                .contains(memberWithProfileAndPreferTown.getId(), "email@naver.com", "닉네임", "image URL", "자기소개 글", 48.8, 11.34, "독일 뮌헨", "독일 뮌헨로");
+                .contains(memberWithProfileAndPreferTown.getId(), "email@naver.com", "닉네임",
+                        "image URL", "자기소개 글",
+                        48.8, 11.34, "독일 뮌헨", "독일 뮌헨로");
         assertThat(responses.get(3))
                 .extracting("id", "email", "nickname", "profile.introduction")
                 .contains(memberWithIntro.getId(), "email@naver.com", "닉네임", "자기소개 글");
@@ -125,6 +130,7 @@ class MemberServiceTest {
     void getNotExistMember() {
         // given
         Member member1 = createMember("email01@naver.com", "password01%^&", "nickname01");
+        // TODO: 테스트 환경으로 삭제된 회원을 만들기 위해 Member.delete 라는 다른 객체의 행위를 끌어다 사용했다. 한편, Member의 빌더에 status 필드를 수정할 수 있게 하려 했으나 다른 곳에서 탈퇴 된 회원을 만들 가능성을 없애기 위해 빌더에 추가하는 것을 그만두었다. 좋은 방법이 없을까?
         member1.delete();
         Member member2 = createMember("email02@naver.com", "password02%^&", "nickname02");
         Long deletedMemberId = memberRepository.save(member1).getId();
@@ -187,8 +193,10 @@ class MemberServiceTest {
         Member savedMember1 = memberRepository.save(member1);
         Member savedMember2 = memberRepository.save(member2);
 
-        MemberNicknameRequest requestWithUnchangedNickname = createMemberNicknameRequest(savedMember1.getId(), savedMember1.getNickname());
-        MemberNicknameRequest requestWithDuplicateNickname = createMemberNicknameRequest(savedMember1.getId(), savedMember2.getNickname());
+        MemberNicknameRequest requestWithUnchangedNickname = createMemberNicknameRequest(
+                savedMember1.getId(), savedMember1.getNickname());
+        MemberNicknameRequest requestWithDuplicateNickname = createMemberNicknameRequest(
+                savedMember1.getId(), savedMember2.getNickname());
 
         // when // then
         assertThatThrownBy(() -> memberService.updateMemberNickname(requestWithUnchangedNickname))
@@ -212,10 +220,12 @@ class MemberServiceTest {
         memberService.updateMemberPassword(request);
 
         // then
-        Member updatedMember = memberRepository.findById(memberId).orElse(member);
-        assertThat(updatedMember)
+        List<Member> members = memberRepository.findAll();
+        assertThat(members).hasSize(1)
                 .extracting("id", "password")
-                .contains(updatedMember.getId(), "new13password%^&");
+                .contains(
+                        tuple(memberId, "new13password%^&")
+                );
     }
 
     @Test
@@ -227,8 +237,10 @@ class MemberServiceTest {
         Member member2 = createMember("email02@naver.com", "password02%^&", "nickname02");
         Long deletedMemberId = memberRepository.save(member1).getId();
         Long notJoinedMemberId = memberRepository.save(member2).getId() + 1;
-        MemberPasswordRequest requestWithDeletedMember = createMemberPasswordRequest(deletedMemberId, "password01%^&", "new13password%^&1");
-        MemberPasswordRequest requestWithNotJoinedMember = createMemberPasswordRequest(notJoinedMemberId, "password02%^&", "new13password%^&2");
+        MemberPasswordRequest requestWithDeletedMember = createMemberPasswordRequest(
+                deletedMemberId, "password01%^&", "new13password%^&1");
+        MemberPasswordRequest requestWithNotJoinedMember = createMemberPasswordRequest(
+                notJoinedMemberId, "password02%^&", "new13password%^&2");
 
         // when // then
         assertThatThrownBy(() -> memberService.updateMemberPassword(requestWithDeletedMember))
@@ -246,7 +258,8 @@ class MemberServiceTest {
         Member member = createMember("email@naver.com", "13password%^&", "nickname");
         Member savedMember = memberRepository.save(member);
 
-        MemberPasswordRequest requestWithUnchangedPassword = createMemberPasswordRequest(savedMember.getId(), savedMember.getPassword(), savedMember.getPassword());
+        MemberPasswordRequest requestWithUnchangedPassword = createMemberPasswordRequest(
+                savedMember.getId(), savedMember.getPassword(), savedMember.getPassword());
 
         // when // then
         assertThatThrownBy(() -> memberService.updateMemberPassword(requestWithUnchangedPassword))
@@ -261,7 +274,8 @@ class MemberServiceTest {
         Member member = createMember("email@naver.com", "13password%^&", "nickname");
         Member savedMember = memberRepository.save(member);
 
-        MemberPasswordRequest requestWithIncorrectPassword = createMemberPasswordRequest(savedMember.getId(), "incorrect13password%", "new13password%^&");
+        MemberPasswordRequest requestWithIncorrectPassword = createMemberPasswordRequest(
+                savedMember.getId(), "incorrect13password%", "new13password%^&");
 
         // when // then
         assertThatThrownBy(() -> memberService.updateMemberPassword(requestWithIncorrectPassword))
@@ -280,10 +294,12 @@ class MemberServiceTest {
         memberService.deleteMember(memberId);
 
         // then
-        Member updatedMember = memberRepository.findById(memberId).orElse(member);
-        assertThat(updatedMember)
+        List<Member> members = memberRepository.findAll();
+        assertThat(members).hasSize(1)
                 .extracting("id", "status")
-                .contains(updatedMember.getId(), INACTIVE);
+                .contains(
+                        tuple(memberId, INACTIVE)
+                );
     }
 
     @Test

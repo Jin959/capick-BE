@@ -1,5 +1,6 @@
 package com.capick.capick.domain.review;
 
+import com.capick.capick.domain.common.BaseStatus;
 import com.capick.capick.exception.DomainPoliticalArgumentException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -56,8 +57,24 @@ class ReviewImageTest {
                 .containsExactlyInAnyOrder("https://image1.url", "https://image2.url", "https://image3.url");
     }
 
-    private Review createReview(String visitPurpose, String content, String menu,
-                                int coffeeIndex, int spaceIndex, int priceIndex, int noiseIndex, String theme) {
+    @Test
+    @DisplayName("성공: 리뷰 이미지 삭제 시 소프트 딜리트 된다.")
+    void delete() {
+        // given
+        Review review = createReview("넓어서 갔어요", "리뷰 내용", "핫 아메리카노", 2, 2, 4, 2, "normal");
+        String imageUrl = "https://storage.com/images%2Fpathname_encoded%EA%B2%BD%EB%A1%9C/80459?type=image&size=2";
+        ReviewImage reviewImage = createReviewImage(imageUrl, review);
+
+        // when
+        reviewImage.delete();
+
+        // then
+        assertThat(reviewImage.getStatus()).isEqualByComparingTo(BaseStatus.INACTIVE);
+    }
+
+    private Review createReview(
+            String visitPurpose, String content, String menu,
+            int coffeeIndex, int spaceIndex, int priceIndex, int noiseIndex, String theme) {
         return Review.builder()
                 .visitPurpose(visitPurpose)
                 .content(content)
@@ -67,6 +84,13 @@ class ReviewImageTest {
                 .priceIndex(priceIndex)
                 .noiseIndex(noiseIndex)
                 .theme(theme)
+                .build();
+    }
+
+    private ReviewImage createReviewImage(String imageUrl, Review review) {
+        return ReviewImage.builder()
+                .imageUrl(imageUrl)
+                .review(review)
                 .build();
     }
 

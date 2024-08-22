@@ -2,6 +2,7 @@ package com.capick.capick.domain.review;
 
 import com.capick.capick.domain.cafe.Cafe;
 import com.capick.capick.domain.common.BaseEntity;
+import com.capick.capick.domain.common.BaseStatus;
 import com.capick.capick.domain.member.Member;
 import com.capick.capick.exception.DomainPoliticalArgumentException;
 import lombok.AccessLevel;
@@ -11,7 +12,6 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 import static com.capick.capick.dto.ApiResponseStatus.REVIEW_WITH_CAFE_TYPE_INDEX_OUT_OF_RANGE;
@@ -34,7 +34,7 @@ public class Review extends BaseEntity {
     @Column(nullable = false, length = 20)
     private String visitPurpose;
 
-    @Column(length = 300)
+    @Column(nullable = false, length = 300)
     private String content;
 
     @Column(nullable = false)
@@ -55,14 +55,13 @@ public class Review extends BaseEntity {
     @Column(nullable = false)
     private String theme;
 
+    @Column(nullable = false)
     private LocalDateTime registeredAt;
 
-    @OneToMany(mappedBy = "review", cascade = CascadeType.ALL)
-    List<ReviewImage> reviewImages = new ArrayList<>();
-
     @Builder
-    private Review(Member writer, Cafe cafe, String visitPurpose, String content, String menu,
-                   int coffeeIndex, int spaceIndex, int priceIndex, int noiseIndex, String theme, LocalDateTime registeredAt) {
+    private Review(
+            Member writer, Cafe cafe, String visitPurpose, String content, String menu, int coffeeIndex,
+            int spaceIndex, int priceIndex, int noiseIndex, String theme, LocalDateTime registeredAt) {
         this.writer = writer;
         this.cafe = cafe;
         this.visitPurpose = visitPurpose;
@@ -76,6 +75,12 @@ public class Review extends BaseEntity {
         this.registeredAt = registeredAt;
     }
 
+    public void updateReviewText(String visitPurpose, String content, String menu) {
+        this.visitPurpose = visitPurpose;
+        this.content = content;
+        this.menu = menu;
+    }
+
     public void updateIndexes(int coffeeIndex, int spaceIndex, int priceIndex, int noiseIndex) {
         List<Integer> indexes = List.of(coffeeIndex, spaceIndex, priceIndex, noiseIndex);
         boolean isIndexOutOfRange = indexes.stream().anyMatch(index -> index < 1 || index > 5);
@@ -87,6 +92,14 @@ public class Review extends BaseEntity {
         this.spaceIndex = spaceIndex;
         this.priceIndex = priceIndex;
         this.noiseIndex = noiseIndex;
+    }
+
+    public void updateTheme(String theme) {
+        this.theme = theme;
+    }
+
+    public void delete() {
+        this.status = BaseStatus.INACTIVE;
     }
 
 }

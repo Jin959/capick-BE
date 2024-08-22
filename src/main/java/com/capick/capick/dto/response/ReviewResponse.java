@@ -28,8 +28,9 @@ public class ReviewResponse {
     private List<String> imageUrls;
 
     @Builder
-    private ReviewResponse(Long id, MemberSimpleResponse writer, String visitPurpose,
-                           String content, String menu, LocalDateTime registeredAt, List<String> imageUrls) {
+    private ReviewResponse(
+            Long id, MemberSimpleResponse writer, String visitPurpose,
+            String content, String menu, LocalDateTime registeredAt, List<String> imageUrls) {
         this.id = id;
         this.writer = writer;
         this.visitPurpose = visitPurpose;
