@@ -4,7 +4,7 @@ import com.capick.capick.dto.request.CafeCreateRequest;
 import com.capick.capick.dto.request.ReviewCreateRequest;
 import com.capick.capick.dto.request.ReviewUpdateRequest;
 import com.capick.capick.dto.response.MemberSimpleResponse;
-import com.capick.capick.dto.response.ReviewResponse;
+import com.capick.capick.dto.response.ReviewSimpleResponse;
 import com.capick.capick.service.ReviewService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
@@ -42,7 +42,7 @@ class ReviewControllerTest {
     @DisplayName("성공: 리뷰를 생성한다. HTTP 상태 코드 200 및 자체 응답 코드 201을 반환한다.")
     void createReview() throws Exception {
         // given
-        ReviewResponse response = ReviewResponse.builder()
+        ReviewSimpleResponse response = ReviewSimpleResponse.builder()
                 .writer(MemberSimpleResponse.builder().build())
                 .imageUrls(List.of())
                 .build();
@@ -619,7 +619,7 @@ class ReviewControllerTest {
     @DisplayName("성공: 단 건 리뷰를 조회한다. HTTP 상태 코드 200 및 자체 응답 코드 200 을 반환한다.")
     void getReview() throws Exception {
         // given
-        ReviewResponse response = ReviewResponse.builder()
+        ReviewSimpleResponse response = ReviewSimpleResponse.builder()
                 .writer(MemberSimpleResponse.builder().build())
                 .imageUrls(List.of())
                 .build();
@@ -643,7 +643,7 @@ class ReviewControllerTest {
     @DisplayName("성공: 리뷰를 수정한다. HTTP 상태 코드 200 및 자체 응답 코드 200 을 반환한다.")
     void updateReview() throws Exception {
         // given
-        ReviewResponse response = ReviewResponse.builder()
+        ReviewSimpleResponse response = ReviewSimpleResponse.builder()
                 .writer(MemberSimpleResponse.builder().build())
                 .imageUrls(List.of())
                 .build();

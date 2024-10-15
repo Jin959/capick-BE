@@ -7,7 +7,7 @@ import com.capick.capick.domain.review.ReviewImage;
 import com.capick.capick.dto.request.CafeCreateRequest;
 import com.capick.capick.dto.request.ReviewCreateRequest;
 import com.capick.capick.dto.request.ReviewUpdateRequest;
-import com.capick.capick.dto.response.ReviewResponse;
+import com.capick.capick.dto.response.ReviewSimpleResponse;
 import com.capick.capick.exception.NotFoundResourceException;
 import com.capick.capick.exception.UnauthorizedException;
 import com.capick.capick.repository.CafeRepository;
@@ -40,7 +40,7 @@ public class ReviewService {
     private final MemberServiceHelper memberServiceHelper;
 
     @Transactional
-    public ReviewResponse createReview(ReviewCreateRequest reviewCreateRequest, LocalDateTime registeredAt) {
+    public ReviewSimpleResponse createReview(ReviewCreateRequest reviewCreateRequest, LocalDateTime registeredAt) {
         Member writer = memberServiceHelper.findMemberByIdOrElseThrow(reviewCreateRequest.getWriterId());
 
         CafeCreateRequest cafeCreateRequest = reviewCreateRequest.getCafe();
@@ -59,17 +59,17 @@ public class ReviewService {
         cafe.updateCafeThemeByAdding(savedReview);
         cafeRepository.save(cafe);
 
-        return ReviewResponse.of(savedReview, reviewImages, writer);
+        return ReviewSimpleResponse.of(savedReview, reviewImages, writer);
     }
 
-    public ReviewResponse getReview(Long reviewId) {
+    public ReviewSimpleResponse getReview(Long reviewId) {
         Review review = findReviewWithMemberByIdOrElseThrow(reviewId);
         List<ReviewImage> reviewImages = reviewImageRepository.findAllByReviewAndStatus(review, ACTIVE);
-        return ReviewResponse.of(review, reviewImages, review.getWriter());
+        return ReviewSimpleResponse.of(review, reviewImages, review.getWriter());
     }
 
     @Transactional
-    public ReviewResponse updateReview(Long reviewId, ReviewUpdateRequest reviewUpdateRequest) {
+    public ReviewSimpleResponse updateReview(Long reviewId, ReviewUpdateRequest reviewUpdateRequest) {
         Review review = findReviewByIdOrElseThrow(reviewId);
         Member writer = findEditorWhoWroteOrElseThrow(reviewUpdateRequest.getWriterId(), review.getWriter().getId());
 
@@ -106,7 +106,7 @@ public class ReviewService {
         cafe.updateCafeThemeByAdding(updatedReview);
         cafeRepository.save(cafe);
 
-        return ReviewResponse.of(updatedReview, updatedReviewImages, writer);
+        return ReviewSimpleResponse.of(updatedReview, updatedReviewImages, writer);
     }
 
     // TODO: 토큰 개발 후 삭제 요청 회원의 존재 여부와 작성자가 삭제 요청자인지 검증하는 로직 개발하기
