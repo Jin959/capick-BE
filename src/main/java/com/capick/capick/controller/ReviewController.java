@@ -3,6 +3,7 @@ package com.capick.capick.controller;
 import com.capick.capick.dto.ApiResponse;
 import com.capick.capick.dto.request.ReviewCreateRequest;
 import com.capick.capick.dto.request.ReviewUpdateRequest;
+import com.capick.capick.dto.response.ReviewResponse;
 import com.capick.capick.dto.response.ReviewSimpleResponse;
 import com.capick.capick.service.ReviewService;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,11 @@ public class ReviewController {
     @GetMapping("/{reviewId}")
     public ApiResponse<ReviewSimpleResponse> getReview(@PathVariable("reviewId") Long reviewId) {
         return ApiResponse.ok(reviewService.getReview(reviewId));
+    }
+
+    @GetMapping("/{reviewId}/detail")
+    public ApiResponse<ReviewResponse> getReviewDetail(@PathVariable("reviewId") Long reviewId) {
+        return ApiResponse.ok(reviewService.getReviewDetail(reviewId));
     }
 
     @PatchMapping("/{reviewId}")
