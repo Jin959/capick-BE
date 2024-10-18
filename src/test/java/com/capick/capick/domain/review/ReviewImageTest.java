@@ -13,6 +13,20 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class ReviewImageTest {
 
     @Test
+    @DisplayName("성공: 리뷰 이미지 생성 시 물리적 삭제 여부의 초기 값은 false 이다.")
+    void createInit() {
+        // given
+        Review review = createReview("일하거나 책읽기 좋아요", "리뷰 내용", "아메리카노", 3, 3, 4, 3, "normal");
+        String imageUrl = "https://image1.url";
+
+        // when
+        ReviewImage reviewImage = ReviewImage.create(imageUrl, review);
+
+        // then
+        assertThat(reviewImage.isHardDeleted()).isFalse();
+    }
+    
+    @Test
     @DisplayName("성공: 리뷰 이미지 생성 시 중복 된 이미지가 있을 경우 중복은 제거된다.")
     void createReviewImagesWithDuplicateImages() {
         // given
