@@ -29,6 +29,9 @@ public class ReviewImage extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private Review review;
 
+    @Column(nullable = false)
+    private boolean isHardDeleted = false;
+
     @Builder
     private ReviewImage(String imageUrl, Review review) {
         this.imageUrl = imageUrl;
