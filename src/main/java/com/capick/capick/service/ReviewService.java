@@ -71,7 +71,9 @@ public class ReviewService {
 
     // TODO: 토큰 개발 후 리뷰 상세 조회 요청 회원의 존재 여부와 작성자가 상세 조회 요청자인지 검증하는 로직 개발하기, 작성자 검증을 어느 계층에서 테스트 해야 할지
     public ReviewResponse getReviewDetail(Long reviewId) {
-        return null;
+        Review review = findReviewWithMemberByIdOrElseThrow(reviewId);
+        List<ReviewImage> reviewImages = reviewImageRepository.findAllByReviewAndStatus(review, ACTIVE);
+        return ReviewResponse.of(review, reviewImages, review.getWriter());
     }
 
     @Transactional
