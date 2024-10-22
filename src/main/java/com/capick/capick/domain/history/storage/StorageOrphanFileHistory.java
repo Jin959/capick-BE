@@ -2,6 +2,7 @@ package com.capick.capick.domain.history.storage;
 
 import com.capick.capick.domain.common.BaseEntity;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -29,6 +30,14 @@ public class StorageOrphanFileHistory extends BaseEntity {
     private String url;
 
     @Column(nullable = false)
-    private boolean isHardDeleted;
+    private boolean isHardDeleted = false;
+
+    @Builder
+    private StorageOrphanFileHistory(String fileName, FileType fileType, FileDomain domain, String url) {
+        this.fileName = fileName;
+        this.fileType = fileType;
+        this.domain = domain;
+        this.url = url;
+    }
 
 }
