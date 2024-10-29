@@ -75,7 +75,7 @@ class HistoryServiceTest {
     }
 
     @Test
-    @DisplayName("성공: 고아 파일 기록 시 중복 된 파일이 기록될 경우 중복은 제거하고 저장한다.")
+    @DisplayName("예외: 고아 파일 기록 시 요청 파일들끼리 중복될 경우 예외가 발생한다.")
     void createStorageOrphanFileHistoriesWithDuplicateUrls() {
         // given
         StorageOrphanFileHistoriesCreateRequest request = createStorageOrphanFileHistoriesCreateRequest(
@@ -91,19 +91,10 @@ class HistoryServiceTest {
                 )
         );
 
-        // when
-        historyService.createStorageOrphanFileHistories(request);
-
-        // then
-        List<StorageOrphanFileHistory> storageOrphanFileHistories = storageOrphanFileHistoryRepository.findAll();
-        assertThat(storageOrphanFileHistories).hasSize(1)
-                .extracting("fileName", "fileType", "domain", "url")
-                .contains(
-                        tuple(
-                                "000000000_0_6bc5f946-fcce-4189-a792-ef21d5ae916d", IMAGE, REVIEW,
-                                "https://storage.com/images%2Fpathname_encoded%EA%B2%BD%EB%A1%9C/80459?type=image&size=2"
-                        )
-                );
+        // when // then
+        assertThatThrownBy(() -> historyService.createStorageOrphanFileHistories(request))
+                .isInstanceOf(DomainPoliticalArgumentException.class)
+                .hasMessage("요청 파일들끼리 중복되었습니다. 중복된 파일 제외하고 요청해 주세요.");
     }
 
     @Test
@@ -146,7 +137,7 @@ class HistoryServiceTest {
         // when // then
         assertThatThrownBy(() -> historyService.createStorageOrphanFileHistories(request))
                 .isInstanceOf(DomainPoliticalArgumentException.class)
-                .hasMessage("고아 파일 기록 시 허락되지 않은 타입의 파일입니다.");
+                .hasMessage("파일 기록 시 허락되지 않은 파일타입입니다.");
     }
 
     @Test
@@ -165,7 +156,7 @@ class HistoryServiceTest {
         // when // then
         assertThatThrownBy(() -> historyService.createStorageOrphanFileHistories(request))
                 .isInstanceOf(DomainPoliticalArgumentException.class)
-                .hasMessage("고아 파일 기록 시 허락되지 않은 도메인입니다.");
+                .hasMessage("파일 기록 시 허락되지 않은 도메인입니다.");
     }
 
     @Test
