@@ -20,6 +20,7 @@ public class HistoryController {
 
     private final HistoryService historyService;
 
+    // TODO: 스토리지에서 바로 삭제하는 요청 기능을 개발하고 해당 API SPEC 은 Deprecate시키는 것 고려하기
     @PostMapping("/storage/orphan-files")
     public ApiResponse<Void> createStorageOrphanFileHistories(
             @Valid @RequestBody StorageOrphanFileHistoriesCreateRequest storageOrphanFileHistoriesCreateRequest) {
