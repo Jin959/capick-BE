@@ -10,6 +10,7 @@ import com.capick.capick.dto.request.LocationCreateRequest;
 import com.capick.capick.dto.request.ReviewCreateRequest;
 import com.capick.capick.dto.request.ReviewUpdateRequest;
 import com.capick.capick.dto.response.ReviewResponse;
+import com.capick.capick.dto.response.ReviewSimpleResponse;
 import com.capick.capick.exception.DomainLogicalException;
 import com.capick.capick.exception.DomainPoliticalArgumentException;
 import com.capick.capick.exception.NotFoundResourceException;
@@ -83,7 +84,7 @@ class ReviewServiceTest {
         LocalDateTime registeredAt = LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS);
 
         // when
-        ReviewResponse response = reviewService.createReview(reviewCreateRequest, registeredAt);
+        ReviewSimpleResponse response = reviewService.createReview(reviewCreateRequest, registeredAt);
 
         // then
         assertThat(response.getId()).isNotNull();
@@ -176,7 +177,7 @@ class ReviewServiceTest {
         LocalDateTime registeredAt = LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS);
 
         // when
-        ReviewResponse response = reviewService.createReview(reviewCreateRequest, registeredAt);
+        ReviewSimpleResponse response = reviewService.createReview(reviewCreateRequest, registeredAt);
 
         // then
         assertThat(response.getImageUrls()).hasSize(2)
@@ -343,7 +344,7 @@ class ReviewServiceTest {
         LocalDateTime registeredAt = LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS);
 
         // when
-        ReviewResponse response = reviewService.createReview(reviewCreateRequest, registeredAt);
+        ReviewSimpleResponse response = reviewService.createReview(reviewCreateRequest, registeredAt);
 
         // then
         assertThat(response.getImageUrls()).hasSize(3)
@@ -378,7 +379,7 @@ class ReviewServiceTest {
         reviewImageRepository.saveAll(reviewImages);
 
         // when
-        List<ReviewResponse> responses = reviewIds.stream()
+        List<ReviewSimpleResponse> responses = reviewIds.stream()
                 .map(reviewId -> reviewService.getReview(reviewId)).collect(Collectors.toList());
 
         // then
@@ -405,6 +406,73 @@ class ReviewServiceTest {
         
         // when // then
         assertThatThrownBy(() -> reviewService.getReview(notCreatedReviewId))
+                .isInstanceOf(NotFoundResourceException.class)
+                .hasMessage("존재하지 않는 리뷰입니다.");
+    }
+
+    @Test
+    @DisplayName("성공: 회원은 리뷰 수정을 위해 자기가 작성한 리뷰의 카페 타입 지수 및 카페 테마를 포함해 상세하게 조회 할 수 있다.")
+    void getReviewDetail() {
+        // given
+        Member writer = createMember("email01@naver.com", "password01%^&", "nickname01");
+        memberRepository.save(writer);
+
+        Location cafeLocation = createLocation(
+                37.57122962143047, 126.97629649901215, "서울 종로구 세종로 00-0", "서울 종로구 세종대로 000");
+        Cafe cafe = createCafe("스타벅스 광화문점", "1234567", "https://place.url", cafeLocation);
+        cafeRepository.save(cafe);
+
+        LocalDateTime registeredAt = LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS);
+
+        Review review = createReview(
+                writer, cafe, "일하거나 책읽기 좋아요", "리뷰 내용", "핫 아메리카노", 3, 3, 4, 3, "normal", registeredAt);
+
+        Review reviewWithImages = createReview(
+                writer, cafe, "일하거나 책읽기 좋아요", "리뷰 내용", "핫 라떼", 3, 3, 4, 3, "vibe", registeredAt);
+        List<String> imageUrls = List.of("https://image1.url", "https://image2.url", "https://image3.url");
+        List<ReviewImage> reviewImages = imageUrls.stream()
+                .map(imageUrl -> createReviewImage(imageUrl, reviewWithImages)).collect(Collectors.toList());
+
+        List<Long> reviewIds = reviewRepository.saveAll(List.of(review, reviewWithImages)).stream()
+                .map(Review::getId).collect(Collectors.toList());
+        reviewImageRepository.saveAll(reviewImages);
+
+        // when
+        List<ReviewResponse> responses = reviewIds.stream()
+                .map(reviewId -> reviewService.getReviewDetail(reviewId)).collect(Collectors.toList());
+
+        // then
+        assertThat(responses.get(0))
+                .extracting("id", "writer.id", "writer.nickname",
+                        "visitPurpose", "content", "menu",
+                        "coffeeIndex", "spaceIndex", "priceIndex", "noiseIndex",
+                        "theme", "registeredAt")
+                .containsExactly(review.getId(), writer.getId(), writer.getNickname(),
+                        "일하거나 책읽기 좋아요", "리뷰 내용", "핫 아메리카노",
+                        3, 3, 4, 3,
+                        "normal", registeredAt);
+        assertThat(responses.get(1))
+                .extracting("id", "writer.id", "writer.nickname",
+                        "visitPurpose", "content", "menu",
+                        "coffeeIndex", "spaceIndex", "priceIndex", "noiseIndex",
+                        "theme", "registeredAt", "imageUrls")
+                .containsExactly(reviewWithImages.getId(), writer.getId(), writer.getNickname(),
+                        "일하거나 책읽기 좋아요", "리뷰 내용", "핫 라떼",
+                        3, 3, 4, 3,
+                        "vibe", registeredAt, imageUrls);
+    }
+
+    @Test
+    @DisplayName("예외: 리뷰 상세 조회 시 삭제 되었거나 존재하지 않는 리뷰이면 예외가 발생한다.")
+    void getNotExistReviewDetail() {
+        // given
+        Member writer = createMember("email01@naver.com", "password01%^&", "nickname01");
+        memberRepository.save(writer);
+
+        Long notCreatedReviewId = 1L;
+
+        // when // then
+        assertThatThrownBy(() -> reviewService.getReviewDetail(notCreatedReviewId))
                 .isInstanceOf(NotFoundResourceException.class)
                 .hasMessage("존재하지 않는 리뷰입니다.");
     }
@@ -445,7 +513,7 @@ class ReviewServiceTest {
                 writerId, "일하거나 책읽고 공부하려고요", "리뷰 내용 수정", "아이스 라떼", 1, 4, 1, 1, "vibe");
 
         // when
-        ReviewResponse response = reviewService.updateReview(reviewId, reviewUpdateRequest);
+        ReviewSimpleResponse response = reviewService.updateReview(reviewId, reviewUpdateRequest);
 
         // then
         assertThat(response)
@@ -530,7 +598,7 @@ class ReviewServiceTest {
                 writerId, "일하거나 책읽고 공부하려고요", "리뷰 내용 수정", "아이스 라떼", 1, 4, 1, 1, "normal", newImageUrls);
 
         // when
-        ReviewResponse response = reviewService.updateReview(reviewId, reviewUpdateRequest);
+        ReviewSimpleResponse response = reviewService.updateReview(reviewId, reviewUpdateRequest);
 
         // then
         assertThat(response.getImageUrls()).hasSize(2)
@@ -572,7 +640,7 @@ class ReviewServiceTest {
                 writerId, "일하거나 책읽고 공부하려고요", "리뷰 내용", "아이스 아메리카노", 1, 4, 1, 1, "vibe", newImageUrls);
 
         // when
-        ReviewResponse response = reviewService.updateReview(reviewId, reviewUpdateRequest);
+        ReviewSimpleResponse response = reviewService.updateReview(reviewId, reviewUpdateRequest);
 
         // then
         assertThat(response.getImageUrls()).hasSize(2)
@@ -811,7 +879,7 @@ class ReviewServiceTest {
                 writerId, "일하거나 책읽고 공부하려고요", "리뷰 내용", "아이스 아메리카노", 1, 4, 1, 1, "vibe", newImageUrls);
 
         // when
-        ReviewResponse response = reviewService.updateReview(reviewId, reviewUpdateRequest);
+        ReviewSimpleResponse response = reviewService.updateReview(reviewId, reviewUpdateRequest);
 
         // then
         assertThat(response.getImageUrls()).hasSize(3)

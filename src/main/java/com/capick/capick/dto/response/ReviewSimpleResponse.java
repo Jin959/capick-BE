@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Getter
-public class ReviewResponse {
+public class ReviewSimpleResponse {
 
     private Long id;
 
@@ -23,41 +23,25 @@ public class ReviewResponse {
 
     private String menu;
 
-    private Integer coffeeIndex;
-
-    private Integer spaceIndex;
-
-    private Integer priceIndex;
-
-    private Integer noiseIndex;
-
-    private String theme;
-
     private LocalDateTime registeredAt;
 
     private List<String> imageUrls;
 
     @Builder
-    private ReviewResponse(
-            Long id, MemberSimpleResponse writer, String visitPurpose, String content, String menu,
-            Integer coffeeIndex, Integer spaceIndex, Integer priceIndex, Integer noiseIndex,
-            String theme, LocalDateTime registeredAt, List<String> imageUrls) {
+    private ReviewSimpleResponse(
+            Long id, MemberSimpleResponse writer, String visitPurpose,
+            String content, String menu, LocalDateTime registeredAt, List<String> imageUrls) {
         this.id = id;
         this.writer = writer;
         this.visitPurpose = visitPurpose;
         this.content = content;
         this.menu = menu;
-        this.coffeeIndex = coffeeIndex;
-        this.spaceIndex = spaceIndex;
-        this.priceIndex = priceIndex;
-        this.noiseIndex = noiseIndex;
-        this.theme = theme;
         this.registeredAt = registeredAt;
         this.imageUrls = imageUrls;
     }
 
-    public static ReviewResponse of(Review review, List<ReviewImage> reviewImages, Member writer) {
-        return ReviewResponse.builder()
+    public static ReviewSimpleResponse of(Review review, List<ReviewImage> reviewImages, Member writer) {
+        return ReviewSimpleResponse.builder()
                 .id(review.getId())
                 .writer(
                         MemberSimpleResponse.of(writer)
@@ -65,11 +49,6 @@ public class ReviewResponse {
                 .visitPurpose(review.getVisitPurpose())
                 .content(review.getContent())
                 .menu(review.getMenu())
-                .coffeeIndex(review.getCoffeeIndex())
-                .spaceIndex(review.getSpaceIndex())
-                .priceIndex(review.getPriceIndex())
-                .noiseIndex(review.getNoiseIndex())
-                .theme(review.getTheme())
                 .registeredAt(review.getRegisteredAt())
                 .imageUrls(
                         reviewImages.stream().map(ReviewImage::getImageUrl).collect(Collectors.toList())
