@@ -33,6 +33,7 @@ public enum ApiResponseStatus {
     DUPLICATE_REQUEST_FILE(HttpStatus.BAD_REQUEST, "요청 파일들끼리 중복되었습니다. 중복된 파일 제외하고 요청해 주세요."),
     ILLEGAL_FILE_TYPE_ERROR(HttpStatus.BAD_REQUEST, "파일 기록 시 허락되지 않은 파일타입입니다."),
     ILLEGAL_FILE_DOMAIN_ERROR(HttpStatus.BAD_REQUEST, "파일 기록 시 허락되지 않은 도메인입니다."),
+    NOT_FOUND_CAFE(HttpStatus.NOT_FOUND, "등록된 적이 없거나 삭제되어 서비스상에서 존재하지 않는 카페입니다."),
 
     // 500
     DATABASE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "데이터베이스 연결 또는 접근에 실패하였습니다. 관리자에게 문의해 주세요."),
