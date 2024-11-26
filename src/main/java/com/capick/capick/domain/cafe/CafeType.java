@@ -22,6 +22,6 @@ public enum CafeType {
         return Arrays.stream(CafeType.values())
                 .filter(cafeType -> cafeType.getIndexName().equals(indexName))
                 .findFirst()
-                .orElseGet(() -> CafeType.NONE);
+                .orElse(CafeType.NONE);
     }
 }
