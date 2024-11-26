@@ -1,7 +1,6 @@
 package com.capick.capick.service;
 
 import com.capick.capick.domain.cafe.Cafe;
-import com.capick.capick.domain.cafe.CafeType;
 import com.capick.capick.domain.common.Location;
 import com.capick.capick.dto.response.CafeResponse;
 import com.capick.capick.exception.NotFoundResourceException;
