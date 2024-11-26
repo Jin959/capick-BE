@@ -16,9 +16,9 @@ public class CafeController {
 
     private final CafeService cafeService;
 
-    @GetMapping("map-vendors/kakao/{mapVendorPlaceId}")
-    public ApiResponse<CafeResponse> getCafeByMapVendorPlaceId(@PathVariable("mapVendorPlaceId") String mapVendorPlaceId) {
-        return ApiResponse.ok(cafeService.getCafeByMapVendorPlaceId(mapVendorPlaceId));
+    @GetMapping("/kakao/{placeId}")
+    public ApiResponse<CafeResponse> getCafeByMapVendorPlaceId(@PathVariable("placeId") String placeId) {
+        return ApiResponse.ok(cafeService.getCafeByMapVendorPlaceId(placeId));
     }
 
 }

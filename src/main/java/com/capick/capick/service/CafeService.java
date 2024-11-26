@@ -18,8 +18,8 @@ public class CafeService {
 
     private final CafeRepository cafeRepository;
 
-    public CafeResponse getCafeByMapVendorPlaceId(String mapVendorPlaceId) {
-        Cafe cafe = cafeRepository.findByKakaoPlaceIdAndStatus(mapVendorPlaceId, ACTIVE)
+    public CafeResponse getCafeByMapVendorPlaceId(String placeId) {
+        Cafe cafe = cafeRepository.findByKakaoPlaceIdAndStatus(placeId, ACTIVE)
                 .orElseThrow(() -> NotFoundResourceException.of(NOT_FOUND_CAFE));
         return CafeResponse.of(cafe);
     }
