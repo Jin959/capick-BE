@@ -33,7 +33,7 @@ class CafeServiceTest {
     }
 
     @Test
-    @DisplayName("회원 또는 방문자는 카카오 지도와 같은 외부 지도 서비스 업체에서 제공한 ID로 카페 정보를 조회할 수 있다.")
+    @DisplayName("성공: 회원 또는 방문자는 카카오 지도와 같은 외부 지도 서비스 업체에서 제공한 ID로 카페 정보를 조회할 수 있다.")
     void getCafeByMapVendorPlaceId() {
         // given
         Location cafeLocation = createLocation(
