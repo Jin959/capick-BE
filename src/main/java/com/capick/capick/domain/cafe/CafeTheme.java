@@ -25,6 +25,6 @@ public enum CafeTheme {
         return Arrays.stream(CafeTheme.values())
                 .filter(cafeTheme -> cafeTheme.getName().equals(name))
                 .findFirst()
-                .orElseGet(() -> CafeTheme.ETC);
+                .orElse(CafeTheme.ETC);
     }
 }
