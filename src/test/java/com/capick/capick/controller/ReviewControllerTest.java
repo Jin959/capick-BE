@@ -4,7 +4,7 @@ import com.capick.capick.dto.request.CafeCreateRequest;
 import com.capick.capick.dto.request.ReviewCreateRequest;
 import com.capick.capick.dto.request.ReviewUpdateRequest;
 import com.capick.capick.dto.response.MemberSimpleResponse;
-import com.capick.capick.dto.response.ReviewResponse;
+import com.capick.capick.dto.response.ReviewDetailResponse;
 import com.capick.capick.dto.response.ReviewSimpleResponse;
 import com.capick.capick.service.ReviewService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -644,7 +644,7 @@ class ReviewControllerTest {
     @DisplayName("성공: 단 건의 리뷰를 상세 조회한다. HTTP 상태 코드 200 및 자체 응답 코드 200 을 반환한다.")
     void getReviewDetail() throws Exception {
         // given
-        ReviewResponse response = ReviewResponse.builder()
+        ReviewDetailResponse response = ReviewDetailResponse.builder()
                 .writer(MemberSimpleResponse.builder().build())
                 .imageUrls(List.of())
                 .build();

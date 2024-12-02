@@ -9,7 +9,7 @@ import com.capick.capick.dto.request.CafeCreateRequest;
 import com.capick.capick.dto.request.LocationCreateRequest;
 import com.capick.capick.dto.request.ReviewCreateRequest;
 import com.capick.capick.dto.request.ReviewUpdateRequest;
-import com.capick.capick.dto.response.ReviewResponse;
+import com.capick.capick.dto.response.ReviewDetailResponse;
 import com.capick.capick.dto.response.ReviewSimpleResponse;
 import com.capick.capick.exception.DomainLogicalException;
 import com.capick.capick.exception.DomainPoliticalArgumentException;
@@ -438,7 +438,7 @@ class ReviewServiceTest {
         reviewImageRepository.saveAll(reviewImages);
 
         // when
-        List<ReviewResponse> responses = reviewIds.stream()
+        List<ReviewDetailResponse> responses = reviewIds.stream()
                 .map(reviewId -> reviewService.getReviewDetail(reviewId)).collect(Collectors.toList());
 
         // then
