@@ -10,7 +10,7 @@ import com.capick.capick.dto.request.LocationCreateRequest;
 import com.capick.capick.dto.request.ReviewCreateRequest;
 import com.capick.capick.dto.request.ReviewUpdateRequest;
 import com.capick.capick.dto.response.ReviewDetailResponse;
-import com.capick.capick.dto.response.ReviewSimpleResponse;
+import com.capick.capick.dto.response.ReviewResponse;
 import com.capick.capick.exception.DomainLogicalException;
 import com.capick.capick.exception.DomainPoliticalArgumentException;
 import com.capick.capick.exception.NotFoundResourceException;
@@ -84,7 +84,7 @@ class ReviewServiceTest {
         LocalDateTime registeredAt = LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS);
 
         // when
-        ReviewSimpleResponse response = reviewService.createReview(reviewCreateRequest, registeredAt);
+        ReviewResponse response = reviewService.createReview(reviewCreateRequest, registeredAt);
 
         // then
         assertThat(response.getId()).isNotNull();
@@ -177,7 +177,7 @@ class ReviewServiceTest {
         LocalDateTime registeredAt = LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS);
 
         // when
-        ReviewSimpleResponse response = reviewService.createReview(reviewCreateRequest, registeredAt);
+        ReviewResponse response = reviewService.createReview(reviewCreateRequest, registeredAt);
 
         // then
         assertThat(response.getImageUrls()).hasSize(2)
@@ -344,7 +344,7 @@ class ReviewServiceTest {
         LocalDateTime registeredAt = LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS);
 
         // when
-        ReviewSimpleResponse response = reviewService.createReview(reviewCreateRequest, registeredAt);
+        ReviewResponse response = reviewService.createReview(reviewCreateRequest, registeredAt);
 
         // then
         assertThat(response.getImageUrls()).hasSize(3)
@@ -379,7 +379,7 @@ class ReviewServiceTest {
         reviewImageRepository.saveAll(reviewImages);
 
         // when
-        List<ReviewSimpleResponse> responses = reviewIds.stream()
+        List<ReviewResponse> responses = reviewIds.stream()
                 .map(reviewId -> reviewService.getReview(reviewId)).collect(Collectors.toList());
 
         // then
@@ -513,7 +513,7 @@ class ReviewServiceTest {
                 writerId, "일하거나 책읽고 공부하려고요", "리뷰 내용 수정", "아이스 라떼", 1, 4, 1, 1, "vibe");
 
         // when
-        ReviewSimpleResponse response = reviewService.updateReview(reviewId, reviewUpdateRequest);
+        ReviewResponse response = reviewService.updateReview(reviewId, reviewUpdateRequest);
 
         // then
         assertThat(response)
@@ -598,7 +598,7 @@ class ReviewServiceTest {
                 writerId, "일하거나 책읽고 공부하려고요", "리뷰 내용 수정", "아이스 라떼", 1, 4, 1, 1, "normal", newImageUrls);
 
         // when
-        ReviewSimpleResponse response = reviewService.updateReview(reviewId, reviewUpdateRequest);
+        ReviewResponse response = reviewService.updateReview(reviewId, reviewUpdateRequest);
 
         // then
         assertThat(response.getImageUrls()).hasSize(2)
@@ -640,7 +640,7 @@ class ReviewServiceTest {
                 writerId, "일하거나 책읽고 공부하려고요", "리뷰 내용", "아이스 아메리카노", 1, 4, 1, 1, "vibe", newImageUrls);
 
         // when
-        ReviewSimpleResponse response = reviewService.updateReview(reviewId, reviewUpdateRequest);
+        ReviewResponse response = reviewService.updateReview(reviewId, reviewUpdateRequest);
 
         // then
         assertThat(response.getImageUrls()).hasSize(2)
@@ -879,7 +879,7 @@ class ReviewServiceTest {
                 writerId, "일하거나 책읽고 공부하려고요", "리뷰 내용", "아이스 아메리카노", 1, 4, 1, 1, "vibe", newImageUrls);
 
         // when
-        ReviewSimpleResponse response = reviewService.updateReview(reviewId, reviewUpdateRequest);
+        ReviewResponse response = reviewService.updateReview(reviewId, reviewUpdateRequest);
 
         // then
         assertThat(response.getImageUrls()).hasSize(3)

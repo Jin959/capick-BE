@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Getter
-public class ReviewSimpleResponse {
+public class ReviewResponse {
 
     private Long id;
 
@@ -28,7 +28,7 @@ public class ReviewSimpleResponse {
     private List<String> imageUrls;
 
     @Builder
-    private ReviewSimpleResponse(
+    private ReviewResponse(
             Long id, MemberSimpleResponse writer, String visitPurpose,
             String content, String menu, LocalDateTime registeredAt, List<String> imageUrls) {
         this.id = id;
@@ -40,8 +40,8 @@ public class ReviewSimpleResponse {
         this.imageUrls = imageUrls;
     }
 
-    public static ReviewSimpleResponse of(Review review, List<ReviewImage> reviewImages, Member writer) {
-        return ReviewSimpleResponse.builder()
+    public static ReviewResponse of(Review review, List<ReviewImage> reviewImages, Member writer) {
+        return ReviewResponse.builder()
                 .id(review.getId())
                 .writer(
                         MemberSimpleResponse.of(writer)
