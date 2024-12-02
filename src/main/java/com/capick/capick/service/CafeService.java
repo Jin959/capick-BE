@@ -3,7 +3,7 @@ package com.capick.capick.service;
 import com.capick.capick.domain.cafe.Cafe;
 import com.capick.capick.dto.PageResponse;
 import com.capick.capick.dto.response.CafeResponse;
-import com.capick.capick.dto.response.ReviewResponse;
+import com.capick.capick.dto.response.ReviewSimpleResponse;
 import com.capick.capick.exception.NotFoundResourceException;
 import com.capick.capick.repository.CafeRepository;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +27,7 @@ public class CafeService {
         return CafeResponse.of(cafe);
     }
 
-    public PageResponse<ReviewResponse> getReviewsByCafeWithMapVendorPlaceId(String placeId, Pageable pageable) {
+    public PageResponse<ReviewSimpleResponse> getReviewsByCafeWithMapVendorPlaceId(String placeId, Pageable pageable) {
         return null;
     }
 }
