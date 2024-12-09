@@ -12,9 +12,11 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.capick.capick.domain.common.BaseStatus.ACTIVE;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 
 @ActiveProfiles("test")
 @DataJpaTest
@@ -54,6 +56,38 @@ class ReviewImageRepositoryTest {
                         "https://storage.com/images/80459",
                         "https://storage.com/images%2Fpathname_encoded%EA%B2%BD%EB%A1%9C",
                         "https://storage.com/images%2Fpathname_encoded%EA%B2%BD%EB%A1%9C/80459?type=image&size=2"
+                );
+    }
+
+    @Test
+    @DisplayName("성공: 리뷰들의 리뷰 이미지를 썸네일용으로 하나씩 조회한다. ID가 가장 낮은 이미지로 조회하고 리뷰별로 한 개 이상 조회되지 않는다.")
+    void findReviewThumbnailsBy() {
+        // given
+        LocalDateTime registeredAt = LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS);
+        List<Review> reviews = List.of(
+                createReview("넓어서 갔어요", "리뷰 내용1", "핫 아메리카노", 3, 3, 4, 3, "normal", registeredAt),
+                createReview("넓어서 갔어요", "리뷰 내용2", "핫 아메리카노", 3, 3, 4, 3, "normal", registeredAt),
+                createReview("넓어서 갔어요", "리뷰 내용3", "핫 아메리카노", 3, 3, 4, 3, "normal", registeredAt)
+        );
+        List<Review> savedReviews = reviewRepository.saveAll(reviews);
+
+        reviewImageRepository.saveAll(Stream.of(
+                                "https://storage.com/images/12345",
+                                "https://storage.com/images%2Fpathname_encoded%EA%B2%BD%EB%A1%9C",
+                                "https://storage.com/images%2Fpathname_encoded%EA%B2%BD%EB%A1%9C/80459?type=image&size=2"
+                        ).map(imageUrl -> createReviewImage(imageUrl, reviews.get(0))).collect(Collectors.toList())
+        );
+        reviewImageRepository.save(createReviewImage("https://storage.com/images/80459", reviews.get(1)));
+
+        // when
+        List<ReviewImage> reviewImages = reviewImageRepository.findReviewThumbnailsBy(savedReviews, ACTIVE);
+
+        // then
+        assertThat(reviewImages).hasSize(2)
+                .extracting("review.id", "imageUrl")
+                .containsExactlyInAnyOrder(
+                        tuple(savedReviews.get(0).getId(), "https://storage.com/images/12345"),
+                        tuple(savedReviews.get(1).getId(), "https://storage.com/images/80459")
                 );
     }
 
