@@ -3,10 +3,12 @@ package com.capick.capick.dto.response;
 import com.capick.capick.domain.cafe.Cafe;
 import com.capick.capick.domain.review.Review;
 import com.capick.capick.domain.review.ReviewImage;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Getter
 public class ReviewSimpleResponse {
@@ -23,6 +25,7 @@ public class ReviewSimpleResponse {
 
     private LocalDateTime registeredAt;
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private String thumbnailUrl;
 
     @Builder
@@ -48,7 +51,10 @@ public class ReviewSimpleResponse {
                 .content(review.getContent())
                 .menu(review.getMenu())
                 .registeredAt(review.getRegisteredAt())
-                .thumbnailUrl(thumbnail.getImageUrl())
+                .thumbnailUrl(
+                        Optional.ofNullable(thumbnail)
+                                .map(ReviewImage::getImageUrl).orElse(null)
+                )
                 .build();
     }
 
