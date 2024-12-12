@@ -3,6 +3,7 @@ package com.capick.capick.dto.response;
 import com.capick.capick.domain.common.Location;
 import com.capick.capick.domain.member.Member;
 import com.capick.capick.domain.member.Profile;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -15,8 +16,10 @@ public class MemberResponse {
 
     private String nickname;
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private MemberProfileResponse profile;
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private LocationResponse preferTown;
 
     @Builder
