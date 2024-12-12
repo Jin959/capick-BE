@@ -28,6 +28,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -1131,6 +1132,7 @@ class ReviewServiceTest {
                 .priceIndex(priceIndex)
                 .noiseIndex(noiseIndex)
                 .theme(theme)
+                .imageUrls(new ArrayList<>())
                 .build();
     }
 
@@ -1165,6 +1167,7 @@ class ReviewServiceTest {
                 .priceIndex(priceIndex)
                 .noiseIndex(noiseIndex)
                 .theme(theme)
+                .imageUrls(new ArrayList<>())
                 .build();
     }
 

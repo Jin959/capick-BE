@@ -2,7 +2,7 @@ package com.capick.capick.controller;
 
 import com.capick.capick.domain.cafe.CafeTheme;
 import com.capick.capick.domain.cafe.CafeType;
-import com.capick.capick.domain.common.Location;
+import com.capick.capick.dto.response.LocationResponse;
 import com.capick.capick.dto.response.CafeResponse;
 import com.capick.capick.service.CafeService;
 import org.junit.jupiter.api.DisplayName;
@@ -33,7 +33,7 @@ class CafeControllerTest {
     void getCafeByMapVendorPlaceId() throws Exception {
         // given
         CafeResponse response = CafeResponse.builder()
-                .location(Location.builder().build())
+                .location(LocationResponse.builder().build())
                 .cafeType(CafeType.NONE)
                 .cafeTheme(CafeTheme.NORMAL)
                 .build();
