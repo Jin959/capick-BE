@@ -6,8 +6,6 @@ import com.capick.capick.domain.member.Profile;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.util.Optional;
-
 @Getter
 public class MemberResponse {
 
@@ -22,23 +20,28 @@ public class MemberResponse {
     private LocationResponse preferTown;
 
     @Builder
-    private MemberResponse(Long id, String email, String nickname, Profile profile, Location location) {
+    private MemberResponse(
+            Long id, String email, String nickname, MemberProfileResponse profile, LocationResponse location) {
         this.id = id;
         this.email = email;
         this.nickname = nickname;
-        Optional.ofNullable(profile)
-                .ifPresent(embeddedProfile -> this.profile = MemberProfileResponse.of(embeddedProfile));
-        Optional.ofNullable(location)
-                .ifPresent(embeddedLocation -> this.preferTown = LocationResponse.of(embeddedLocation));
+        this.profile = profile;
+        this.preferTown = location;
     }
 
     public static MemberResponse of(Member member) {
+        Profile profile = member.getProfile();
+        Location preferTown = member.getPreferTown();
         return MemberResponse.builder()
                 .id(member.getId())
                 .email(member.getEmail())
                 .nickname(member.getNickname())
-                .profile(member.getProfile())
-                .location(member.getPreferTown())
+                .profile(
+                        profile != null ? MemberProfileResponse.of(profile) : null
+                )
+                .location(
+                        preferTown != null ? LocationResponse.of(preferTown) : null
+                )
                 .build();
     }
 

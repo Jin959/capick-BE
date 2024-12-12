@@ -8,7 +8,6 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 @Getter
 public class ReviewSimpleResponse {
@@ -52,8 +51,7 @@ public class ReviewSimpleResponse {
                 .menu(review.getMenu())
                 .registeredAt(review.getRegisteredAt())
                 .thumbnailUrl(
-                        Optional.ofNullable(thumbnail)
-                                .map(ReviewImage::getImageUrl).orElse(null)
+                        thumbnail != null ? thumbnail.getImageUrl() : null
                 )
                 .build();
     }

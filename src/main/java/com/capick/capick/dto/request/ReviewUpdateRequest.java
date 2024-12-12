@@ -10,7 +10,6 @@ import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Getter
 @NoArgsConstructor
@@ -64,8 +63,7 @@ public class ReviewUpdateRequest {
         this.priceIndex = priceIndex;
         this.noiseIndex = noiseIndex;
         this.theme = theme;
-        // TODO: 리뷰 수정 서비스 테스트를 위해 다음과 같이 작성함. 더 좋은 방법이 없을지 생각해보기
-        this.imageUrls = Optional.ofNullable(imageUrls).orElseGet(ArrayList::new);
+        this.imageUrls = imageUrls != null ? imageUrls : new ArrayList<>();
     }
 
 }
