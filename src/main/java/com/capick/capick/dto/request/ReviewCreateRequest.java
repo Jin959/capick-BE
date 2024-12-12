@@ -72,7 +72,7 @@ public class ReviewCreateRequest {
         this.priceIndex = priceIndex;
         this.noiseIndex = noiseIndex;
         this.theme = theme;
-        this.imageUrls = imageUrls != null ? imageUrls : new ArrayList<>();
+        this.imageUrls = imageUrls;
     }
 
     // TODO: 테스트를 위해 리뷰 등록 시간 registeredAt 을 기록하는 로직을 일단 여기에 개발한다. toEntity 는 제거하고 Review.create 으로 개발하고 등록시간 테스트 작성하기

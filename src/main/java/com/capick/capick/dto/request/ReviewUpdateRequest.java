@@ -63,7 +63,7 @@ public class ReviewUpdateRequest {
         this.priceIndex = priceIndex;
         this.noiseIndex = noiseIndex;
         this.theme = theme;
-        this.imageUrls = imageUrls != null ? imageUrls : new ArrayList<>();
+        this.imageUrls = imageUrls;
     }
 
 }

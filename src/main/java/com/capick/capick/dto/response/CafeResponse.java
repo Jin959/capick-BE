@@ -3,7 +3,6 @@ package com.capick.capick.dto.response;
 import com.capick.capick.domain.cafe.Cafe;
 import com.capick.capick.domain.cafe.CafeTheme;
 import com.capick.capick.domain.cafe.CafeType;
-import com.capick.capick.domain.common.Location;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -25,11 +24,11 @@ public class CafeResponse {
     @Builder
     private CafeResponse(
             String name, String kakaoPlaceId, String kakaoDetailPageUrl,
-            Location location, CafeType cafeType, CafeTheme cafeTheme) {
+            LocationResponse location, CafeType cafeType, CafeTheme cafeTheme) {
         this.name = name;
         this.kakaoPlaceId = kakaoPlaceId;
         this.kakaoDetailPageUrl = kakaoDetailPageUrl;
-        this.location = LocationResponse.of(location);
+        this.location = location;
         this.cafeType = cafeType;
         this.cafeTheme = cafeTheme;
     }
@@ -39,7 +38,9 @@ public class CafeResponse {
                 .name(cafe.getName())
                 .kakaoPlaceId(cafe.getKakaoPlaceId())
                 .kakaoDetailPageUrl(cafe.getKakaoDetailPageUrl())
-                .location(cafe.getLocation())
+                .location(
+                        LocationResponse.of(cafe.getLocation())
+                )
                 .cafeType(cafe.getCafeTypeInfo().getCafeType())
                 .cafeTheme(cafe.getCafeThemeInfo().getCafeTheme())
                 .build();
